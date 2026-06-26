@@ -1,0 +1,87 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  titre="L'atelier"
+  description="L'histoire d'Atelier Acidulé : du crochet fait main, sur commande, avec une bonne dose de peps."
+>
+  <section class="section">
+    <div class="contenu atelier">
+      <div class="atelier__texte">
+        <p class="surtitre">L'atelier</p>
+        <h1>Du fil, des couleurs,<br />beaucoup de peps.</h1>
+        <p>
+          Atelier Acidulé, c'est un petit atelier où chaque sac naît d'une
+          pelote et d'une envie. Inspirées par l'Italie, la Méditerranée et les
+          étals gorgés de citrons, nos créations jouent l'acidulé et le
+          sucré-doux à la fois.
+        </p>
+        <p>
+          Ici, rien n'est produit en série : tu choisis ton modèle et tes
+          couleurs, et la pièce est crochetée à la main, rien que pour toi. Le
+          temps d'un sac, on prend soin du détail comme d'une recette de famille.
+        </p>
+        <a
+          class="btn btn--citron"
+          href="https://www.instagram.com/atelier_acidule"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Suivre l'atelier sur Instagram
+        </a>
+      </div>
+
+      <aside class="atelier__contact">
+        <h2>Commander &amp; questions</h2>
+        <p>
+          La commande se passe directement sur le site via le studio de
+          personnalisation. Pour toute question, une couleur précise ou une
+          demande sur mesure, on échange en <strong>DM Instagram</strong>.
+        </p>
+        <ul class="atelier__infos">
+          <li><span>📍</span> Fait main en France</li>
+          <li><span>⏳</span> Pièce crochetée après commande</li>
+          <li><span>💬</span> FAQ &amp; suivi → DM Instagram</li>
+          <li><span>💳</span> Paiement en ligne bientôt disponible</li>
+        </ul>
+        <a class="btn btn--primaire" href="/personnaliser">Composer mon sac →</a>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .atelier {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: start;
+  }
+  .atelier__texte h1 { margin-bottom: 1rem; }
+  .atelier__texte p { color: var(--texte-doux); max-width: 52ch; }
+  .atelier__contact {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--ombre-douce);
+    border: 1px solid color-mix(in srgb, var(--sauge) 22%, transparent);
+  }
+  .atelier__infos { list-style: none; padding: 0; margin: 1.2rem 0 1.6rem; }
+  .atelier__infos li {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.4rem 0; font-weight: 600; color: var(--sapin);
+    border-bottom: 1px dashed color-mix(in srgb, var(--sauge) 30%, transparent);
+  }
+  @media (max-width: 760px) {
+    .atelier { grid-template-columns: 1fr; }
+    .atelier__texte { text-align: center; }
+    .atelier__texte p { margin-inline: auto; }
+    .atelier__contact { padding: 1.6rem; }
+    .atelier__infos li { font-size: 0.95rem; }
+  }
+  @media (max-width: 400px) {
+    .atelier__contact { padding: 1.2rem; }
+    .atelier__infos li { font-size: 0.9rem; }
+  }
+</style>

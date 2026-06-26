@@ -1,0 +1,471 @@
+---
+// IntroAnim.astro
+// Intro scrollée : Logo → Citron coupé → Jus → Pelote → Tricot "Atelier Acidulé" → Zoom Site
+// Utilise le vrai logo Atelier Acidulé (pelote + citron).
+// Desktop + Mobile responsive. Animation fluidifiée via requestAnimationFrame + lerp.
+---
+
+<div id="intro-spacer" class="intro-spacer" aria-hidden="true"></div>
+
+<div id="intro" class="intro" role="presentation" aria-hidden="true">
+  <div class="intro__bg"></div>
+
+  <div class="intro__scene">
+    <!-- ═══ PHASE 1-2 : LOGO / CITRON ═══ -->
+    <div class="logo-wrapper">
+      <!-- Logo entier (phase 1) -->
+      <img class="logo__full" src="/images/logo.png" alt="" width="300" height="300" />
+
+      <!-- Logo coupé : deux moitiés (phase 2) -->
+      <div class="logo__moitie logo__moitie--g" aria-hidden="true">
+        <div class="logo__moitie-img">
+          <img src="/images/logo.png" alt="" width="300" height="300" />
+        </div>
+      </div>
+      <div class="logo__moitie logo__moitie--d" aria-hidden="true">
+        <div class="logo__moitie-img">
+          <img src="/images/logo.png" alt="" width="300" height="300" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PHASE 3 : JUS ═══ -->
+    <svg class="jus-svg" viewBox="0 0 40 400" aria-hidden="true">
+      <defs>
+        <linearGradient id="jus-grad-intro" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f4cf3f" />
+          <stop offset="50%" stop-color="#f8e07a" />
+          <stop offset="100%" stop-color="#f4cf3f" stop-opacity="0.2" />
+        </linearGradient>
+      </defs>
+      <path class="jus-svg__path" d="M20 0 Q6 60 20 130 Q34 200 20 260 Q6 310 20 360 Q26 380 20 400"
+            stroke="url(#jus-grad-intro)" stroke-width="10" fill="none" stroke-linecap="round" />
+      <circle class="jus-svg__drop" cx="20" cy="95" r="4" fill="#f4cf3f" />
+      <circle class="jus-svg__drop" cx="12" cy="180" r="3" fill="#f4cf3f" />
+      <circle class="jus-svg__drop" cx="28" cy="240" r="4" fill="#f4cf3f" />
+      <circle class="jus-svg__drop" cx="14" cy="310" r="3" fill="#f4cf3f" />
+    </svg>
+
+    <!-- ═══ PHASE 4-5 : TEXTE "Atelier Acidulé" ═══ -->
+    <div class="texte-intro" id="intro-texte">
+      <span class="texte-intro__lettre" style="--i:0">A</span>
+      <span class="texte-intro__lettre" style="--i:1">t</span>
+      <span class="texte-intro__lettre" style="--i:2">e</span>
+      <span class="texte-intro__lettre" style="--i:3">l</span>
+      <span class="texte-intro__lettre" style="--i:4">i</span>
+      <span class="texte-intro__lettre" style="--i:5">e</span>
+      <span class="texte-intro__lettre" style="--i:6">r</span>
+      <span class="texte-intro__spacer"></span>
+      <span class="texte-intro__lettre" style="--i:7">A</span>
+      <span class="texte-intro__lettre" style="--i:8">c</span>
+      <span class="texte-intro__lettre" style="--i:9">i</span>
+      <span class="texte-intro__lettre" style="--i:10">d</span>
+      <span class="texte-intro__lettre" style="--i:11">u</span>
+      <span class="texte-intro__lettre" style="--i:12">l</span>
+      <span class="texte-intro__lettre" style="--i:13">é</span>
+    </div>
+
+    <!-- Fil de laine décoratif -->
+    <svg class="fil-intro" viewBox="0 0 800 40" aria-hidden="true">
+      <path class="fil-intro__path" d="M0 20 Q200 8 400 20 Q600 32 800 20"
+            fill="none" stroke="#f4cf3f" stroke-width="2.5" stroke-dasharray="5 7" opacity="0.5" />
+    </svg>
+  </div>
+
+  <p class="intro__hint" id="intro-hint"><span>↓</span></p>
+</div>
+
+<style>
+  .intro {
+    --dur: 0.5s;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --coul-fond: #2f4334;
+    --coul-creme: #fbf5e9;
+  }
+
+  .intro-spacer {
+    height: 400vh;
+    pointer-events: none;
+  }
+
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transition: opacity 0.6s var(--ease), visibility 0.6s ease;
+  }
+  .intro--done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .intro__bg {
+    position: absolute;
+    inset: 0;
+    background: var(--coul-fond);
+    transition: opacity 0.5s ease;
+  }
+  .intro--done .intro__bg { opacity: 0; }
+
+  .intro__scene {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(85vw, 640px);
+    max-height: 85vh;
+    aspect-ratio: 1 / 1;
+  }
+
+  /* ── Hint ── */
+  .intro__hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--coul-creme);
+    opacity: 0.4;
+    font-size: 1.4rem;
+    margin: 0;
+    pointer-events: none;
+    animation: hint-bounce 2.4s ease-in-out infinite;
+    transition: opacity 0.5s ease;
+  }
+  .intro--p2 .intro__hint,
+  .intro--p3 .intro__hint,
+  .intro--p4 .intro__hint,
+  .intro--p5 .intro__hint { opacity: 0; }
+  @keyframes hint-bounce {
+    0%,100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+    50% { transform: translateX(-50%) translateY(8px); opacity: 0.9; }
+  }
+
+  /* ── Logo wrapper ── */
+  .logo-wrapper {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+
+  /* Logo entier (phase 1) */
+  .logo__full {
+    width: min(55%, 280px);
+    height: auto;
+    object-fit: contain;
+    transition: none;
+    will-change: transform, opacity;
+  }
+
+  /* Logo coupé : chaque moitié = clip-path qui cache l'autre côté */
+  .logo__moitie {
+    position: absolute;
+    width: min(55%, 280px);
+    height: min(55%, 280px);
+    overflow: hidden;
+    transition: none;
+    will-change: transform, opacity;
+  }
+  .logo__moitie--g {
+    left: calc(50% - min(27.5%, 140px));
+    clip-path: inset(0 50% 0 0);
+  }
+  .logo__moitie--d {
+    left: calc(50% - min(27.5%, 140px));
+    clip-path: inset(0 0 0 50%);
+  }
+  .logo__moitie-img {
+    width: 100%;
+    height: 100%;
+  }
+  .logo__moitie-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* ── Jus SVG ── */
+  .jus-svg {
+    position: absolute;
+    width: min(14%, 56px);
+    height: auto;
+    transition: none;
+    will-change: transform, opacity;
+  }
+  .jus-svg__path {
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    transition: none;
+  }
+  .jus-svg__drop {
+    transition: none;
+  }
+
+  /* ── Texte "Atelier Acidulé" ── */
+  .texte-intro {
+    position: absolute;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.1em;
+    padding: 0 1rem;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    color: var(--coul-creme);
+    text-align: center;
+    line-height: 1.3;
+    transition: none;
+    white-space: nowrap;
+    pointer-events: none;
+    text-shadow: 0 0 30px rgba(244, 207, 63, 0.35);
+  }
+  .texte-intro__lettre {
+    display: inline-block;
+    transition: none;
+    will-change: transform, opacity, filter;
+  }
+  .texte-intro__spacer {
+    display: inline-block;
+    width: 0.45em;
+  }
+
+  /* ── Fil décoratif ── */
+  .fil-intro {
+    position: absolute;
+    bottom: 22%;
+    width: 65%;
+    transition: none;
+    will-change: opacity;
+    pointer-events: none;
+  }
+
+  /* ── Reduced motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    .intro-spacer { display: none; }
+    .intro { display: none; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .intro__scene {
+      width: 95vw;
+      max-height: 70vh;
+    }
+    .logo__full,
+    .logo__moitie {
+      width: min(70%, 220px);
+      height: min(70%, 220px);
+    }
+    .logo__moitie--g,
+    .logo__moitie--d {
+      left: calc(50% - min(35%, 110px));
+    }
+    .texte-intro {
+      font-size: clamp(1.2rem, 6vw, 1.8rem);
+      gap: 0.05em;
+    }
+    .jus-svg {
+      width: min(16%, 36px);
+    }
+    .intro__hint {
+      bottom: 1.2rem;
+      font-size: 1.1rem;
+    }
+  }
+  @media (max-width: 420px) {
+    .texte-intro {
+      font-size: 1.1rem;
+    }
+    .intro__scene {
+      width: 100vw;
+    }
+  }
+</style>
+
+<script>
+(function () {
+  const spacer = document.getElementById('intro-spacer');
+  const overlay = document.getElementById('intro');
+  if (!spacer || !overlay) return;
+
+  /* ── Éléments ── */
+  const logoFull    = overlay.querySelector('.logo__full');
+  const logoG       = overlay.querySelector('.logo__moitie--g');
+  const logoD       = overlay.querySelector('.logo__moitie--d');
+  const jusSvg      = overlay.querySelector('.jus-svg');
+  const jusPath     = overlay.querySelector('.jus-svg__path');
+  const jusDrops    = overlay.querySelectorAll('.jus-svg__drop');
+  const texte       = overlay.querySelector('.texte-intro');
+  const lettres     = overlay.querySelectorAll('.texte-intro__lettre');
+  const filIntr     = overlay.querySelector('.fil-intro');
+  const bg          = overlay.querySelector('.intro__bg');
+
+  const NB_LETTRES = lettres.length;
+  const JUS_LENGTH = 600;
+
+  /* ── Phase thresholds ── */
+  const PHASES = [
+    { s: 0.00, e: 0.18 },  // p1 — Logo apparaît
+    { s: 0.18, e: 0.36 },  // p2 — Logo se coupe
+    { s: 0.36, e: 0.50 },  // p3 — Jus coule
+    { s: 0.50, e: 0.74 },  // p4 — Texte tricoté apparaît
+    { s: 0.74, e: 0.94 },  // p5 — Zoom → transition site
+  ];
+
+  let done = false;
+  let phase = 0;
+
+  /* ── Smooth scroll progress (lerp vers target) ── */
+  let currentProgress = 0;
+  let targetProgress = 0;
+
+  /* ── Easing utils ── */
+  function clamp(v, mn, mx) { return Math.min(Math.max(v, mn), mx); }
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+  function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+  function easeOutBack(t) {
+    const c = 1.70158;
+    return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2);
+  }
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  /* ── Scroll handler (capture target progress) ── */
+  function onScroll() {
+    if (done) return;
+    const maxScroll = Math.max(spacer.offsetHeight - window.innerHeight, 1);
+    targetProgress = clamp(window.scrollY / maxScroll, 0, 1);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  /* ── RAF animation loop ── */
+  function tick() {
+    if (done) { /* check if we should still render */ }
+
+    // Lerp currentProgress → targetProgress (smooth following)
+    const diff = targetProgress - currentProgress;
+    currentProgress += diff * 0.15;  // 0.12–0.20 = glide fluide
+    // Tiny epsilon to prevent micro-jitter at end
+    if (Math.abs(diff) < 0.0005) currentProgress = targetProgress;
+
+    const p = currentProgress;
+
+    // Compute per-phase progress [0..1]
+    const pp = PHASES.map(ph => {
+      if (p < ph.s) return 0;
+      if (p > ph.e) return 1;
+      return (p - ph.s) / (ph.e - ph.s);
+    });
+
+    // Phase class
+    const newPhaseIdx = pp.findIndex(v => v < 1);
+    const newPhase = newPhaseIdx >= 0 ? newPhaseIdx + 1 : PHASES.length;
+    if (newPhase !== phase) {
+      phase = newPhase;
+      overlay.className = overlay.className.replace(/intro--p\d+/g, '');
+      if (phase <= PHASES.length) overlay.classList.add(`intro--p${phase}`);
+    }
+
+    /* ═══════ PHASE 1 — Logo apparaît ═══════ */
+    const p1 = pp[0];
+    const p1e = easeOutCubic(p1);
+    logoFull.style.opacity = p1e;
+    logoFull.style.transform = `scale(${0.7 + 0.3 * p1e})`;
+
+    /* ═══════ PHASE 2 — Logo se coupe ═══════ */
+    const p2 = pp[1];
+    logoFull.style.opacity = Math.max(0, 1 - p2 * 1.8);
+    logoG.style.opacity = p2;
+    logoD.style.opacity = p2;
+    const ecart = 20 + p2 * 140;
+    logoG.style.transform = `translateX(-${ecart}px)`;
+    logoD.style.transform = `translateX(${ecart}px)`;
+
+    /* ═══════ PHASE 3 — Jus coule ═══════ */
+    const p3 = pp[2];
+    const p3e = easeOutCubic(p3);
+    jusSvg.style.opacity = p3e;
+    jusSvg.style.transform = p3e > 0.05 ? `translateY(${(1 - p3e) * -20}px)` : 'translateY(0)';
+    jusPath.style.strokeDashoffset = JUS_LENGTH * (1 - p3e);
+    // Drops
+    jusDrops.forEach((drop, i) => {
+      const t = 0.2 + i * 0.2;
+      drop.style.opacity = p3e > t ? clamp((p3e - t) / 0.1, 0, 1) : 0;
+    });
+
+    /* ═══════ PHASE 4 — Texte tricoté ═══════ */
+    const p4 = pp[3];
+    if (p4 > 0.05) {
+      const p4e = easeOutQuart(p4);
+      // Transition du jus vers le texte
+      jusSvg.style.opacity = Math.max(0, (1 - p4e * 1.8));
+
+      // Texte global
+      const tScale = 0.5 + 0.25 * p4e;
+      texte.style.transform = `scale(${tScale})`;
+      texte.style.opacity = 1;
+
+      // Lettres en stagger
+      lettres.forEach((lettre, i) => {
+        const delay = i / NB_LETTRES;
+        const tStart = 0.02 + delay * 0.7;
+        const lp = p4e > tStart ? clamp((p4e - tStart) / 0.18, 0, 1) : 0;
+        const eased = easeOutBack(lp);
+        const translateY = 20 - 20 * eased;
+        const scaleY = 0.3 + 0.7 * eased;
+        const blur = 8 - 8 * eased;
+        lettre.style.opacity = eased;
+        lettre.style.transform = `translateY(${translateY}px) scaleY(${scaleY})`;
+        lettre.style.filter = `blur(${blur}px)`;
+      });
+
+      // Fil décoratif
+      filIntr.style.opacity = clamp(p4e * 2 - 0.4, 0, 1);
+    } else {
+      texte.style.opacity = 0;
+      filIntr.style.opacity = 0;
+    }
+
+    /* ═══════ PHASE 5 — Zoom → site ═══════ */
+    const p5 = pp[4];
+    if (p5 > 0) {
+      const p5e = easeInOutCubic(p5);
+      const s = 1 + p5e * 10;
+      const ty = -(p5e * 40);
+      texte.style.transform = `scale(${s}) translateY(${ty}px)`;
+      texte.style.opacity = Math.max(0, 1 - p5e * 1.6);
+      bg.style.opacity = Math.max(0, 1 - p5e * 1.3);
+      filIntr.style.opacity = Math.max(0, 1 - p5e * 2);
+    }
+
+    /* ═══════ Done ═══════ */
+    if (targetProgress >= 0.96 && !done) {
+      done = true;
+      spacer.style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      overlay.classList.add('intro--done');
+      return;  // stop the loop
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  // Premier appel
+  onScroll();
+  currentProgress = targetProgress;  // pas de lerp au premier frame
+  tick();
+
+  // Reduced motion bypass
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    spacer.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    overlay.classList.add('intro--done');
+  }
+})();
+</script>

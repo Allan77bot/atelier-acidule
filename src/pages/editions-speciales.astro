@@ -1,0 +1,105 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Galerie de pièces uniques. Pas de configurateur : la cliente compose / la pièce est figée.
+// (Provisoire : on branchera les vraies photos d'éditions au fil des saisons.)
+const pieces = [
+  { titre: "Édition Limonade d'été", note: 'Pièce unique', photo: '/images/grand-sac.png', dispo: true },
+  { titre: 'Pochette Provence', note: 'Série de 3', photo: '/images/pochette-livres.png', dispo: true },
+  { titre: 'Petit sac Méditerranée', note: 'Pièce unique', photo: '/images/petit-sac.png', dispo: false },
+];
+---
+
+<Base
+  titre="Éditions spéciales"
+  description="Des pièces uniques au crochet, en quantité limitée. Quand elles sont parties, elles sont parties."
+>
+  <section class="section">
+    <div class="contenu">
+      <header class="entete">
+        <p class="surtitre">En quantité limitée</p>
+        <h1>Éditions spéciales</h1>
+        <p class="entete__sous">
+          Des créations composées à la main au gré des saisons. Ici, pas de
+          configurateur : chaque pièce est déjà pensée dans ses moindres mailles.
+          Un coup de cœur&nbsp;? Réserve-la vite en DM.
+        </p>
+      </header>
+
+      <div class="galerie">
+        {pieces.map((p) => (
+          <article class:list={['piece', { 'piece--epuise': !p.dispo }]}>
+            <div class="piece__media">
+              <img src={p.photo} alt={p.titre} loading="lazy" />
+              {!p.dispo && <span class="piece__badge">Épuisé</span>}
+            </div>
+            <div class="piece__corps">
+              <p class="piece__note">{p.note}</p>
+              <h3>{p.titre}</h3>
+              {p.dispo ? (
+                <a
+                  class="btn btn--citron"
+                  href="https://www.instagram.com/atelier_acidule"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Réserver en DM
+                </a>
+              ) : (
+                <span class="piece__indispo">Plus disponible</span>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .entete { text-align: center; max-width: 58ch; margin: 0 auto 2.6rem; }
+  .entete__sous { color: var(--texte-doux); }
+  .galerie {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem;
+  }
+  .piece {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--ombre-douce);
+    border: 1px solid color-mix(in srgb, var(--sauge) 22%, transparent);
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
+  .piece:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--ombre);
+  }
+  .piece__media {
+    position: relative;
+    aspect-ratio: 1;
+    background: var(--creme-2);
+  }
+  .piece__media img { width: 100%; height: 100%; object-fit: cover; }
+  .piece--epuise .piece__media img { filter: grayscale(0.6) opacity(0.7); }
+  .piece__badge {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--encre); color: #fff;
+    font-size: 0.78rem; font-weight: 800;
+    padding: 0.25rem 0.7rem; border-radius: 999px;
+  }
+  .piece__corps { padding: 1.3rem 1.4rem 1.5rem; }
+  .piece__note {
+    font-family: var(--font-wordmark); font-style: italic;
+    color: var(--terracotta); margin: 0 0 0.2rem; font-size: 0.9rem;
+  }
+  .piece__corps h3 { margin: 0 0 1rem; }
+  .piece__indispo { color: var(--texte-doux); font-weight: 700; font-size: 0.9rem; }
+
+  @media (max-width: 860px) { .galerie { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) {
+    .galerie { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
+    .piece__corps { padding: 1.1rem 1.2rem 1.3rem; }
+  }
+</style>

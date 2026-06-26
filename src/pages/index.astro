@@ -1,0 +1,455 @@
+---
+import Base from '../layouts/Base.astro';
+import CarteModele from '../components/CarteModele.astro';
+import IntroAnim from '../components/IntroAnim.astro';
+import { modeles } from '../data/modeles';
+
+// Récit au scroll : chaque phrase = une "rubrique" avec sa propre image dans la bulle.
+const recits = [
+  {
+    img: '/images/pochette-livres.png',
+    emoji: '🍋‍🟩',
+    phrase: 'Des créations qui ne manquent pas de piquant',
+  },
+  {
+    img: '/images/grand-sac.png',
+    emoji: '🧶',
+    phrase:
+      'Des sacs et accessoires au crochet, crochetés à la main rien que pour toi, dans la couleur de ton choix',
+  },
+  {
+    img: '/images/edition-speciale.png',
+    emoji: '🎁',
+    phrase: 'Le cadeau parfait pour soi ou à offrir',
+  },
+];
+---
+
+<Base titre="Accueil">
+  <!-- INTRO ANIMÉE SCROLLÉE : Citron → Pelote → Tricot → Site -->
+  <IntroAnim />
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="contenu hero__inner">
+      <div class="hero__texte">
+        <p class="surtitre">Crochet fait main · sur commande</p>
+        <h1>
+          Rends ta tenue<br />
+          aussi <em>acidulée</em><br />
+          que ta personnalité.
+        </h1>
+        <div class="hero__cta">
+          <a class="btn btn--citron" href="/personnaliser">SHOP TON SAC&nbsp;!</a>
+          <a class="btn btn--ghost" href="#modeles">Voir les modèles</a>
+        </div>
+        <p class="hero__scroll" aria-hidden="true">défile pour découvrir ↓</p>
+      </div>
+      <div class="hero__visuel">
+        <div class="bulle bulle--hero">
+          <img src="/images/petit-sac.png" alt="Sac au crochet Atelier Acidulé porté avec une tenue estivale" />
+        </div>
+        <span class="pastille pastille--1">🍋</span>
+        <span class="pastille pastille--2">🧶</span>
+        <span class="pastille pastille--3">🍋‍🟩</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RÉCIT AU SCROLL : phrase par phrase, image par image -->
+  <section class="recits" data-recits>
+    <div class="contenu recits__grid">
+      <div class="recits__media">
+        <div class="bulle bulle--recit">
+          <img data-recit-media src={recits[0].img} alt="" />
+          <span class="bulle__emoji" data-recit-emoji>{recits[0].emoji}</span>
+        </div>
+      </div>
+      <div class="recits__steps">
+        {recits.map((r, i) => (
+          <article class:list={['step', { actif: i === 0 }]} data-step data-img={r.img} data-emoji={r.emoji}>
+            <p class="step__num">0{i + 1}</p>
+            <p class="step__phrase">
+              {r.phrase} <span class="step__emoji">{r.emoji}</span>
+            </p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- VALEURS -->
+  <section class="valeurs">
+    <div class="contenu valeurs__grid">
+      <div><span>🧶</span><h3>Fait main</h3><p>Chaque maille est crochetée à la main, pièce par pièce.</p></div>
+      <div><span>🎨</span><h3>Sur mesure</h3><p>Tu choisis les couleurs, on lance la création rien que pour toi.</p></div>
+      <div><span>🎁</span><h3>Le cadeau parfait</h3><p>Pour se faire plaisir comme pour offrir une pièce unique.</p></div>
+    </div>
+  </section>
+
+  <!-- MODÈLES -->
+  <section class="section" id="modeles">
+    <div class="contenu">
+      <header class="entete">
+        <p class="surtitre">La collection</p>
+        <h2>Nos modèles à croquer</h2>
+        <p class="entete__sous">
+          Quatre pièces, une même gourmandise. À personnaliser dans la couleur
+          de ton choix — ou à dénicher en édition limitée.
+        </p>
+      </header>
+      <div class="grille-modeles">
+        {modeles.map((m) => <CarteModele modele={m} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE PERSO -->
+  <section class="perso">
+    <div class="contenu perso__inner">
+      <div class="perso__texte">
+        <p class="surtitre">L'atelier des couleurs</p>
+        <h2>Compose ta maille, fil par fil</h2>
+        <p>
+          Notre studio de personnalisation te laisse essayer les couleurs en
+          direct : choisis ton modèle, monte une palette de
+          <strong>jusqu'à 3 fils</strong> qui se combinent dans la maille,
+          choisis anse en laine ou anneaux laiton, et laisse-toi guider par nos
+          conseils de mariage de couleurs.
+        </p>
+        <ul class="perso__liste">
+          <li>🍋 Des pastilles citron qui changent de teinte au clic</li>
+          <li>🧶 Jusqu'à 3 couleurs combinées rang par rang</li>
+          <li>💡 Des accords pensés pour aller à coup sûr</li>
+        </ul>
+        <a class="btn btn--primaire" href="/personnaliser">Ouvrir le studio →</a>
+      </div>
+      <div class="perso__apercu" aria-hidden="true">
+        <div class="perso__pastilles">
+          <span style="background:#f4cf3f"></span>
+          <span style="background:#8fa06a"></span>
+          <span style="background:#c75c39"></span>
+          <span style="background:#7fa7c4"></span>
+        </div>
+        <p class="perso__legende">maille recolorable · couleurs combinables</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉDITIONS SPÉCIALES TEASER -->
+  <section class="section">
+    <div class="contenu teaser">
+      <div>
+        <p class="surtitre">En quantité limitée</p>
+        <h2>Éditions spéciales</h2>
+        <p>
+          Des pièces uniques composées à la main, au gré des saisons et des
+          envies. Pas de configurateur ici : c'est la création qui décide.
+        </p>
+        <a class="btn btn--ghost" href="/editions-speciales">Voir les éditions →</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ═══════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════ */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(2.5rem, 6vw, 5rem) clamp(3rem, 7vw, 6rem);
+    /* Pas de mosaïque sur le hero — fond crème plein */
+    background: var(--creme);
+  }
+  .hero__inner {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+  .hero h1 em {
+    font-family: var(--font-wordmark);
+    font-style: italic;
+    color: var(--terracotta);
+  }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1.6rem; }
+  .hero__scroll {
+    margin-top: 2rem;
+    font-family: var(--font-wordmark);
+    font-style: italic;
+    color: var(--olive);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+  .hero__visuel { position: relative; display: grid; place-items: center; }
+
+  /* Bulle ronde réutilisée (hero + récit) */
+  .bulle {
+    position: relative;
+    aspect-ratio: 1;
+    width: min(100%, 380px);
+    border-radius: 50%;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 35%, var(--citron-clair), var(--sauge-clair) 72%);
+    box-shadow: var(--ombre);
+    border: 6px solid #fff;
+  }
+  .bulle img { width: 100%; height: 100%; object-fit: cover; }
+  .bulle__emoji {
+    position: absolute;
+    bottom: 8%;
+    right: 10%;
+    font-size: 2rem;
+    background: #fff;
+    width: 56px; height: 56px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    box-shadow: var(--ombre-douce);
+  }
+
+  .pastille {
+    position: absolute;
+    font-size: 1.9rem;
+    background: #fff;
+    width: 56px; height: 56px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    box-shadow: var(--ombre-douce);
+    animation: flotte 5s ease-in-out infinite;
+  }
+  .pastille--1 { top: 4%; left: 4%; }
+  .pastille--2 { bottom: 8%; left: 0%; animation-delay: 1.2s; }
+  .pastille--3 { top: 16%; right: 2%; animation-delay: 2.1s; }
+  @keyframes flotte { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+  /* ═══════════════════════════════════════════
+     RÉCIT AU SCROLL
+     ═══════════════════════════════════════════ */
+  .recits {
+    background: linear-gradient(180deg, var(--creme) 0%, var(--creme-2) 100%);
+  }
+  .recits__grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+  .recits__media {
+    position: sticky;
+    top: 16vh;
+    height: fit-content;
+    padding-block: 18vh;
+  }
+  .bulle--recit { margin-inline: auto; }
+  .bulle--recit img { transition: opacity 360ms ease; }
+  .recits__media.fade .bulle--recit img { opacity: 0; }
+
+  .recits__steps { display: flex; flex-direction: column; }
+  .step {
+    min-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.3;
+    transform: translateY(14px);
+    transition: opacity 400ms ease, transform 400ms ease;
+  }
+  .step.actif { opacity: 1; transform: none; }
+  .step__num {
+    font-family: var(--font-wordmark);
+    font-size: 1.1rem;
+    color: var(--terracotta);
+    margin: 0 0 0.4rem;
+    letter-spacing: 0.1em;
+  }
+  .step__phrase {
+    font-family: var(--font-titre);
+    font-size: clamp(1.7rem, 3.6vw, 2.8rem);
+    line-height: 1.18;
+    color: var(--sapin);
+    margin: 0;
+    font-weight: 600;
+  }
+  .step__emoji { white-space: nowrap; }
+
+  /* ═══════════════════════════════════════════
+     VALEURS
+     ═══════════════════════════════════════════ */
+  .valeurs { background: var(--sapin); color: var(--creme); }
+  .valeurs__grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+    padding-block: 2.5rem; text-align: center;
+  }
+  .valeurs__grid span { font-size: 2rem; }
+  .valeurs__grid h3 { color: var(--citron-clair); margin: 0.4rem 0 0.3rem; }
+  .valeurs__grid p { color: color-mix(in srgb, var(--creme) 85%, transparent); font-size: 0.95rem; margin: 0; }
+
+  /* ═══════════════════════════════════════════
+     MODÈLES
+     ═══════════════════════════════════════════ */
+  .entete { text-align: center; max-width: 52ch; margin: 0 auto 2.6rem; }
+  .entete__sous { color: var(--texte-doux); }
+  .grille-modeles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
+
+  /* ═══════════════════════════════════════════
+     PERSO
+     ═══════════════════════════════════════════ */
+  .perso {
+    background: linear-gradient(135deg, var(--creme-2), color-mix(in srgb, var(--citron-clair) 35%, var(--creme)));
+    padding-block: clamp(3rem, 7vw, 5rem);
+  }
+  .perso__inner {
+    display: grid; grid-template-columns: 1.1fr 0.9fr;
+    gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
+  }
+  .perso__liste { list-style: none; padding: 0; margin: 1rem 0 1.6rem; }
+  .perso__liste li { padding: 0.3rem 0; font-weight: 600; color: var(--sapin); }
+  .perso__apercu {
+    background: var(--sapin); border-radius: var(--radius-lg); padding: 2.5rem;
+    text-align: center; box-shadow: var(--ombre);
+  }
+  .perso__pastilles { display: flex; justify-content: center; gap: 0.8rem; }
+  .perso__pastilles span {
+    width: 56px; height: 56px; border-radius: 50%; border: 3px solid #fff;
+    box-shadow: 0 8px 18px -8px rgba(0,0,0,0.5);
+  }
+  .perso__legende {
+    color: var(--citron-clair); font-family: var(--font-wordmark);
+    font-style: italic; margin: 1.4rem 0 0;
+  }
+
+  /* ═══════════════════════════════════════════
+     TEASER
+     ═══════════════════════════════════════════ */
+  .teaser {
+    background: var(--terracotta); color: #fff; border-radius: var(--radius-lg);
+    padding: clamp(2rem, 5vw, 3.5rem); text-align: center;
+  }
+  .teaser h2 { color: #fff; }
+  .teaser .btn--ghost { color: #fff; border-color: rgba(255,255,255,0.7); }
+  .teaser .btn--ghost:hover { background: #fff; color: var(--terracotta); }
+
+  /* ═══════════════════════════════════════════
+     TABLETTE
+     ═══════════════════════════════════════════ */
+  @media (max-width: 1024px) {
+    .grille-modeles { grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
+  }
+
+  /* ═══════════════════════════════════════════
+     MOBILE (≤ 760 px)
+     ═══════════════════════════════════════════ */
+  @media (max-width: 760px) {
+    /* Hero empilé */
+    .hero__inner { grid-template-columns: 1fr; gap: 1.8rem; }
+    .hero__texte { text-align: center; }
+    .hero__cta { justify-content: center; }
+    .hero__visuel { max-width: 280px; margin: 0 auto; }
+
+    /* Pastilles : repositionnées pour éviter la superposition */
+    .pastille--1 { top: 0%; left: -4%; font-size: 1.4rem; width: 44px; height: 44px; }
+    .pastille--2 { bottom: 2%; left: -8%; font-size: 1.4rem; width: 44px; height: 44px; }
+    .pastille--3 { top: 12%; right: -6%; font-size: 1.4rem; width: 44px; height: 44px; }
+
+    /* Récit : vertical */
+    .recits__grid { grid-template-columns: 1fr; gap: 0; }
+    .recits__media { position: static; padding-block: 1.5rem 0.5rem; }
+    .bulle--recit { width: min(100%, 220px); }
+    .step {
+      min-height: auto;
+      padding-block: 2.5rem;
+      opacity: 1;
+      transform: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--sauge) 20%, transparent);
+    }
+    .step:last-child { border-bottom: none; }
+    .step__phrase { font-size: clamp(1.35rem, 5vw, 1.7rem); }
+
+    /* Valeurs : empilées avec plus d'espace */
+    .valeurs__grid { grid-template-columns: 1fr; gap: 2rem; padding-block: 3rem 2.8rem; }
+    .valeurs__grid span { font-size: 2.4rem; }
+    .valeurs__grid h3 { font-size: 1.35rem; }
+    .valeurs__grid p { font-size: 1rem; max-width: 28ch; margin: 0 auto; }
+
+    /* Perso : empilé, aperçu en haut */
+    .perso__inner {
+      grid-template-columns: 1fr;
+      gap: 1.8rem;
+    }
+    .perso__inner .perso__apercu { order: -1; }
+    .perso__texte { text-align: center; }
+    .perso__liste { text-align: left; max-width: 32ch; margin-inline: auto; }
+    .perso__apercu { padding: 2rem 1.2rem; }
+
+    /* Teaser */
+    .teaser { border-radius: 0; margin-inline: calc(var(--gouttiere) * -1); }
+  }
+
+  /* ═══════════════════════════════════════════
+     PETIT MOBILE (≤ 480 px)
+     ═══════════════════════════════════════════ */
+  @media (max-width: 480px) {
+    /* Hero full-width image */
+    .hero__visuel { max-width: 240px; }
+    .pastille { display: none; }
+    .hero__cta { flex-direction: column; align-items: center; }
+    .hero__cta .btn { width: 100%; justify-content: center; }
+
+    /* Modèles : 1 colonne, plus aéré */
+    .grille-modeles { grid-template-columns: 1fr; max-width: 360px; margin-inline: auto; }
+
+    /* Valeurs plus compactes */
+    .valeurs__grid { gap: 1.6rem; padding-block: 2.5rem 2rem; }
+
+    /* Perso : padding allégé */
+    .perso { padding-block: 2.5rem; }
+  }
+
+  /* ═══════════════════════════════════════════
+     TRÈS PETIT MOBILE (≤ 380 px)
+     ═══════════════════════════════════════════ */
+  @media (max-width: 380px) {
+    .bulle { width: 100%; }
+    .hero { padding-block: 1.8rem 2.5rem; }
+    .step { padding-block: 1.8rem; }
+    .step__phrase { font-size: 1.2rem; }
+  }
+</style>
+
+<script>
+  // Récit au scroll : l'étape centrée pilote l'image de la bulle.
+  const recits = document.querySelector<HTMLElement>('[data-recits]');
+  if (recits) {
+    const media = recits.querySelector<HTMLElement>('.recits__media')!;
+    const img = recits.querySelector<HTMLImageElement>('[data-recit-media]')!;
+    const emoji = recits.querySelector<HTMLElement>('[data-recit-emoji]')!;
+    const steps = [...recits.querySelectorAll<HTMLElement>('[data-step]')];
+    let courant = '';
+
+    const activer = (step: HTMLElement) => {
+      const src = step.dataset.img!;
+      if (src === courant) return;
+      courant = src;
+      steps.forEach((s) => s.classList.toggle('actif', s === step));
+      media.classList.add('fade');
+      window.setTimeout(() => {
+        img.src = src;
+        emoji.textContent = step.dataset.emoji!;
+        media.classList.remove('fade');
+      }, 300);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries
+          .filter((e) => e.isIntersecting)
+          .forEach((e) => activer(e.target as HTMLElement));
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+    );
+    steps.forEach((s) => io.observe(s));
+  }
+</script>

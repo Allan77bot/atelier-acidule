@@ -1,0 +1,113 @@
+---
+import type { Modele } from '../data/modeles';
+
+interface Props {
+  modele: Modele;
+}
+const { modele } = Astro.props;
+const lien = modele.personnalisable
+  ? `/personnaliser?modele=${modele.slug}`
+  : '/editions-speciales';
+const cta = modele.personnalisable ? 'Personnaliser' : 'Découvrir';
+---
+
+<article class="carte">
+  <a class="carte__media" href={lien}>
+    <img src={modele.photo} alt={`${modele.nom} — Atelier Acidulé`} loading="lazy" />
+    <span class="carte__prix">dès {modele.prix} €</span>
+  </a>
+  <div class="carte__corps">
+    <p class="carte__baseline">{modele.baseline}</p>
+    <h3>{modele.nom}</h3>
+    <p class="carte__desc">{modele.description}</p>
+    <p class="carte__anse"><span>🧶</span> {modele.anse}</p>
+    <a class="btn btn--ghost carte__cta" href={lien}>{cta}</a>
+  </div>
+</article>
+
+<style>
+  .carte {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--ombre-douce);
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition), box-shadow var(--transition);
+    border: 1px solid color-mix(in srgb, var(--sauge) 22%, transparent);
+  }
+  .carte:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--ombre);
+  }
+  .carte__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    background: var(--creme-2);
+    overflow: hidden;
+  }
+  .carte__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .carte:hover .carte__media img {
+    transform: scale(1.05);
+  }
+  .carte__prix {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: var(--citron);
+    color: var(--sapin);
+    font-family: var(--font-wordmark);
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.4);
+  }
+  .carte__corps {
+    padding: 1.4rem 1.5rem 1.6rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .carte__baseline {
+    font-family: var(--font-wordmark);
+    font-style: italic;
+    color: var(--terracotta);
+    margin: 0 0 0.2rem;
+    font-size: 0.95rem;
+  }
+  .carte__corps h3 {
+    margin: 0 0 0.5rem;
+  }
+  .carte__desc {
+    color: var(--texte-doux);
+    font-size: 0.95rem;
+    flex: 1;
+  }
+  .carte__anse {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--olive);
+    margin: 0.2rem 0 1.1rem;
+  }
+  .carte__cta {
+    align-self: flex-start;
+    font-size: 0.95rem;
+    padding: 0.55rem 1.25rem;
+  }
+
+  @media (max-width: 560px) {
+    .carte__media { aspect-ratio: 4 / 3; }
+    .carte__corps { padding: 1.1rem 1.2rem 1.3rem; }
+    .carte__baseline { font-size: 0.85rem; }
+    .carte__corps h3 { font-size: 1.2rem; }
+    .carte__desc { font-size: 0.9rem; }
+    .carte__cta { width: 100%; }
+  }
+</style>
