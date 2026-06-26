@@ -30,7 +30,17 @@ modèles**, stack **GSAP + Lenis**, parcours **accueil → fiche détail → per
 - **Build OK** (`npm run build`, 5 pages). ⚠️ FS `/mnt/e` lent : build ~140s.
 - Réf. d'analyse complète : `Pool/ref-sandqvist-structure.md`.
 
+### 📥 Nouveau matériel à exploiter (déposé par Allan le 2026-06-26)
+`Ref/catalogue/` — **27 nouvelles photos produit** (non suivies par git) : beaucoup
+de **variantes de couleur** et de **nouveaux modèles** au-delà des 4 actuels —
+pochettes à livres (écru/kaki/fuchsia/rouge/prune/bleu), protège-livre, clutch vert
+sapin, cabas (teal/marron/perles/crème-bois/beige/crème-doré/multicolore), sacs
+(violet baguette & hobo, rouge tube, bordeaux, vert anis, bleu marine, marron choco,
+rose, jaune, bleu ciel), pochette tél. **À trier/détourer/intégrer à la reprise** —
+pourrait enrichir le catalogue (`modeles.ts`) et alimenter un défilé de coloris.
+
 ### ▶️ Next refonte
+0. **Trier `Ref/catalogue/`** : quels modèles/coloris on garde, mapping → `modeles.ts`.
 1. **Validation visuelle d'Allan** sur l'accueil (ressenti des transitions).
 2. Ré-skin des autres pages (personnaliser, éditions, atelier, commander) dans le
    même langage split-screen.
