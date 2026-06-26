@@ -10,6 +10,8 @@ export interface Modele {
   anse: string;
   photo: string;
   personnalisable: boolean;
+  // Couleur de fond du panneau dans l'expérience split-screen (texte blanc dessus).
+  couleur: string;
 }
 
 export const modeles: Modele[] = [
@@ -23,6 +25,7 @@ export const modeles: Modele[] = [
     anse: 'Anneaux laiton',
     photo: '/images/petit-sac.png',
     personnalisable: true,
+    couleur: '#c75c39',
   },
   {
     slug: 'pochette-livres',
@@ -34,6 +37,7 @@ export const modeles: Modele[] = [
     anse: 'Fermeture nouée laine',
     photo: '/images/pochette-livres.png',
     personnalisable: true,
+    couleur: '#6f7c3c',
   },
   {
     slug: 'grand-sac',
@@ -45,6 +49,7 @@ export const modeles: Modele[] = [
     anse: 'Bandoulière + franges laine',
     photo: '/images/grand-sac.png',
     personnalisable: true,
+    couleur: '#7b2d3a',
   },
   {
     slug: 'editions-speciales',
@@ -56,6 +61,7 @@ export const modeles: Modele[] = [
     anse: 'Variable',
     photo: '/images/edition-speciale.png',
     personnalisable: false,
+    couleur: '#2f4334',
   },
 ];
 

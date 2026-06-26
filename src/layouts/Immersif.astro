@@ -1,0 +1,150 @@
+---
+// Coquille immersive partagée par l'expérience split-screen (refonte SANDQVIST-like).
+// Pas de Nav/Footer classiques : un header minimal fixe + un tiroir menu.
+// C'est ici qu'on branchera plus tard le loader d'intro et le smooth-scroll Lenis.
+import '../styles/global.css';
+
+interface Props {
+  titre: string;
+  description?: string;
+}
+
+const {
+  titre,
+  description = 'Sacs et accessoires au crochet faits main à la demande — Atelier Acidulé. Une expérience à composer, fil par fil.',
+} = Astro.props;
+
+const liens = [
+  { href: '/personnaliser', label: 'Personnaliser' },
+  { href: '/editions-speciales', label: 'Éditions spéciales' },
+  { href: '/atelier', label: "L'atelier" },
+  { href: '/commander', label: 'Commander' },
+];
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <title>{titre} · Atelier Acidulé</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Nunito+Sans:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,500..700;1,500..600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="immersif">
+    <header class="chrome" data-chrome>
+      <a class="chrome__wordmark" href="/">Atelier&nbsp;Acidulé</a>
+      <button class="chrome__burger" data-burger aria-label="Ouvrir le menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </header>
+
+    <nav class="drawer" data-drawer aria-hidden="true">
+      <ul>
+        {liens.map((l) => (
+          <li><a href={l.href}>{l.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <main><slot /></main>
+
+    <style>
+      .immersif {
+        margin: 0;
+        overflow: hidden; /* l'expérience tient en plein écran, pas de scroll natif */
+      }
+      .immersif::before { display: none; } /* pas de mosaïque par-dessus les panneaux */
+
+      .chrome {
+        position: fixed;
+        inset: 0 0 auto 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: clamp(1rem, 2.5vw, 1.6rem) clamp(1.2rem, 4vw, 3rem);
+        pointer-events: none; /* laisse cliquer la scène, sauf sur les éléments interactifs */
+      }
+      .chrome > * { pointer-events: auto; }
+      .chrome__wordmark {
+        font-family: var(--font-wordmark);
+        font-style: italic;
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        color: var(--encre);
+        text-decoration: none;
+        letter-spacing: 0.01em;
+        mix-blend-mode: difference;
+        color: #fff; /* difference -> lisible sur blanc ET sur couleur */
+      }
+      .chrome__burger {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 40px;
+        padding: 8px;
+        background: none;
+        border: 0;
+        cursor: pointer;
+      }
+      .chrome__burger span {
+        height: 2px;
+        width: 100%;
+        background: #fff;
+        mix-blend-mode: difference;
+        border-radius: 2px;
+        transition: transform 240ms ease, opacity 200ms ease;
+      }
+      .chrome__burger[aria-expanded='true'] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+      .chrome__burger[aria-expanded='true'] span:nth-child(2) { opacity: 0; }
+      .chrome__burger[aria-expanded='true'] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+      .drawer {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        background: var(--sapin);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 360ms ease, visibility 360ms ease;
+      }
+      .drawer[aria-hidden='false'] { opacity: 1; visibility: visible; }
+      .drawer ul { list-style: none; margin: 0; padding: 0; text-align: center; }
+      .drawer li { overflow: hidden; }
+      .drawer a {
+        font-family: var(--font-titre);
+        font-size: clamp(2rem, 6vw, 3.6rem);
+        color: var(--creme);
+        text-decoration: none;
+        display: inline-block;
+        padding: 0.35rem 0;
+        transition: color 200ms ease, transform 300ms ease;
+        transform: translateY(110%);
+      }
+      .drawer[aria-hidden='false'] a { transform: translateY(0); }
+      .drawer li:nth-child(1) a { transition-delay: 60ms; }
+      .drawer li:nth-child(2) a { transition-delay: 120ms; }
+      .drawer li:nth-child(3) a { transition-delay: 180ms; }
+      .drawer li:nth-child(4) a { transition-delay: 240ms; }
+      .drawer a:hover { color: var(--citron); }
+    </style>
+
+    <script>
+      const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+      const drawer = document.querySelector<HTMLElement>('[data-drawer]');
+      burger?.addEventListener('click', () => {
+        const open = burger.getAttribute('aria-expanded') === 'true';
+        burger.setAttribute('aria-expanded', String(!open));
+        drawer?.setAttribute('aria-hidden', String(open));
+      });
+    </script>
+  </body>
+</html>

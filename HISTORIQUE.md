@@ -8,6 +8,39 @@
 
 ## 📌 État actuel (réécrit à chaque session)
 
+**Phase :** **refonte « split-screen » en cours** sur la branche
+`feat/refonte-split-screen` (inspirée du site SANDQVIST, vidéo de réf. analysée).
+`main` garde encore l'ancienne vitrine multi-pages. Décision validée avec Allan :
+**tout le site** passe en expérience plein écran, les flèches font défiler **les 4
+modèles**, stack **GSAP + Lenis**, parcours **accueil → fiche détail → personnaliser
+→ commander**.
+
+### 🚧 Refonte split-screen (branche)
+- **Fondation** : git initialisé, branche dédiée, GSAP 3.15 + Lenis 1.3 installés.
+- `src/layouts/Immersif.astro` : coquille immersive (header minimal wordmark + burger
+  + tiroir menu), sans Nav/Footer classiques. À enrichir : loader d'intro + Lenis.
+- `src/pages/index.astro` : **accueil split-screen** complet (état 1 sélecteur 4
+  modèles + état 2 fiche détail), animé GSAP (slide couleur, fondu-zoom du sac,
+  textes masqués, split 50/50↔40/60, reveal en cascade). Molette/clavier/clic.
+- `src/data/modeles.ts` : champ `couleur` ajouté par modèle (terracotta/olive/
+  bordeaux/sapin).
+- **Photos détourées** (rembg/u2net) : `petit-sac`, `pochette-livres`, `grand-sac`,
+  `edition-speciale` → fond transparent (indispensable pour le sac « qui flotte »).
+  Originaux opaques sauvegardés dans `Pool/orig-photos-opaque/`.
+- **Build OK** (`npm run build`, 5 pages). ⚠️ FS `/mnt/e` lent : build ~140s.
+- Réf. d'analyse complète : `Pool/ref-sandqvist-structure.md`.
+
+### ▶️ Next refonte
+1. **Validation visuelle d'Allan** sur l'accueil (ressenti des transitions).
+2. Ré-skin des autres pages (personnaliser, éditions, atelier, commander) dans le
+   même langage split-screen.
+3. Loader d'intro (split-reveal) + smooth-scroll Lenis + transition « volets ».
+4. Polish mobile + `prefers-reduced-motion` (déjà géré côté accueil).
+
+---
+
+### Historique pré-refonte (ancienne vitrine, sur `main`)
+
 **Phase :** mise en production démarrée — projet Astro scaffoldé à la main.
 
 ### ✅ Fait
@@ -42,6 +75,28 @@
 ---
 
 ## 🗓️ Log des sessions (append-only)
+
+### 2026-06-26 — Refonte split-screen (réf. SANDQVIST) : accueil
+Allan envoie un enregistrement d'écran (`A:`) du site **SANDQVIST** : « je veux
+exactement cette structure ». Analyse multimodale déléguée à Gemini via le skill
+`regarder-video` (voie **File API**, car fichier local — le script ne gère que les
+URL). Site décodé : expérience plein écran 2 états (sélecteur split 50/50 ↔ fiche
+40/60), slide vertical de couleur, fondu-zoom produit, reveal masqué, loader split,
+transition volets ; stack GSAP + Lenis. Sauvegardé dans `Pool/ref-sandqvist-structure.md`.
+
+**Cadrage validé (3 questions)** : tout le site / les flèches défilent les 4 modèles
+/ GSAP + Lenis OK. Parcours détail laissé « à mon jugement » → **accueil → fiche
+détail → personnaliser → commander**.
+
+**Construit** : git init + branche `feat/refonte-split-screen`, install GSAP/Lenis,
+`Immersif.astro` (coquille), `index.astro` (accueil split-screen animé GSAP),
+`modeles.ts` (+couleur). **Photos détourées** via skill `DelBackground` (rembg),
+originaux dans `Pool/orig-photos-opaque/`. Build OK (5 pages). À valider visuellement.
+
+**Aussi cette session** : skill `regarder-video` installé à `~/.claude/skills/`
+(structure aplatie, chemin script corrigé Windows→`~/`), clé Gemini posée + validée
+(modèle `gemini-3.5-flash`). `CLAUDE.md` mis à jour (Configurateur PNG, HISTORIQUE existe).
+
 
 ### 2026-06-25 (2ᵉ partie) — Intro scrollée animée + header vert
 Suite de la session : corrections demandées par Allan — mosaïque retirée du hero, header en vert sapin, et surtout **intro animée scrollée** complète.
