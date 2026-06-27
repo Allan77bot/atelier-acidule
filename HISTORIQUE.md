@@ -24,14 +24,31 @@ modèles**, stack **GSAP + Lenis**, parcours **accueil → fiche détail → per
   textes masqués, split 50/50↔40/60, reveal en cascade). Molette/clavier/clic.
 - `src/data/modeles.ts` : champ `couleur` ajouté par modèle (terracotta/olive/
   bordeaux/sapin).
-- **Photos détourées** (rembg/u2net) : `petit-sac`, `pochette-livres`, `grand-sac`,
-  `edition-speciale` → fond transparent (indispensable pour le sac « qui flotte »).
-  Originaux opaques sauvegardés dans `Pool/orig-photos-opaque/`.
-- **Build OK** (`npm run build`, 5 pages). ⚠️ FS `/mnt/e` lent : build ~140s.
+- **Photos produit refaites** (session 06-27) : les 4 captures Instagram remplacées
+  par les photos studio du catalogue. Mapping : `petit-sac`=16_cabas-marron,
+  `pochette-livres`=01_pochette-livre-ecru, `grand-sac`=13_sac-bordeaux,
+  `edition-speciale`=25_cabas-multicolore.
+  - **Cartes / éditions / autres pages** : versions **détourées** (rembg `isnet-general-use`)
+    `public/images/<slug>.png` (fond transparent).
+  - **Accueil** : versions **fond recolorisé par sac** `public/images/accueil-<slug>.png`
+    (fond crème → couleur du modèle, ombre de contact gardée, champ plat = couleur exacte
+    pour être raccord avec le fond de scène). ⚠️ nom = **slug** (`accueil-editions-speciales.png`,
+    pluriel, ≠ base `edition-speciale.png`).
+  - **Configurateur** : 6 calques `sim-*` régénérés **depuis ces photos** (texture =
+    relief passe-haut auto-calibré par sac via percentile ; masque = alpha silhouette).
+    ⚠️ Allan **n'aime pas** le rendu « photo recolorée » du configurateur → il veut
+    refaire plus propre lui-même (piste : revenir aux dessins au trait `Simulateur_*`).
+- **Accueil plein couleur** : panneau gauche passe blanc→couleur (hero) puis →crème
+  (fiche), logo (pelote+citron) ajouté en haut à gauche, titre décalé en haut /
+  baseline en bas + ombre texte (lisibilité, demandé par Allan).
+- **Build OK** (`npm run build`, 5 pages). ⚠️ FS `/mnt/e` lent.
+- ⚠️ **Gotcha dev WSL** : `astro dev` met `public/` en cache au boot → après ajout
+  d'un asset, **redémarrer** le serveur. Tuer avec `pkill -f "astro.js dev"` (PAS
+  `"astro dev"`, qui ne matche pas le process node).
 - Réf. d'analyse complète : `Pool/ref-sandqvist-structure.md`.
 
-### 📥 Nouveau matériel à exploiter (déposé par Allan le 2026-06-26)
-`Ref/catalogue/` — **27 nouvelles photos produit** (non suivies par git) : beaucoup
+### 📥 Matériel catalogue (déposé 2026-06-26, partiellement exploité)
+`Ref/catalogue/` — **27 photos produit** (désormais **suivies par git**) : beaucoup
 de **variantes de couleur** et de **nouveaux modèles** au-delà des 4 actuels —
 pochettes à livres (écru/kaki/fuchsia/rouge/prune/bleu), protège-livre, clutch vert
 sapin, cabas (teal/marron/perles/crème-bois/beige/crème-doré/multicolore), sacs
@@ -39,13 +56,21 @@ sapin, cabas (teal/marron/perles/crème-bois/beige/crème-doré/multicolore), sa
 rose, jaune, bleu ciel), pochette tél. **À trier/détourer/intégrer à la reprise** —
 pourrait enrichir le catalogue (`modeles.ts`) et alimenter un défilé de coloris.
 
+### ⚠️ Travail NON commité en fin de session 06-27 (branche)
+Commité : `be111ab` (photos+calques+catalogue), `218958b` (CLAUDE.md).
+**Pas encore commité** (à valider/commiter à la reprise) : `src/pages/index.astro`
++ `src/layouts/Immersif.astro` (logo, accueil plein couleur, fiche crème, décalage
+texte) + 4 images `public/images/accueil-*.png` (non suivies). Dev server à relancer.
+
 ### ▶️ Next refonte
-0. **Trier `Ref/catalogue/`** : quels modèles/coloris on garde, mapping → `modeles.ts`.
-1. **Validation visuelle d'Allan** sur l'accueil (ressenti des transitions).
-2. Ré-skin des autres pages (personnaliser, éditions, atelier, commander) dans le
-   même langage split-screen.
-3. Loader d'intro (split-reveal) + smooth-scroll Lenis + transition « volets ».
-4. Polish mobile + `prefers-reduced-motion` (déjà géré côté accueil).
+1. **Refaire le configurateur** « plus propre » (Allan s'en charge — rendu photo pas validé).
+2. **Validation visuelle d'Allan** sur l'accueil (état fiche : sac vs panneau crème ;
+   grand-sac ton sur ton ; écart du texte) + commiter le lot ci-dessus.
+3. Brancher un **slogan citron + CTA « Shop ton sac »** (liste proposée en session)
+   à la place de « Découvrir → » / « Personnaliser ce sac → ».
+4. Exploiter le reste de `Ref/catalogue/` (coloris/nouveaux modèles → `modeles.ts`).
+5. Ré-skin des autres pages dans le langage split-screen + loader intro + Lenis.
+6. Polish mobile + `prefers-reduced-motion`.
 
 ---
 
@@ -85,6 +110,33 @@ pourrait enrichir le catalogue (`modeles.ts`) et alimenter un défilé de colori
 ---
 
 ## 🗓️ Log des sessions (append-only)
+
+### 2026-06-27 — Vraies photos produit, accueil plein couleur, logo
+**Hors projet (début de session)** : install d'**UltraCode-Shim** (outil, PAS un skill)
+côté Windows (`%LOCALAPPDATA%\UltraCode-Shim`, lanceur `ultracode` sur le PATH) — le
+`irm|iex` a été bloqué par la sécu, fait en manuel depuis le clone ; self-test OK.
+Confirmé que le skill `organiser-une-session-claude-code` est déjà dans la racine
+skills Windows. `/init` : `CLAUDE.md` actualisé (accueil split-screen, Immersif,
+gsap/lenis, git).
+
+**Projet — photos** : remplacé les 4 captures Insta par les photos studio du catalogue.
+Détourage rembg (`isnet-general-use`) pour `<slug>.png` (cartes/éditions). Régénéré
+les 6 calques `sim-*` du configurateur depuis les photos (relief passe-haut auto-calibré
+par percentile ; 2 bugs réglés en route : quadrant dû au resize avant join, puis texture
+trop plate). 2 commits : `be111ab` (photos+calques+`Ref/catalogue` désormais tracké),
+`218958b` (CLAUDE.md). Identité git remise (`Atelier Acidule`).
+
+**Projet — accueil (option A validée par Allan)** : photos **non détourées à fond
+recolorisé** par sac (`accueil-<slug>.png`, fond crème→couleur, ombre gardée, champ plat
+= couleur exacte). Accueil passé **plein couleur** (panneau gauche couleur en hero →
+crème en fiche), **logo** pelote+citron ajouté en haut à gauche, **texte décalé**
+(titre haut / baseline bas + ombre) pour la lisibilité (demande d'Allan). ⚠️ Ce lot
+(`index.astro`, `Immersif.astro`, 4 `accueil-*.png`) **non commité**.
+
+**Refusé/à refaire** : Allan n'aime pas le configurateur en « photo recolorée » → il
+refait plus propre lui-même. **Slogans citron + CTA « Shop ton sac »** proposés (non
+intégrés). **Galère** : process `astro dev` fantômes squattant le port 4321 (`pkill`
+doit cibler `astro.js dev`) + `public/` mis en cache au boot.
 
 ### 2026-06-26 — Refonte split-screen (réf. SANDQVIST) : accueil
 Allan envoie un enregistrement d'écran (`A:`) du site **SANDQVIST** : « je veux

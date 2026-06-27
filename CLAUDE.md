@@ -28,6 +28,12 @@ npm run check      # vérif types/diagnostics Astro (astro check)
 Pas encore de tests unitaires : aucun framework de test installé. Quand on en
 ajoutera (Vitest pressenti), documenter ici comment lancer un seul test.
 
+⚠️ **Gotcha dev WSL** : `astro dev` met `public/` en cache au démarrage. Après
+avoir ajouté/régénéré un asset (`accueil-*.png`, `sim-*.png`…), **redémarrer** le
+serveur sinon l'image reste introuvable. Tuer le process avec
+`pkill -f "astro.js dev"` (et **pas** `"astro dev"`, qui ne matche pas le node).
+Le FS `/mnt/e` (WSL) est lent : builds et `npm install` prennent leur temps.
+
 Dépendances runtime : **`gsap`** (anime l'accueil split-screen) et **`lenis`**
 (smooth-scroll, prévu mais pas encore branché — voir commentaire dans `Immersif.astro`).
 
@@ -39,11 +45,19 @@ Dépendances runtime : **`gsap`** (anime l'accueil split-screen) et **`lenis`**
 - `src/components/` — `Logo`, `Nav`, `Footer`, `CarteModele`, `Configurateur`, `IntroAnim` (intro animée scrollée : logo → citron coupé → jus → wordmark tricoté ; scroll-driven, RAF + lerp ; brief `briefs/intro-citron-scroll.md`).
 - `src/data/modeles.ts` — catalogue (`Modele[]` : slug, nom, baseline, description, prix, anse, photo, personnalisable, **`couleur`** = couleur de fond du panneau dans l'accueil split-screen). Export dérivé `modelesPerso` = `modeles.filter(m => m.personnalisable)`, **source de vérité** des modèles recolorables (utilisé par le Configurateur). Les 4 modèles (dont éditions-spéciales) alimentent l'accueil ; les 3 `personnalisable` alimentent le Configurateur.
 - `src/styles/global.css` — tokens couleur/typo + utilitaires ; `:root` définit toute la palette (`--creme`, `--sapin`, `--citron`, `--terracotta`…) et le fond décoratif mosaïque via `body::before`.
-- `public/images/` — assets de prod : `logo.png`, `mosaique-citron.jpg`,
-  `petit-sac.png`, `pochette-livres.png`, `grand-sac.png`, `edition-speciale.png`
-  (copiés/renommés depuis `Ref/PhotoClient`). Plus les **calques recolorables du
-  Configurateur** : pour chaque modèle perso, un couple `sim-<slug>-tex.png`
-  (texture maille) + `sim-<slug>-mask.png` (silhouette qui masque la couleur).
+- `public/images/` — assets de prod, **trois familles d'images de sacs à ne pas confondre** :
+  - **photos détourées** `<slug>.png` (`petit-sac.png`, `pochette-livres.png`,
+    `grand-sac.png`, `edition-speciale.png`) — fond transparent, pour cartes /
+    éditions / autres pages.
+  - **photos « accueil »** `accueil-<slug>.png` — fond recolorisé = couleur du
+    panneau, chargées par l'accueil split-screen (`src={/images/accueil-${m.slug}.png}`).
+    ⚠️ Nom = **slug exact** : `accueil-editions-speciales.png` (pluriel), **≠** la
+    base `edition-speciale.png` (singulier). C'est le seul cas où les deux familles
+    divergent — un mauvais nom = sac invisible sans erreur de build.
+  - **calques recolorables du Configurateur** : par modèle perso, un couple
+    `sim-<slug>-tex.png` (texture maille) + `sim-<slug>-mask.png` (silhouette qui
+    masque la couleur). `sim-<slug>.png` = aperçu composite.
+  - Plus `logo.png`, `mosaique-citron.jpg` (copiés/renommés depuis `Ref/PhotoClient`).
 
 ## Vision produit validée (big picture)
 
