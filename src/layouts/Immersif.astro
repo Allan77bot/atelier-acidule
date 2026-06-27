@@ -15,6 +15,7 @@ const {
 } = Astro.props;
 
 const liens = [
+  { href: '/mes-creations', label: 'Mes créations' },
   { href: '/personnaliser', label: 'Personnaliser' },
   { href: '/editions-speciales', label: 'Éditions spéciales' },
   { href: '/atelier', label: "L'atelier" },
@@ -147,6 +148,7 @@ const liens = [
       .drawer li:nth-child(2) a { transition-delay: 120ms; }
       .drawer li:nth-child(3) a { transition-delay: 180ms; }
       .drawer li:nth-child(4) a { transition-delay: 240ms; }
+      .drawer li:nth-child(5) a { transition-delay: 300ms; }
       .drawer a:hover { color: var(--citron); }
     </style>
 

@@ -1,429 +1,154 @@
 ---
+// Nouvelle page d'accueil « split éditorial » : accroche + CTA à gauche (crème),
+// photo studio héros à droite. Réutilise la coquille Immersif (header + menu).
+// L'ancien accueil split-screen est devenu /mes-creations.
 import Immersif from '../layouts/Immersif.astro';
-import { modeles } from '../data/modeles';
 
-const premier = modeles[0];
+const minis = [
+  { src: '/images/accueil-mini-1.png', alt: 'Sac bordeaux au crochet' },
+  { src: '/images/accueil-mini-2.png', alt: 'Cabas marron aux anses laiton' },
+  { src: '/images/accueil-mini-3.png', alt: 'Sac rose au crochet' },
+];
 ---
 
 <Immersif titre="Accueil">
-  <section class="scene" data-scene data-mode="hero" style={`--c:${premier.couleur}`}>
-    <!-- Les deux panneaux : gauche blanc, droite couleur du modèle -->
-    <div class="panels">
-      <div class="panel panel--left" data-left></div>
-      <div class="panel panel--right" data-right></div>
-      <span class="wipe" data-wipe></span>
-    </div>
+  <section class="hero">
+    <!-- Gauche : accroche + CTA -->
+    <div class="hero__left">
+      <div class="hero__content">
+        <p class="hero__surtitre">Crochet fait main · Méditerranée</p>
+        <h1 class="hero__titre">Une pointe d'acidulé,<br />cousue main rien que pour toi.</h1>
+        <p class="hero__sous">
+          Des sacs et accessoires au crochet, faits à la demande, dans les
+          couleurs que tu choisis. Des pièces uniques, à l'esprit sucré-doux.
+        </p>
 
-    <!-- Les sacs empilés (un seul visible), centrés sur la ligne -->
-    <div class="stage" data-stage>
-      {modeles.map((m, i) => (
-        <img class="bag" data-bag={m.slug} src={`/images/accueil-${m.slug}.png`} alt={m.nom} hidden={i !== 0} decoding="async" />
-      ))}
-    </div>
+        <div class="hero__cta">
+          <a class="btn btn--primaire" href="/personnaliser">Personnaliser mon sac</a>
+          <a class="btn btn--secondaire" href="/mes-creations">Voir mes créations</a>
+        </div>
 
-    <!-- État 1 : nom du modèle (gauche) + baseline (droite) -->
-    <div class="titles" data-titles>
-      <div class="mask mask--name"><h1 class="title" data-title>{premier.nom}</h1></div>
-      <div class="mask mask--sub"><p class="sub" data-sub>{premier.baseline}</p></div>
-    </div>
-
-    <!-- État 2 : la fiche détail (cachée au départ) -->
-    <aside class="detail" data-detail aria-hidden="true">
-      <p class="detail__surtitre" data-d-anse>{premier.anse}</p>
-      <h2 class="detail__nom" data-d-nom>{premier.nom}</h2>
-      <p class="detail__prix" data-d-prix>{premier.prix}&nbsp;€</p>
-      <p class="detail__desc" data-d-desc>{premier.description}</p>
-      <a class="detail__cta" data-d-cta href={`/personnaliser?modele=${premier.slug}`}>Personnaliser ce sac →</a>
-    </aside>
-
-    <!-- Barre de contrôle (bas) -->
-    <div class="controls">
-      <div class="models-nav">
-        <button class="arrow" data-prev aria-label="Modèle précédent">↑</button>
-        <button class="arrow" data-next aria-label="Modèle suivant">↓</button>
-        <span class="models-nav__label">Modèle&nbsp;suivant</span>
-        <span class="models-nav__count"><b data-counter>1</b>&nbsp;/&nbsp;{modeles.length}</span>
+        <a class="hero__gallery" href="/mes-creations" aria-label="Voir toutes mes créations">
+          {minis.map((m) => <img src={m.src} alt={m.alt} loading="lazy" decoding="async" />)}
+          <span class="hero__gallery-plus">+ de créations →</span>
+        </a>
       </div>
-      <button class="more" data-more>Découvrir →</button>
+    </div>
+
+    <!-- Droite : photo studio héros -->
+    <div class="hero__right">
+      <img
+        class="hero__photo"
+        src="/images/accueil-hero.png"
+        alt="Sac au crochet vert anis, anse tressée et charm fleur"
+        decoding="async"
+        fetchpriority="high"
+      />
     </div>
   </section>
 
-  <!-- Données pour le script (évite de coder les modèles en double) -->
-  <script type="application/json" data-models set:html={JSON.stringify(modeles)}></script>
+  <style>
+    .hero {
+      height: 100dvh;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      background: var(--creme);
+    }
+
+    /* --- Colonne gauche : texte --- */
+    .hero__left {
+      display: flex;
+      align-items: center;
+      padding: clamp(2rem, 6vw, 5rem);
+      padding-top: clamp(5rem, 10vh, 7rem); /* sous le header fixe */
+    }
+    .hero__content { max-width: 30rem; }
+    .hero__surtitre {
+      margin: 0 0 1rem;
+      font-family: var(--font-corps);
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--olive);
+    }
+    .hero__titre {
+      margin: 0;
+      font-family: var(--font-titre);
+      font-weight: 600;
+      font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+      line-height: 1.05;
+      color: var(--sapin);
+    }
+    .hero__sous {
+      margin: 1.2rem 0 0;
+      font-size: clamp(1rem, 1.4vw, 1.12rem);
+      line-height: 1.6;
+      color: var(--texte-doux);
+    }
+
+    /* --- CTA --- */
+    .hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.85rem 1.5rem;
+      border-radius: 999px;
+      font-family: var(--font-corps);
+      font-weight: 700;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .btn--primaire { background: var(--sapin); color: var(--creme); }
+    .btn--primaire:hover { background: var(--sapin-2); transform: translateY(-2px); }
+    .btn--secondaire { border: 1.5px solid var(--sauge); color: var(--sapin); }
+    .btn--secondaire:hover { background: var(--sauge-clair); }
+
+    /* --- Mini galerie --- */
+    .hero__gallery {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 2.4rem;
+      text-decoration: none;
+    }
+    .hero__gallery img {
+      width: clamp(44px, 5vw, 58px);
+      height: clamp(44px, 5vw, 58px);
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: var(--ombre-douce);
+      transition: var(--transition);
+    }
+    .hero__gallery:hover img { transform: translateY(-3px); }
+    .hero__gallery-plus {
+      font-family: var(--font-corps);
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--terracotta);
+      margin-left: 0.3rem;
+    }
+
+    /* --- Colonne droite : photo --- */
+    .hero__right { position: relative; overflow: hidden; background: var(--creme-2); }
+    .hero__photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 42%;
+    }
+
+    /* --- Mobile : on empile, photo en haut, et on autorise le scroll --- */
+    @media (max-width: 760px) {
+      :global(body.immersif) { overflow-y: auto; height: auto; }
+      .hero {
+        height: auto;
+        min-height: 100dvh;
+        grid-template-columns: 1fr;
+        grid-template-rows: 45vh auto;
+      }
+      .hero__right { order: -1; }
+      .hero__left { padding-top: 2.5rem; }
+    }
+  </style>
 </Immersif>
-
-<style>
-  .scene {
-    position: relative;
-    width: 100vw;
-    height: 100dvh;
-    overflow: hidden;
-    background: var(--c);
-  }
-
-  /* --- Panneaux --- */
-  .panels { position: absolute; inset: 0; }
-  .panel { position: absolute; top: 0; height: 100%; }
-  .panel--left { left: 0; width: 50%; background: var(--c); }
-  .panel--right { right: 0; width: 50%; background: var(--c); overflow: hidden; }
-  .wipe {
-    position: absolute;
-    inset: 0;
-    display: block;
-    visibility: hidden;
-    will-change: transform;
-  }
-
-  /* --- Sacs empilés --- */
-  .stage {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: min(46vw, 460px);
-    aspect-ratio: 3 / 4;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    will-change: transform;
-    pointer-events: none;
-  }
-  .bag {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    /* image opaque (fond = couleur du sac) : pas de drop-shadow CSS, l'ombre est dans la photo */
-    will-change: transform, opacity;
-  }
-  .bag[hidden] { display: none; }
-
-  /* --- Titres état 1 --- */
-  .titles {
-    position: absolute;
-    inset: 0;
-    z-index: 6;
-    pointer-events: none;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-  }
-  .mask { overflow: hidden; padding: 0.1em 0; }
-  /* Titre en haut, baseline en bas : on dégage le sac (centré) pour la lisibilité */
-  .mask--name {
-    grid-column: 1;
-    align-self: start;
-    padding-top: clamp(4.5rem, 13vh, 8rem);
-    padding-left: clamp(1.5rem, 5vw, 5rem);
-  }
-  .mask--sub {
-    grid-column: 2;
-    align-self: end;
-    text-align: right;
-    padding-bottom: clamp(5rem, 14vh, 9rem);
-    padding-right: clamp(1.5rem, 5vw, 5rem);
-  }
-  .title {
-    margin: 0;
-    font-family: var(--font-titre);
-    font-weight: 600;
-    font-size: clamp(2.4rem, 6vw, 5.5rem);
-    line-height: 1;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: -0.01em;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-    will-change: transform, opacity;
-  }
-  .sub {
-    margin: 0;
-    font-family: var(--font-wordmark);
-    font-style: italic;
-    font-size: clamp(1.1rem, 2.2vw, 1.8rem);
-    color: #fff;
-    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.32);
-    will-change: transform, opacity;
-  }
-
-  /* --- État 2 : fiche détail --- */
-  .detail {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 40%;
-    transform: translateY(-50%);
-    z-index: 7;
-    padding: 0 clamp(1.5rem, 4vw, 4rem) 0 clamp(1.5rem, 5vw, 5rem);
-    visibility: hidden;
-  }
-  .detail[aria-hidden='false'] { visibility: visible; }
-  .detail__surtitre {
-    margin: 0 0 0.6rem;
-    font-size: 0.78rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--olive);
-    font-weight: 700;
-  }
-  .detail__nom {
-    margin: 0 0 0.4rem;
-    font-size: clamp(1.8rem, 3.4vw, 2.8rem);
-    text-transform: uppercase;
-    color: var(--encre);
-  }
-  .detail__prix {
-    margin: 0 0 1.2rem;
-    font-weight: 800;
-    font-size: 1.3rem;
-    color: var(--terracotta);
-  }
-  .detail__desc {
-    margin: 0 0 1.8rem;
-    color: var(--texte-doux);
-    max-width: 34ch;
-    line-height: 1.7;
-  }
-  .detail__cta {
-    display: inline-block;
-    background: var(--encre);
-    color: #fff;
-    text-decoration: none;
-    font-weight: 700;
-    padding: 0.9rem 1.6rem;
-    border-radius: 999px;
-    transition: transform 200ms ease, background 200ms ease;
-  }
-  .detail__cta:hover { transform: translateY(-2px); background: var(--terracotta); }
-
-  /* --- Contrôles --- */
-  .controls {
-    position: absolute;
-    inset: auto 0 0 0;
-    z-index: 8;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: clamp(1.2rem, 3vw, 2.4rem) clamp(1.2rem, 4vw, 3rem);
-  }
-  .models-nav { display: flex; align-items: center; gap: 0.7rem; }
-  .arrow {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 1px solid color-mix(in srgb, #fff 55%, transparent);
-    background: transparent;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    mix-blend-mode: difference;
-    transition: background 200ms ease, transform 200ms ease;
-  }
-  .arrow:hover { background: rgba(255, 255, 255, 0.16); transform: translateY(-2px); }
-  .models-nav__label {
-    color: #fff;
-    mix-blend-mode: difference;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-size: 0.7rem;
-    font-weight: 700;
-  }
-  .models-nav__count { color: #fff; mix-blend-mode: difference; font-size: 0.8rem; opacity: 0.85; }
-  .more {
-    background: #fff;
-    color: var(--encre);
-    border: 0;
-    padding: 0.9rem 1.8rem;
-    border-radius: 999px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 200ms ease, background 200ms ease, color 200ms ease;
-  }
-  .more:hover { transform: translateY(-2px); }
-  .scene[data-mode='detail'] .more { background: transparent; color: #fff; border: 1px solid #fff; }
-
-  /* En mode détail, on masque la nav modèles (on est concentré sur la fiche) */
-  .scene[data-mode='detail'] .models-nav { opacity: 0; pointer-events: none; }
-
-  /* --- Mobile : split horizontal (couleur en haut, blanc en bas) --- */
-  @media (max-width: 760px) {
-    .panel--left { top: auto; bottom: 0; left: 0; width: 100%; height: 42%; }
-    .panel--right { top: 0; right: 0; width: 100%; height: 58%; }
-    .stage { top: 46%; width: min(70vw, 320px); }
-    .titles { grid-template-columns: 1fr; align-content: end; padding-bottom: 18%; }
-    .mask--name { grid-column: 1; align-self: auto; text-align: center; padding: 0 1rem; }
-    .mask--sub { grid-column: 1; align-self: auto; text-align: center; padding: 0.3rem 1rem 0; }
-    .title { font-size: clamp(2rem, 9vw, 3rem); }
-    .sub { color: #fff; }
-    .detail { top: auto; bottom: 0; width: 100%; transform: none; padding: 1.4rem 1.5rem 6rem; }
-    .scene[data-mode='detail'] .stage { top: 30%; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .bag, .title, .sub, .wipe { will-change: auto; }
-  }
-</style>
-
-<script>
-  import gsap from 'gsap';
-
-  type Modele = {
-    slug: string; nom: string; baseline: string; description: string;
-    prix: number; anse: string; couleur: string;
-  };
-
-  const scene = document.querySelector<HTMLElement>('[data-scene]');
-  if (scene) {
-    const modeles: Modele[] = JSON.parse(
-      document.querySelector<HTMLElement>('[data-models]')!.textContent!
-    );
-
-    const right = scene.querySelector<HTMLElement>('[data-right]')!;
-    const panelLeft = scene.querySelector<HTMLElement>('[data-left]')!;
-    const CREAM = getComputedStyle(document.documentElement).getPropertyValue('--creme').trim() || '#f6efdd';
-    const wipe = scene.querySelector<HTMLElement>('[data-wipe]')!;
-    const stage = scene.querySelector<HTMLElement>('[data-stage]')!;
-    const bags = [...scene.querySelectorAll<HTMLElement>('[data-bag]')];
-    const titleEl = scene.querySelector<HTMLElement>('[data-title]')!;
-    const subEl = scene.querySelector<HTMLElement>('[data-sub]')!;
-    const titles = scene.querySelector<HTMLElement>('[data-titles]')!;
-    const detail = scene.querySelector<HTMLElement>('[data-detail]')!;
-    const counter = scene.querySelector<HTMLElement>('[data-counter]')!;
-    const moreBtn = scene.querySelector<HTMLButtonElement>('[data-more]')!;
-    const prevBtn = scene.querySelector<HTMLButtonElement>('[data-prev]')!;
-    const nextBtn = scene.querySelector<HTMLButtonElement>('[data-next]')!;
-
-    const dNom = scene.querySelector<HTMLElement>('[data-d-nom]')!;
-    const dAnse = scene.querySelector<HTMLElement>('[data-d-anse]')!;
-    const dPrix = scene.querySelector<HTMLElement>('[data-d-prix]')!;
-    const dDesc = scene.querySelector<HTMLElement>('[data-d-desc]')!;
-    const dCta = scene.querySelector<HTMLAnchorElement>('[data-d-cta]')!;
-
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const D = reduce ? 0.001 : 1; // multiplicateur de durée (0 ≈ instantané)
-
-    let i = 0;
-    let mode: 'hero' | 'detail' = 'hero';
-    let busy = false;
-
-    const peindreFiche = (m: Modele) => {
-      dNom.textContent = m.nom;
-      dAnse.textContent = m.anse;
-      dPrix.innerHTML = `${m.prix}&nbsp;€`;
-      dDesc.textContent = m.description;
-      dCta.href = `/personnaliser?modele=${m.slug}`;
-    };
-
-    // Slide masqué d'un texte (sort vers le haut/bas, le nouveau entre du côté opposé)
-    const maskSwap = (el: HTMLElement, texte: string, sign: number) => {
-      gsap.to(el, {
-        yPercent: -sign * 110, autoAlpha: 0, duration: 0.3 * D, ease: 'power2.in',
-        onComplete: () => {
-          el.textContent = texte;
-          gsap.set(el, { yPercent: sign * 110 });
-          gsap.to(el, { yPercent: 0, autoAlpha: 1, duration: 0.45 * D, ease: 'power3.out' });
-        },
-      });
-    };
-
-    const allerVers = (dir: number) => {
-      if (busy || mode !== 'hero') return;
-      const ni = (i + dir + modeles.length) % modeles.length;
-      if (ni === i) return;
-      busy = true;
-      const m = modeles[ni];
-      const sign = dir >= 0 ? 1 : -1;
-
-      // 1) Balayage vertical de la couleur sur le panneau droit
-      gsap.set(wipe, { backgroundColor: m.couleur, yPercent: sign * 100, visibility: 'visible' });
-      const tl = gsap.timeline({
-        onComplete: () => {
-          scene.style.setProperty('--c', m.couleur);
-          gsap.set(wipe, { visibility: 'hidden' });
-          counter.textContent = String(ni + 1);
-          i = ni;
-          busy = false;
-        },
-      });
-      tl.to(wipe, { yPercent: 0, duration: 0.6 * D, ease: 'power3.inOut' }, 0);
-
-      // 2) Sac : fondu + zoom (le sortant grossit et s'efface, l'entrant arrive de plus petit)
-      const sortant = bags[i];
-      const entrant = bags[ni];
-      entrant.hidden = false;
-      gsap.set(entrant, { autoAlpha: 0, scale: 0.9, yPercent: sign * 5 });
-      tl.to(sortant, {
-        autoAlpha: 0, scale: 1.08, yPercent: -sign * 5, duration: 0.4 * D, ease: 'power2.in',
-        onComplete: () => { sortant.hidden = true; gsap.set(sortant, { scale: 1, yPercent: 0 }); },
-      }, 0);
-      tl.to(entrant, { autoAlpha: 1, scale: 1, yPercent: 0, duration: 0.55 * D, ease: 'power3.out' }, 0.12 * D);
-
-      // 3) Textes masqués + fiche détail prête en coulisse
-      maskSwap(titleEl, m.nom, sign);
-      maskSwap(subEl, m.baseline, sign);
-      peindreFiche(m);
-    };
-
-    const ouvrirDetail = () => {
-      if (busy || mode !== 'hero') return;
-      busy = true;
-      mode = 'detail';
-      scene.dataset.mode = 'detail';
-      detail.setAttribute('aria-hidden', 'false');
-      moreBtn.textContent = '← Retour';
-      const tl = gsap.timeline({ onComplete: () => { busy = false; } });
-      tl.to(panelLeft, { width: '40%', backgroundColor: CREAM, duration: 0.7 * D, ease: 'power3.inOut' }, 0)
-        .to(right, { width: '60%', duration: 0.7 * D, ease: 'power3.inOut' }, 0)
-        .to(stage, { xPercent: 24, scale: 1.06, duration: 0.7 * D, ease: 'power3.inOut' }, 0)
-        .to(titles, { autoAlpha: 0, duration: 0.25 * D }, 0)
-        .fromTo(detail.children,
-          { autoAlpha: 0, y: 26 },
-          { autoAlpha: 1, y: 0, stagger: 0.07 * D, duration: 0.5 * D, ease: 'power3.out' }, 0.32 * D);
-    };
-
-    const fermerDetail = () => {
-      if (busy || mode !== 'detail') return;
-      busy = true;
-      mode = 'hero';
-      scene.dataset.mode = 'hero';
-      moreBtn.textContent = 'Découvrir →';
-      const tl = gsap.timeline({
-        onComplete: () => {
-          detail.setAttribute('aria-hidden', 'true');
-          panelLeft.style.removeProperty('background-color'); // reprend var(--c)
-          busy = false;
-        },
-      });
-      tl.to(detail.children, { autoAlpha: 0, y: 18, duration: 0.25 * D, ease: 'power2.in' }, 0)
-        .to(panelLeft, { width: '50%', backgroundColor: modeles[i].couleur, duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
-        .to(right, { width: '50%', duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
-        .to(stage, { xPercent: 0, scale: 1, duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
-        .to(titles, { autoAlpha: 1, duration: 0.4 * D }, 0.3 * D);
-    };
-
-    // Contrôles
-    nextBtn.addEventListener('click', () => allerVers(1));
-    prevBtn.addEventListener('click', () => allerVers(-1));
-    moreBtn.addEventListener('click', () => (mode === 'hero' ? ouvrirDetail() : fermerDetail()));
-
-    // Molette : change de modèle en mode hero, ferme la fiche en mode détail
-    let wheelLock = false;
-    scene.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      if (wheelLock || busy) return;
-      wheelLock = true;
-      setTimeout(() => (wheelLock = false), 720);
-      const dir = e.deltaY > 0 ? 1 : -1;
-      if (mode === 'hero') allerVers(dir);
-      else if (dir < 0) fermerDetail();
-    }, { passive: false });
-
-    // Clavier
-    addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') allerVers(1);
-      else if (e.key === 'ArrowUp') { mode === 'detail' ? fermerDetail() : allerVers(-1); }
-      else if (e.key === 'Enter' && mode === 'hero') ouvrirDetail();
-      else if (e.key === 'Escape' && mode === 'detail') fermerDetail();
-    });
-  }
-</script>
