@@ -6,6 +6,38 @@
 
 ---
 
+## 2026-06-27 (refonte) — Vraie landing + /mes-creations en scroll + suppression perso
+
+**Objectif du jour :** refonte complète demandée par Allan (trop d'erreurs sur l'ancienne version).
+
+**Cadrage validé (3 questions) :** commande = **DM Instagram** ; périmètre = **home + mes-créations**
+(reste juste nettoyé) ; créations = **1 sac / 1 section plein écran** au scroll.
+
+**Fait (workflow ultracode : 3 lots disjoints en parallèle + revue adversariale, 3× « clean ») :**
+- **`/index`** réécrit en **vraie landing** (layout Base, Nav + Footer, scroll) : hero sac flottant + halo,
+  3 valeurs, aperçu catalogue (4 cartes), teaser atelier (cabas multicolore), teaser éditions, bandeau
+  final. Tous les CTA « Commander » → Instagram.
+- **`/mes-creations`** réécrit en **CSS scroll-snap** (conteneur `.reel`, 4 sections plein écran couleur),
+  infos en **texte blanc lisible** + scrim léger (plus de rectangle blanc), indicateur « Défiler ↓ » qui
+  s'efface, lien discret « Commander en DM ». **GSAP, flèches, bouton Découvrir et mode détail supprimés.**
+- **Suppression perso** : `personnaliser.astro`, `Configurateur.astro`, `CarteModele.astro` (mort) + 9 calques
+  `sim-*.png` retirés (git rm) ; liens « Personnaliser »/« SHOP TON SAC » → Instagram ; `/personnaliser` = 404.
+- Build vert (5 pages), 0 erreur console, 0 débordement (390 + 1440), lisibilité OK sur les 4 couleurs.
+- Redéployé en manuel → https://atelier-acidule.netlify.app (live vérifié).
+
+**Décisions :** personnalisation abandonnée ; commande 100 % DM Instagram ; home en layout Base (règle
+l'incohérence des 2 en-têtes) ; mes-creations en scroll-snap (Immersif `fixe` + conteneur interne).
+
+**Appris / pièges :** après une réécriture massive + suppressions, le dev server garde un **overlay HMR
+périmé** (« Unhandled rejection » alors que la console est vide et le build vert) → **redémarrer le dev
+server** (tuer le PID du port 4321, pas tout node). Le test de scroll programmatique est faussé par
+`scroll-behavior:smooth` → désactiver le smooth pour mesurer.
+
+**Reste / next :** validation Allan ; **mettre à jour `CLAUDE.md`** (périmé) ; brancher l'auto-deploy
+Netlify↔GitHub (Allan).
+
+---
+
 ## 2026-06-27 (suite) — Passe qualité UI/UX (mobile-first, premium) — /goal autonome
 
 **Objectif du jour :** audit du site puis refonte qualité en autonomie (mobile-first, premium), sans casser.

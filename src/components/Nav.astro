@@ -2,7 +2,6 @@
 import Logo from './Logo.astro';
 const liens = [
   { href: '/mes-creations', label: 'Mes créations' },
-  { href: '/personnaliser', label: 'Personnaliser' },
   { href: '/editions-speciales', label: 'Éditions spéciales' },
   { href: '/atelier', label: "L'atelier" },
 ];
@@ -25,7 +24,7 @@ const liens = [
 
     <nav class="nav__liens" aria-label="Navigation principale">
       {liens.map((l) => <a href={l.href}>{l.label}</a>)}
-      <a class="btn btn--citron nav__cta" href="/personnaliser">SHOP TON SAC !</a>
+      <a class="btn btn--citron nav__cta" href="https://www.instagram.com/atelier_acidule" target="_blank" rel="noopener noreferrer">SHOP TON SAC !</a>
     </nav>
   </div>
 </header>

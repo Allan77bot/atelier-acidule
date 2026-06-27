@@ -1,437 +1,307 @@
 ---
+// Mes créations — refonte en SCROLL plein écran (scroll-snap vertical).
+// Plus de GSAP, plus de flèches, plus de bouton « Découvrir », plus de mode « détail ».
+// Une section plein écran par modèle, fond = couleur du modèle, texte blanc lisible.
 import Immersif from '../layouts/Immersif.astro';
 import { modeles } from '../data/modeles';
 
-const premier = modeles[0];
+const instagram = 'https://www.instagram.com/atelier_acidule';
 ---
 
 <Immersif titre="Mes créations" fixe>
-  <section class="scene" data-scene data-mode="hero" style={`--c:${premier.couleur}`}>
-    <!-- Les deux panneaux : gauche blanc, droite couleur du modèle -->
-    <div class="panels">
-      <div class="panel panel--left" data-left></div>
-      <div class="panel panel--right" data-right></div>
-      <span class="wipe" data-wipe></span>
-    </div>
+  <div class="reel" data-reel>
+    {modeles.map((m, i) => (
+      <section class="creation" style={`--c:${m.couleur}`}>
+        <div class="creation__inner">
+          <div class="creation__media">
+            <img
+              class="creation__bag"
+              src={m.photo}
+              alt={m.nom}
+              decoding="async"
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          </div>
+          <div class="creation__texte">
+            <p class="creation__anse">{m.anse}</p>
+            <h2 class="creation__nom">{m.nom}</h2>
+            <p class="creation__baseline">{m.baseline}</p>
+            <p class="creation__prix">dès&nbsp;{m.prix}&nbsp;€</p>
+            <p class="creation__desc">{m.description}</p>
+            <a
+              class="creation__cta"
+              href={instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+            >Commander en DM →</a>
+          </div>
+        </div>
+      </section>
+    ))}
+  </div>
 
-    <!-- Les sacs empilés (un seul visible), centrés sur la ligne -->
-    <div class="stage" data-stage>
-      {modeles.map((m, i) => (
-        <img class="bag" data-bag={m.slug} src={m.photo} alt={m.nom} hidden={i !== 0} decoding="async" />
-      ))}
-    </div>
-
-    <!-- État 1 : nom du modèle (gauche) + baseline (droite) -->
-    <div class="titles" data-titles>
-      <div class="mask mask--name"><h1 class="title" data-title>{premier.nom}</h1></div>
-      <div class="mask mask--sub"><p class="sub" data-sub>{premier.baseline}</p></div>
-    </div>
-
-    <!-- État 2 : la fiche détail (cachée au départ) -->
-    <aside class="detail" data-detail aria-hidden="true">
-      <p class="detail__surtitre" data-d-anse>{premier.anse}</p>
-      <h2 class="detail__nom" data-d-nom>{premier.nom}</h2>
-      <p class="detail__prix" data-d-prix>{premier.prix}&nbsp;€</p>
-      <p class="detail__desc" data-d-desc>{premier.description}</p>
-      <a class="detail__cta" data-d-cta href={`/personnaliser?modele=${premier.slug}`}>Personnaliser ce sac →</a>
-    </aside>
-
-    <!-- Barre de contrôle (bas) -->
-    <div class="controls">
-      <div class="models-nav">
-        <button class="arrow" data-prev aria-label="Modèle précédent">↑</button>
-        <button class="arrow" data-next aria-label="Modèle suivant">↓</button>
-        <span class="models-nav__label">Modèle&nbsp;suivant</span>
-        <span class="models-nav__count"><b data-counter>1</b>&nbsp;/&nbsp;{modeles.length}</span>
-      </div>
-      <button class="more" data-more>Découvrir →</button>
-    </div>
-  </section>
-
-  <!-- Données pour le script (évite de coder les modèles en double) -->
-  <script type="application/json" data-models set:html={JSON.stringify(modeles)}></script>
+  <!-- Indicateur de scroll : visible sur le 1er écran, disparaît au 1er défilement -->
+  <div class="indicateur" data-indicateur aria-hidden="true">
+    <span class="indicateur__txt">Défiler</span>
+    <span class="indicateur__chevron">↓</span>
+  </div>
 </Immersif>
 
 <style>
-  .scene {
-    position: relative;
-    width: 100vw;
+  /* --- Conteneur scrollable interne (le body est figé par la prop `fixe`) --- */
+  .reel {
     height: 100dvh;
-    overflow: hidden;
-    background: var(--c);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
   }
 
-  /* --- Panneaux --- */
-  .panels { position: absolute; inset: 0; }
-  .panel { position: absolute; top: 0; height: 100%; }
-  .panel--left { left: 0; width: 50%; background: var(--c); }
-  .panel--right { right: 0; width: 50%; background: var(--c); overflow: hidden; }
-  .wipe {
-    position: absolute;
-    inset: 0;
-    display: block;
-    visibility: hidden;
-    will-change: transform;
-  }
-
-  /* --- Sacs empilés --- */
-  .stage {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: min(46vw, 460px);
-    aspect-ratio: 3 / 4;
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    will-change: transform;
-    pointer-events: none;
-  }
-  .bag {
-    position: absolute;
-    inset: 0;
+  /* --- Une section plein écran par modèle --- */
+  .creation {
+    position: relative;
+    height: 100dvh;
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    /* sac détouré (fond transparent) posé sur le panneau coloré → aucune couture ;
-       l'ombre de contact est rendue en CSS pour ancrer le sac */
-    filter: drop-shadow(0 26px 30px rgba(20, 12, 8, 0.32));
-    will-change: transform, opacity, filter;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    background: var(--c);
+    box-sizing: border-box;
   }
-  .bag[hidden] { display: none; }
 
-  /* --- Titres état 1 --- */
-  .titles {
-    position: absolute;
-    inset: 0;
-    z-index: 6;
-    pointer-events: none;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+  .creation__inner {
+    height: 100%;
+    box-sizing: border-box;
+    max-width: var(--max);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: clamp(1.2rem, 4vh, 2.4rem);
+    /* haut généreux pour dégager le header fixe (wordmark + burger) */
+    padding: clamp(5.5rem, 14vh, 8rem) clamp(1.4rem, 6vw, 3rem) clamp(3rem, 9vh, 5rem);
   }
-  .mask { overflow: hidden; padding: 0.1em 0; }
-  /* Titre en haut, baseline en bas : on dégage le sac (centré) pour la lisibilité */
-  .mask--name {
-    grid-column: 1;
-    align-self: start;
-    padding-top: clamp(4.5rem, 13vh, 8rem);
-    padding-left: clamp(1.5rem, 5vw, 5rem);
+
+  /* --- Le sac détouré qui flotte --- */
+  .creation__media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
   }
-  .mask--sub {
-    grid-column: 2;
-    align-self: end;
-    text-align: right;
-    padding-bottom: clamp(5rem, 14vh, 9rem);
-    padding-right: clamp(1.5rem, 5vw, 5rem);
+  .creation__bag {
+    width: auto;
+    max-width: min(74vw, 320px);
+    max-height: 40vh;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 26px 32px rgba(20, 12, 8, 0.34));
   }
-  .title {
-    margin: 0;
+
+  /* --- Bloc texte (blanc + scrim doux, jamais de rectangle blanc) --- */
+  .creation__texte {
+    position: relative;
+    color: #fff;
+    max-width: 44ch;
+    z-index: 1;
+  }
+  /* Scrim translucide foncé, faible opacité, pour garantir le contraste */
+  .creation__texte::before {
+    content: '';
+    position: absolute;
+    inset: -1.4rem -1.8rem;
+    z-index: -1;
+    border-radius: var(--radius-lg);
+    background: radial-gradient(
+      120% 120% at 50% 45%,
+      rgba(0, 0, 0, 0.3),
+      rgba(0, 0, 0, 0) 72%
+    );
+  }
+
+  .creation__anse {
+    margin: 0 0 0.6rem;
+    font-family: var(--font-corps);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.88);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+  .creation__nom {
+    margin: 0 0 0.35rem;
     font-family: var(--font-titre);
     font-weight: 600;
-    font-size: clamp(2.4rem, 6vw, 5.5rem);
-    line-height: 1;
+    line-height: 1.04;
+    font-size: clamp(2.1rem, 7vw, 3.6rem);
     color: #fff;
-    text-transform: uppercase;
-    letter-spacing: -0.01em;
-    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-    will-change: transform, opacity;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
   }
-  .sub {
-    margin: 0;
+  .creation__baseline {
+    margin: 0 0 0.9rem;
     font-family: var(--font-wordmark);
     font-style: italic;
-    font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+    font-size: clamp(1.1rem, 3vw, 1.5rem);
     color: #fff;
-    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.32);
-    will-change: transform, opacity;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.32);
+  }
+  .creation__prix {
+    margin: 0 0 1.1rem;
+    font-family: var(--font-corps);
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: 0.01em;
+    color: var(--citron-clair);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  }
+  .creation__desc {
+    margin: 0 0 1.6rem;
+    font-family: var(--font-corps);
+    line-height: 1.7;
+    font-size: clamp(0.98rem, 2.4vw, 1.08rem);
+    color: rgba(255, 255, 255, 0.94);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
   }
 
-  /* --- État 2 : fiche détail --- */
-  .detail {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 40%;
-    transform: translateY(-50%);
-    z-index: 7;
-    padding: 0 clamp(1.5rem, 4vw, 4rem) 0 clamp(1.5rem, 5vw, 5rem);
-    visibility: hidden;
-  }
-  .detail[aria-hidden='false'] { visibility: visible; }
-  .detail__surtitre {
-    margin: 0 0 0.6rem;
-    font-size: 0.78rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--olive);
-    font-weight: 700;
-  }
-  .detail__nom {
-    margin: 0 0 0.4rem;
-    font-size: clamp(1.8rem, 3.4vw, 2.8rem);
-    text-transform: uppercase;
-    color: var(--encre);
-  }
-  .detail__prix {
-    margin: 0 0 1.2rem;
-    font-weight: 800;
-    font-size: 1.3rem;
-    color: var(--terracotta);
-  }
-  .detail__desc {
-    margin: 0 0 1.8rem;
-    color: var(--texte-doux);
-    max-width: 34ch;
-    line-height: 1.7;
-  }
-  .detail__cta {
+  /* CTA discret (lien souligné, pas un gros bouton) */
+  .creation__cta {
     display: inline-block;
-    background: var(--encre);
+    font-family: var(--font-corps);
+    font-weight: 700;
+    font-size: 0.98rem;
     color: #fff;
     text-decoration: none;
-    font-weight: 700;
-    padding: 0.9rem 1.6rem;
-    border-radius: 999px;
-    transition: transform 200ms ease, background 200ms ease;
+    padding-bottom: 3px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.55);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.25s ease, transform 0.25s ease;
   }
-  .detail__cta:hover { transform: translateY(-2px); background: var(--terracotta); }
+  .creation__cta:hover,
+  .creation__cta:focus-visible {
+    border-color: #fff;
+    transform: translateX(3px);
+  }
 
-  /* --- Contrôles --- */
-  .controls {
-    position: absolute;
-    inset: auto 0 0 0;
-    z-index: 8;
+  /* --- Indicateur de scroll --- */
+  .indicateur {
+    position: fixed;
+    left: 50%;
+    bottom: clamp(1.2rem, 4vh, 2.4rem);
+    transform: translateX(-50%);
+    z-index: 30;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: clamp(1.2rem, 3vw, 2.4rem) clamp(1.2rem, 4vw, 3rem);
-  }
-  .models-nav { display: flex; align-items: center; gap: 0.7rem; }
-  .arrow {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid color-mix(in srgb, #fff 55%, transparent);
-    background: transparent;
+    gap: 0.3rem;
     color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    display: grid;
-    place-items: center;
-    mix-blend-mode: difference;
-    transition: background 200ms ease, transform 200ms ease;
+    mix-blend-mode: difference; /* lisible sur n'importe quelle couleur de panneau */
+    pointer-events: none;
+    transition: opacity 0.5s ease;
   }
-  .arrow:hover { background: rgba(255, 255, 255, 0.16); transform: translateY(-2px); }
-  .models-nav__label {
-    color: #fff;
-    mix-blend-mode: difference;
+  .indicateur__txt {
+    font-family: var(--font-corps);
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    font-size: 0.68rem;
     font-weight: 700;
   }
-  .models-nav__count { color: #fff; mix-blend-mode: difference; font-size: 0.8rem; opacity: 0.85; }
-  .more {
-    background: #fff;
-    color: var(--encre);
-    border: 0;
-    padding: 0.9rem 1.8rem;
-    border-radius: 999px;
-    font-weight: 800;
-    cursor: pointer;
-    transition: transform 200ms ease, background 200ms ease, color 200ms ease;
+  .indicateur__chevron {
+    font-size: 1.2rem;
+    line-height: 1;
+    animation: rebond 1.6s ease-in-out infinite;
   }
-  .more:hover { transform: translateY(-2px); }
-  .scene[data-mode='detail'] .more { background: transparent; color: #fff; border: 1px solid #fff; }
-
-  /* En mode détail, on masque la nav modèles (on est concentré sur la fiche) */
-  .scene[data-mode='detail'] .models-nav { opacity: 0; pointer-events: none; }
-
-  /* --- Mobile : split horizontal (couleur en haut, blanc en bas) --- */
-  @media (max-width: 760px) {
-    .panel--left { top: auto; bottom: 0; left: 0; width: 100%; height: 42%; }
-    .panel--right { top: 0; right: 0; width: 100%; height: 58%; }
-    .stage { top: 46%; width: min(70vw, 320px); }
-    .titles { grid-template-columns: 1fr; align-content: end; padding-bottom: 26%; }
-    .mask--name { grid-column: 1; align-self: auto; text-align: center; padding: 0 1rem; }
-    .mask--sub { grid-column: 1; align-self: auto; text-align: center; padding: 0.3rem 1rem 0; }
-    .title { font-size: clamp(2rem, 9vw, 3rem); }
-    .sub { color: #fff; }
-    .detail { top: auto; bottom: 0; width: 100%; transform: none; padding: 1.4rem 1.5rem calc(6.5rem + env(safe-area-inset-bottom)); }
-    .scene[data-mode='detail'] .stage { top: 30%; }
-
-    /* Barre de contrôle empilée et centrée : ni chevauchement ni débordement horizontal */
-    .controls { flex-direction: column; gap: 0.6rem; padding: 1rem 1rem calc(1.1rem + env(safe-area-inset-bottom)); }
-    .models-nav { justify-content: center; width: 100%; gap: 0.6rem; }
-    .more { width: 100%; max-width: 320px; margin-inline: auto; text-align: center; }
-    .scene[data-mode='detail'] .models-nav { display: none; }
+  .indicateur.is-hidden {
+    opacity: 0;
   }
 
+  @keyframes rebond {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(7px); }
+  }
+
+  /* --- Reveal léger des sections (activé par JS seulement) --- */
+  .reel.reveal-on .creation__inner {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reel.reveal-on .creation__inner.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* --- Desktop : 2 colonnes alternées (sac / texte) --- */
+  @media (min-width: 760px) {
+    .creation__inner {
+      flex-direction: row;
+      text-align: left;
+      gap: clamp(2rem, 6vw, 6rem);
+    }
+    .creation__media,
+    .creation__texte {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .creation__bag {
+      max-width: min(38vw, 440px);
+      max-height: 72vh;
+    }
+    /* alternance : sac à droite et texte aligné à droite sur les sections paires */
+    .creation:nth-child(even) .creation__inner {
+      flex-direction: row-reverse;
+    }
+    .creation:nth-child(even) .creation__texte {
+      text-align: right;
+    }
+  }
+
+  /* --- Mouvement réduit : on neutralise toute animation --- */
   @media (prefers-reduced-motion: reduce) {
-    .bag, .title, .sub, .wipe { will-change: auto; }
+    .reel { scroll-behavior: auto; }
+    .indicateur__chevron { animation: none; }
+    .reel.reveal-on .creation__inner {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .creation__cta { transition: none; }
   }
 </style>
 
 <script>
-  import gsap from 'gsap';
+  const reel = document.querySelector<HTMLElement>('[data-reel]');
+  const indicateur = document.querySelector<HTMLElement>('[data-indicateur]');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  type Modele = {
-    slug: string; nom: string; baseline: string; description: string;
-    prix: number; anse: string; couleur: string;
-  };
+  // (a) cacher l'indicateur dès le premier défilement (> ~40px)
+  if (reel && indicateur) {
+    const onScroll = () => {
+      if (reel.scrollTop > 40) {
+        indicateur.classList.add('is-hidden');
+        reel.removeEventListener('scroll', onScroll);
+      }
+    };
+    reel.addEventListener('scroll', onScroll, { passive: true });
+  }
 
-  const scene = document.querySelector<HTMLElement>('[data-scene]');
-  if (scene) {
-    const modeles: Modele[] = JSON.parse(
-      document.querySelector<HTMLElement>('[data-models]')!.textContent!
+  // (b) reveal léger des sections via IntersectionObserver (désactivé si mouvement réduit)
+  if (reel && !reduce && 'IntersectionObserver' in window) {
+    reel.classList.add('reveal-on');
+    const inners = reel.querySelectorAll<HTMLElement>('.creation__inner');
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { root: reel, threshold: 0.35 }
     );
-
-    const right = scene.querySelector<HTMLElement>('[data-right]')!;
-    const panelLeft = scene.querySelector<HTMLElement>('[data-left]')!;
-    const CREAM = getComputedStyle(document.documentElement).getPropertyValue('--creme').trim() || '#f6efdd';
-    const wipe = scene.querySelector<HTMLElement>('[data-wipe]')!;
-    const stage = scene.querySelector<HTMLElement>('[data-stage]')!;
-    const bags = [...scene.querySelectorAll<HTMLElement>('[data-bag]')];
-    const titleEl = scene.querySelector<HTMLElement>('[data-title]')!;
-    const subEl = scene.querySelector<HTMLElement>('[data-sub]')!;
-    const titles = scene.querySelector<HTMLElement>('[data-titles]')!;
-    const detail = scene.querySelector<HTMLElement>('[data-detail]')!;
-    const counter = scene.querySelector<HTMLElement>('[data-counter]')!;
-    const moreBtn = scene.querySelector<HTMLButtonElement>('[data-more]')!;
-    const prevBtn = scene.querySelector<HTMLButtonElement>('[data-prev]')!;
-    const nextBtn = scene.querySelector<HTMLButtonElement>('[data-next]')!;
-
-    const dNom = scene.querySelector<HTMLElement>('[data-d-nom]')!;
-    const dAnse = scene.querySelector<HTMLElement>('[data-d-anse]')!;
-    const dPrix = scene.querySelector<HTMLElement>('[data-d-prix]')!;
-    const dDesc = scene.querySelector<HTMLElement>('[data-d-desc]')!;
-    const dCta = scene.querySelector<HTMLAnchorElement>('[data-d-cta]')!;
-
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const D = reduce ? 0.001 : 1; // multiplicateur de durée (0 ≈ instantané)
-
-    let i = 0;
-    let mode: 'hero' | 'detail' = 'hero';
-    let busy = false;
-
-    const peindreFiche = (m: Modele) => {
-      dNom.textContent = m.nom;
-      dAnse.textContent = m.anse;
-      dPrix.innerHTML = `${m.prix}&nbsp;€`;
-      dDesc.textContent = m.description;
-      dCta.href = `/personnaliser?modele=${m.slug}`;
-    };
-
-    // Slide masqué d'un texte (sort vers le haut/bas, le nouveau entre du côté opposé)
-    const maskSwap = (el: HTMLElement, texte: string, sign: number) => {
-      gsap.to(el, {
-        yPercent: -sign * 110, autoAlpha: 0, duration: 0.3 * D, ease: 'power2.in',
-        onComplete: () => {
-          el.textContent = texte;
-          gsap.set(el, { yPercent: sign * 110 });
-          gsap.to(el, { yPercent: 0, autoAlpha: 1, duration: 0.45 * D, ease: 'power3.out' });
-        },
-      });
-    };
-
-    const allerVers = (dir: number) => {
-      if (busy || mode !== 'hero') return;
-      const ni = (i + dir + modeles.length) % modeles.length;
-      if (ni === i) return;
-      busy = true;
-      const m = modeles[ni];
-      const sign = dir >= 0 ? 1 : -1;
-
-      // 1) Balayage vertical de la couleur sur le panneau droit
-      gsap.set(wipe, { backgroundColor: m.couleur, yPercent: sign * 100, visibility: 'visible' });
-      const tl = gsap.timeline({
-        onComplete: () => {
-          scene.style.setProperty('--c', m.couleur);
-          gsap.set(wipe, { visibility: 'hidden' });
-          counter.textContent = String(ni + 1);
-          i = ni;
-          busy = false;
-        },
-      });
-      tl.to(wipe, { yPercent: 0, duration: 0.6 * D, ease: 'power3.inOut' }, 0);
-
-      // 2) Sac : fondu + zoom (le sortant grossit et s'efface, l'entrant arrive de plus petit)
-      const sortant = bags[i];
-      const entrant = bags[ni];
-      entrant.hidden = false;
-      gsap.set(entrant, { autoAlpha: 0, scale: 0.9, yPercent: sign * 5 });
-      tl.to(sortant, {
-        autoAlpha: 0, scale: 1.08, yPercent: -sign * 5, duration: 0.4 * D, ease: 'power2.in',
-        onComplete: () => { sortant.hidden = true; gsap.set(sortant, { scale: 1, yPercent: 0 }); },
-      }, 0);
-      tl.to(entrant, { autoAlpha: 1, scale: 1, yPercent: 0, duration: 0.55 * D, ease: 'power3.out' }, 0.12 * D);
-
-      // 3) Textes masqués + fiche détail prête en coulisse
-      maskSwap(titleEl, m.nom, sign);
-      maskSwap(subEl, m.baseline, sign);
-      peindreFiche(m);
-    };
-
-    const ouvrirDetail = () => {
-      if (busy || mode !== 'hero') return;
-      busy = true;
-      mode = 'detail';
-      scene.dataset.mode = 'detail';
-      detail.setAttribute('aria-hidden', 'false');
-      moreBtn.textContent = '← Retour';
-      const tl = gsap.timeline({ onComplete: () => { busy = false; } });
-      tl.to(panelLeft, { width: '40%', backgroundColor: CREAM, duration: 0.7 * D, ease: 'power3.inOut' }, 0)
-        .to(right, { width: '60%', duration: 0.7 * D, ease: 'power3.inOut' }, 0)
-        .to(stage, { xPercent: 24, scale: 1.06, duration: 0.7 * D, ease: 'power3.inOut' }, 0)
-        .to(titles, { autoAlpha: 0, duration: 0.25 * D }, 0)
-        .fromTo(detail.children,
-          { autoAlpha: 0, y: 26 },
-          { autoAlpha: 1, y: 0, stagger: 0.07 * D, duration: 0.5 * D, ease: 'power3.out' }, 0.32 * D);
-    };
-
-    const fermerDetail = () => {
-      if (busy || mode !== 'detail') return;
-      busy = true;
-      mode = 'hero';
-      scene.dataset.mode = 'hero';
-      moreBtn.textContent = 'Découvrir →';
-      const tl = gsap.timeline({
-        onComplete: () => {
-          detail.setAttribute('aria-hidden', 'true');
-          panelLeft.style.removeProperty('background-color'); // reprend var(--c)
-          busy = false;
-        },
-      });
-      tl.to(detail.children, { autoAlpha: 0, y: 18, duration: 0.25 * D, ease: 'power2.in' }, 0)
-        .to(panelLeft, { width: '50%', backgroundColor: modeles[i].couleur, duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
-        .to(right, { width: '50%', duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
-        .to(stage, { xPercent: 0, scale: 1, duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
-        .to(titles, { autoAlpha: 1, duration: 0.4 * D }, 0.3 * D);
-    };
-
-    // Contrôles
-    nextBtn.addEventListener('click', () => allerVers(1));
-    prevBtn.addEventListener('click', () => allerVers(-1));
-    moreBtn.addEventListener('click', () => (mode === 'hero' ? ouvrirDetail() : fermerDetail()));
-
-    // Molette : change de modèle en mode hero, ferme la fiche en mode détail
-    let wheelLock = false;
-    scene.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      if (wheelLock || busy) return;
-      wheelLock = true;
-      setTimeout(() => (wheelLock = false), 720);
-      const dir = e.deltaY > 0 ? 1 : -1;
-      if (mode === 'hero') allerVers(dir);
-      else if (dir < 0) fermerDetail();
-    }, { passive: false });
-
-    // Clavier
-    addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowDown') allerVers(1);
-      else if (e.key === 'ArrowUp') { mode === 'detail' ? fermerDetail() : allerVers(-1); }
-      else if (e.key === 'Enter' && mode === 'hero') ouvrirDetail();
-      else if (e.key === 'Escape' && mode === 'detail') fermerDetail();
-    });
+    inners.forEach((el) => io.observe(el));
   }
 </script>

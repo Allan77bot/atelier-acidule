@@ -8,12 +8,13 @@
 
 ## 📌 État actuel (réécrit à chaque session)
 
-**Phase :** **passe qualité UI/UX (mobile-first, premium) terminée** sur la branche
-`feat/refonte-accueil` (changements **non commités**, en attente de validation visuelle d'Allan).
-La home `/index` est désormais une **page éditoriale** (accroche + CTA + photo héros) et
-l'**expérience split-screen GSAP** vit sur **`/mes-creations`**. `main` garde l'ancienne
-vitrine multi-pages. **Snapshot détaillé et à jour : `docs/ETAT.md`** (les notes ci-dessous
-restent valables pour l'architecture du split-screen).
+**Phase :** **refonte complète terminée** sur la branche `feat/refonte-accueil` (commits **locaux
+non poussés**) : `/index` est une **vraie landing page** (layout Base, scroll), `/mes-creations` est
+une **expérience scroll-snap** (1 sac = 1 section couleur, plus de GSAP/boutons/mode détail), et la
+**personnalisation est supprimée** (commande = **DM Instagram**). En ligne :
+https://atelier-acidule.netlify.app. `main` garde l'ancienne vitrine. **Snapshot détaillé et à jour :
+`docs/ETAT.md`.** ⚠️ Les notes d'architecture ci-dessous (configurateur, split-screen GSAP, ancienne
+home éditoriale) sont **PÉRIMÉES** par la refonte — à actualiser dans `CLAUDE.md`.
 
 ### 🚧 Refonte split-screen (branche)
 - **Fondation** : git initialisé, branche dédiée, GSAP 3.15 + Lenis 1.3 installés.
@@ -110,6 +111,23 @@ texte) + 4 images `public/images/accueil-*.png` (non suivies). Dev server à rel
 ---
 
 ## 🗓️ Log des sessions (append-only)
+
+### 2026-06-27 (refonte) — Vraie landing + /mes-creations scroll + suppression perso
+Refonte demandée par Allan (trop d'erreurs sur l'ancienne version). Cadrage validé : commande = **DM
+Instagram**, périmètre **home + créations**, créations = **1 sac / 1 section plein écran** au scroll.
+**Workflow ultracode** (3 lots disjoints en parallèle + revue adversariale → 3× « clean ») :
+- `/index` réécrit en **vraie landing** (layout Base : hero sac flottant + halo, 3 valeurs, aperçu
+  catalogue 4 cartes, teasers atelier/éditions, bandeau final ; CTA « Commander » → Instagram).
+- `/mes-creations` réécrit en **CSS scroll-snap** (conteneur `.reel`, 4 sections couleur plein écran,
+  texte blanc lisible + scrim, indicateur « Défiler ↓ », lien « Commander en DM ») — **GSAP, flèches,
+  bouton Découvrir et mode détail SUPPRIMÉS** → règle le bug du rectangle blanc illisible.
+- **Suppression perso** : `personnaliser.astro`, `Configurateur.astro`, `CarteModele.astro` (mort) + 9
+  `sim-*.png` (git rm) ; liens « Personnaliser »/« SHOP TON SAC » → Instagram ; `/personnaliser` = 404.
+Build vert (5 pages), 0 erreur console, 0 débordement (390 + 1440), lisibilité OK sur les 4 couleurs.
+Redéployé en manuel → live OK. **Piège appris** : après réécriture massive + suppressions, **redémarrer
+le dev server** (overlay HMR « Unhandled rejection » périmé alors que console vide + build vert) — tuer
+le PID du port 4321, pas tout node. Commits **locaux non poussés** (Allan branchera l'auto-deploy plus
+tard). **À faire : actualiser `CLAUDE.md`** (périmé).
 
 ### 2026-06-27 (suite) — Passe qualité UI/UX (mobile-first, premium), /goal autonome
 Audit Playwright (6 pages, mobile + desktop) → 5 priorités, puis 5 correctifs : home **scrollable

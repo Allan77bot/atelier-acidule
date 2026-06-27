@@ -1,170 +1,420 @@
 ---
-// Nouvelle page d'accueil « split éditorial » : accroche + CTA à gauche (crème),
-// photo studio héros à droite. Réutilise la coquille Immersif (header + menu).
-// L'ancien accueil split-screen est devenu /mes-creations.
-import Immersif from '../layouts/Immersif.astro';
+// Landing page « Atelier Acidulé » — page qui scrolle, layout classique (Nav + Footer).
+// Hero produit flottant, valeurs, aperçu catalogue, teasers atelier & éditions,
+// bandeau d'appel final. Mobile-first, 0 overflow-x, tokens du design system uniquement.
+import Base from '../layouts/Base.astro';
+import { modeles } from '../data/modeles';
 
-const minis = [
-  { src: '/images/accueil-mini-1-detoure.png', alt: 'Sac bordeaux au crochet' },
-  { src: '/images/accueil-mini-2-detoure.png', alt: 'Cabas marron aux anses laiton' },
-  { src: '/images/accueil-mini-3-detoure.png', alt: 'Sac rose au crochet' },
-];
+const instagram = 'https://www.instagram.com/atelier_acidule';
 ---
 
-<Immersif titre="Accueil">
+<Base
+  titre="Accueil"
+  description="Sacs et accessoires au crochet faits main à la demande — Atelier Acidulé. Pièces uniques, esprit méditerranéen sucré-doux."
+>
+  <!-- 1) HERO ----------------------------------------------------------- -->
   <section class="hero">
-    <!-- Gauche : accroche + CTA -->
-    <div class="hero__left">
-      <div class="hero__content">
-        <p class="hero__surtitre">Crochet fait main · Méditerranée</p>
-        <h1 class="hero__titre">Une pointe d'acidulé,<br />cousue main rien que pour toi.</h1>
-        <p class="hero__sous">
+    <div class="contenu hero__grille">
+      <div class="hero__texte">
+        <p class="surtitre">Crochet fait main · Méditerranée</p>
+        <h1>Une pointe d'acidulé, cousue main rien que pour toi.</h1>
+        <p class="hero__accroche">
           Des sacs et accessoires au crochet, faits à la demande, dans les
           couleurs que tu choisis. Des pièces uniques, à l'esprit sucré-doux.
         </p>
-
         <div class="hero__cta">
-          <a class="btn btn--primaire" href="/personnaliser">Personnaliser mon sac</a>
-          <a class="btn btn--secondaire" href="/mes-creations">Voir mes créations</a>
+          <a class="btn btn--primaire" href={instagram} target="_blank" rel="noopener noreferrer">
+            Commander sur Instagram
+          </a>
+          <a class="btn btn--ghost" href="/mes-creations">Voir mes créations</a>
         </div>
+      </div>
 
-        <a class="hero__gallery" href="/mes-creations" aria-label="Voir toutes mes créations">
-          {minis.map((m) => <img src={m.src} alt={m.alt} loading="lazy" decoding="async" />)}
-          <span class="hero__gallery-plus">+ de créations →</span>
-        </a>
+      <div class="hero__visuel">
+        <img
+          class="hero__photo"
+          src="/images/accueil-hero-detoure.png"
+          alt="Sac au crochet vert sauge fait main, posé sur fond crème"
+          decoding="async"
+          fetchpriority="high"
+        />
       </div>
     </div>
+  </section>
 
-    <!-- Droite : photo studio héros -->
-    <div class="hero__right">
-      <img
-        class="hero__photo"
-        src="/images/accueil-hero-detoure.png"
-        alt="Sac au crochet vert anis, anse tressée et charm fleur"
-        decoding="async"
-        fetchpriority="high"
-      />
+  <!-- 2) VALEURS --------------------------------------------------------- -->
+  <section class="section">
+    <div class="contenu">
+      <div class="valeurs__grille">
+        <article class="valeur">
+          <span class="valeur__ico" aria-hidden="true">🧶</span>
+          <h3 class="valeur__titre">Fait main à la demande</h3>
+          <p class="valeur__txt">Chaque pièce est crochetée pour toi, après commande.</p>
+        </article>
+        <article class="valeur">
+          <span class="valeur__ico" aria-hidden="true">🎨</span>
+          <h3 class="valeur__titre">Les couleurs que tu choisis</h3>
+          <p class="valeur__txt">On compose ensemble la palette de ton sac, fil par fil.</p>
+        </article>
+        <article class="valeur">
+          <span class="valeur__ico" aria-hidden="true">🍋</span>
+          <h3 class="valeur__titre">Esprit méditerranéen</h3>
+          <p class="valeur__txt">Inspiration Italie, citron acidulé et douceur sucrée.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3) MES CRÉATIONS (aperçu) ----------------------------------------- -->
+  <section class="section creations">
+    <div class="contenu">
+      <div class="creations__tete">
+        <p class="surtitre">Le catalogue</p>
+        <h2>Mes créations</h2>
+      </div>
+
+      <div class="creations__grille">
+        {modeles.map((m) => (
+          <article class="carte">
+            <div class="carte__media">
+              <img src={m.photo} alt={`${m.nom} — ${m.baseline}`} loading="lazy" decoding="async" />
+            </div>
+            <div class="carte__corps">
+              <div class="carte__tete">
+                <h3 class="carte__nom">{m.nom}</h3>
+                <span class="carte__prix">dès {m.prix} €</span>
+              </div>
+              <p class="carte__anse">
+                <span aria-hidden="true">🧶</span>{m.anse}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div class="creations__cta">
+        <a class="btn btn--primaire" href="/mes-creations">Voir toutes mes créations</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4) TEASER ATELIER -------------------------------------------------- -->
+  <section class="section">
+    <div class="contenu atelier__grille">
+      <div class="atelier__texte">
+        <p class="surtitre">L'atelier</p>
+        <h2>Du fil, des couleurs, beaucoup de peps.</h2>
+        <p>
+          Tout part d'une pelote et d'une envie. Je crochète chaque pièce à la
+          main, près de chez moi, en soignant le moindre détail.
+        </p>
+        <a class="btn btn--ghost" href="/atelier">Découvrir l'atelier</a>
+      </div>
+
+      <div class="atelier__media">
+        <img
+          src="/images/atelier-cabas.png"
+          alt="Cabas au crochet multicolore fait main"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- 5) TEASER ÉDITIONS SPÉCIALES -------------------------------------- -->
+  <section class="section editions">
+    <div class="contenu">
+      <p class="surtitre">En quantité limitée</p>
+      <h2>Éditions spéciales</h2>
+      <p>Des pièces uniques, composées à la main au gré des saisons.</p>
+      <a class="btn btn--ghost" href="/editions-speciales">Voir les éditions</a>
+    </div>
+  </section>
+
+  <!-- 6) BANDEAU FINAL --------------------------------------------------- -->
+  <section class="section final">
+    <div class="contenu">
+      <h2>Commande ta pièce unique</h2>
+      <p>Fait main en France, sur commande. On confirme couleurs et délai en DM.</p>
+      <a class="btn btn--citron" href={instagram} target="_blank" rel="noopener noreferrer">
+        Commander sur Instagram
+      </a>
     </div>
   </section>
 
   <style>
+    /* ====================================================================
+       1) HERO — produit détouré qui flotte sur le crème (pas de cadre photo)
+       ==================================================================== */
     .hero {
-      height: 100dvh;
-      display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
+      position: relative;
+      overflow: hidden; /* le halo reste contenu, jamais d'overflow-x */
       background: var(--creme);
     }
-
-    /* --- Colonne gauche : texte --- */
-    .hero__left {
-      display: flex;
+    .hero__grille {
+      display: grid;
+      gap: clamp(1.2rem, 5vw, 3rem);
       align-items: center;
-      padding: clamp(2rem, 6vw, 5rem);
-      padding-top: clamp(5rem, 10vh, 7rem); /* sous le header fixe */
+      padding-block: clamp(2.5rem, 7vw, 4.5rem);
     }
-    .hero__content { max-width: 30rem; }
-    .hero__surtitre {
-      margin: 0 0 1rem;
-      font-family: var(--font-corps);
-      font-weight: 700;
-      font-size: 0.8rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--olive);
+    .hero h1 {
+      margin-bottom: 0.55rem;
     }
-    .hero__titre {
-      margin: 0;
-      font-family: var(--font-titre);
-      font-weight: 600;
-      font-size: clamp(2.1rem, 4.6vw, 3.6rem);
-      line-height: 1.05;
-      color: var(--sapin);
-    }
-    .hero__sous {
-      margin: 1.2rem 0 0;
-      font-size: clamp(1rem, 1.4vw, 1.12rem);
-      line-height: 1.6;
+    .hero__accroche {
       color: var(--texte-doux);
+      font-size: clamp(1rem, 1.4vw, 1.15rem);
+      max-width: 46ch;
+      margin-bottom: 1.8rem;
     }
-
-    /* --- CTA --- */
-    .hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.85rem 1.5rem;
-      border-radius: 999px;
-      font-family: var(--font-corps);
-      font-weight: 700;
-      text-decoration: none;
-      transition: var(--transition);
-    }
-    .btn--primaire { background: var(--sapin); color: var(--creme); }
-    .btn--primaire:hover { background: var(--sapin-2); transform: translateY(-2px); }
-    .btn--secondaire { border: 1.5px solid var(--sauge); color: var(--sapin); }
-    .btn--secondaire:hover { background: var(--sauge-clair); }
-
-    /* --- Mini galerie --- */
-    .hero__gallery {
+    .hero__cta {
       display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-top: 2.4rem;
-      text-decoration: none;
-    }
-    .hero__gallery img {
-      width: clamp(48px, 6vw, 64px);
-      height: clamp(48px, 6vw, 64px);
-      object-fit: contain;
-      filter: drop-shadow(0 6px 9px rgba(20, 12, 8, 0.18));
-      transition: var(--transition);
-    }
-    .hero__gallery:hover img { transform: translateY(-3px); }
-    .hero__gallery-plus {
-      font-family: var(--font-corps);
-      font-weight: 700;
-      font-size: 0.85rem;
-      color: var(--terracotta);
-      margin-left: 0.3rem;
+      flex-wrap: wrap;
+      gap: 0.8rem;
     }
 
-    /* --- Colonne droite : sac détouré qui flotte sur le crème (pas de bloc photo) --- */
-    .hero__right { position: relative; overflow: hidden; background: transparent; }
-    /* halo doux derrière le sac pour la profondeur (premium, sans cadre) */
-    .hero__right::before {
+    /* Visuel : sac détouré centré, halo citron doux derrière, ombre portée */
+    .hero__visuel {
+      position: relative;
+      order: -1; /* mobile : visuel en premier pour l'impact de marque */
+      display: grid;
+      place-items: center;
+      min-height: 34vh;
+    }
+    .hero__visuel::before {
       content: '';
       position: absolute;
-      inset: 12% 8%;
+      inset: 6%;
       z-index: 0;
       border-radius: 50%;
-      background: radial-gradient(closest-side, color-mix(in srgb, var(--citron) 24%, transparent), transparent 72%);
-      filter: blur(10px);
+      background: radial-gradient(
+        closest-side,
+        color-mix(in srgb, var(--citron) 30%, transparent),
+        transparent 72%
+      );
+      filter: blur(14px);
     }
     .hero__photo {
       position: relative;
       z-index: 1;
+      width: min(78%, 320px);
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 24px 32px rgba(20, 12, 8, 0.22));
+    }
+
+    @media (min-width: 820px) {
+      .hero {
+        display: grid;
+        align-items: center;
+        min-height: 78vh;
+      }
+      .hero__grille {
+        grid-template-columns: 1.05fr 0.95fr;
+        padding-block: clamp(3rem, 6vw, 5rem);
+      }
+      .hero__visuel {
+        order: 0; /* desktop : texte gauche, visuel droite */
+        min-height: 0;
+      }
+      .hero__photo {
+        width: min(100%, 420px);
+      }
+    }
+
+    /* ====================================================================
+       2) VALEURS
+       ==================================================================== */
+    .valeurs__grille {
+      display: grid;
+      gap: clamp(1rem, 3vw, 1.8rem);
+    }
+    @media (min-width: 720px) {
+      .valeurs__grille {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    .valeur {
+      text-align: center;
+      padding: clamp(1.4rem, 3vw, 2rem);
+      background: color-mix(in srgb, var(--creme-2) 70%, transparent);
+      border: 1px solid color-mix(in srgb, var(--sauge) 24%, transparent);
+      border-radius: var(--radius-lg);
+    }
+    .valeur__ico {
+      display: block;
+      font-size: 2.4rem;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+    .valeur__titre {
+      margin: 0 0 0.4rem;
+      font-size: clamp(1.15rem, 2vw, 1.4rem);
+    }
+    .valeur__txt {
+      margin: 0;
+      color: var(--texte-doux);
+    }
+
+    /* ====================================================================
+       3) MES CRÉATIONS — cartes premium
+       ==================================================================== */
+    .creations__tete {
+      text-align: center;
+      margin-bottom: clamp(1.8rem, 4vw, 3rem);
+    }
+    .creations__tete h2 {
+      margin: 0;
+    }
+    .creations__grille {
+      display: grid;
+      gap: clamp(1.1rem, 3vw, 1.8rem);
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    }
+    .carte {
+      display: flex;
+      flex-direction: column;
+      background: var(--creme);
+      border: 1px solid color-mix(in srgb, var(--sauge) 18%, transparent);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--ombre-douce);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .carte:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--ombre);
+    }
+    .carte__media {
+      aspect-ratio: 4 / 3;
+      display: grid;
+      place-items: center;
+      padding: 1.2rem;
+      background: var(--creme-2);
+    }
+    .carte__media img {
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: clamp(1rem, 3vw, 2.5rem);
-      filter: drop-shadow(0 30px 36px rgba(20, 12, 8, 0.20));
+    }
+    .carte__corps {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 1rem 1.1rem 1.2rem;
+    }
+    .carte__tete {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+    .carte__nom {
+      margin: 0;
+      font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+    }
+    .carte__prix {
+      flex-shrink: 0;
+      align-self: center;
+      background: var(--citron);
+      color: var(--sapin);
+      font-family: var(--font-corps);
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .carte__anse {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin: 0;
+      color: var(--texte-doux);
+      font-size: 0.92rem;
+    }
+    .creations__cta {
+      text-align: center;
+      margin-top: clamp(1.8rem, 4vw, 3rem);
     }
 
-    /* --- Mobile : on empile (photo en haut), hauteur naturelle, la page scrolle
-       nativement (la home n'est PAS en mode `fixe`, cf. Immersif). --- */
-    @media (max-width: 760px) {
-      .hero {
-        height: auto;
-        min-height: 100dvh;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
+    /* ====================================================================
+       4) TEASER ATELIER — texte + cabas flottant sur dégradé chaud
+       ==================================================================== */
+    .atelier__grille {
+      display: grid;
+      gap: clamp(1.4rem, 4vw, 3rem);
+      align-items: center;
+    }
+    .atelier__texte h2 {
+      margin-bottom: 0.6rem;
+    }
+    .atelier__texte p {
+      color: var(--texte-doux);
+      margin-bottom: 1.6rem;
+    }
+    .atelier__media {
+      order: -1; /* mobile : visuel d'abord */
+      display: grid;
+      place-items: center;
+      padding: clamp(1.5rem, 4vw, 2.5rem);
+      min-height: 200px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(
+        140deg,
+        var(--creme-2),
+        color-mix(in srgb, var(--sauge-clair) 45%, var(--creme))
+      );
+    }
+    .atelier__media img {
+      width: min(80%, 320px);
+      object-fit: contain;
+      filter: drop-shadow(0 22px 30px rgba(20, 12, 8, 0.2));
+    }
+    @media (min-width: 820px) {
+      .atelier__grille {
+        grid-template-columns: 1fr 1fr;
       }
-      .hero__right { order: -1; height: 52dvh; }
-      .hero__left {
-        padding-top: 2rem;
-        padding-bottom: 3.5rem;
-        align-items: start;
+      .atelier__media {
+        order: 0; /* desktop : texte à gauche, visuel à droite */
       }
     }
+
+    /* ====================================================================
+       5) TEASER ÉDITIONS SPÉCIALES — bande crème claire centrée
+       ==================================================================== */
+    .editions {
+      text-align: center;
+      background: var(--creme-2);
+    }
+    .editions .contenu {
+      max-width: 640px;
+    }
+    .editions h2 {
+      margin: 0 0 0.5rem;
+    }
+    .editions p {
+      color: var(--texte-doux);
+      margin-bottom: 1.6rem;
+    }
+
+    /* ====================================================================
+       6) BANDEAU FINAL — pleine largeur, fond sapin, texte clair
+       ==================================================================== */
+    .final {
+      text-align: center;
+      background: var(--sapin);
+    }
+    .final .contenu {
+      max-width: 640px;
+    }
+    .final h2 {
+      color: var(--creme);
+      margin: 0 0 0.5rem;
+    }
+    .final p {
+      color: color-mix(in srgb, var(--creme) 85%, transparent);
+      margin-bottom: 1.8rem;
+    }
   </style>
-</Immersif>
+</Base>

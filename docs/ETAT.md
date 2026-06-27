@@ -6,58 +6,48 @@
 
 ## 🟢 OÙ ON EN EST (en 3 lignes)
 
-1. Site vitrine Astro en prod-démarrée ; **passe qualité mobile-first + premium** faite sur `feat/refonte-accueil`.
-2. **En ligne : https://atelier-acidule.netlify.app** (deploy CLI manuel du `dist/`). Dev : `http://localhost:4321`.
-3. Prochaine grande étape : **validation visuelle d'Allan** sur la passe qualité, puis nettoyage assets + configurateur (Allan).
+1. **Refonte faite** : vraie landing page + `/mes-creations` en scroll + **personnalisation supprimée**.
+2. **En ligne** : https://atelier-acidule.netlify.app (déploiement CLI manuel du `dist/`).
+3. Prochaine étape : **validation visuelle d'Allan**, puis mise à jour du `CLAUDE.md` (devenu périmé par la refonte).
 
 ## 👉 REPRISE IMMÉDIATE (à lire en premier)
 
-**Phase = passe qualité terminée et vérifiée (branche `feat/refonte-accueil`), NON commitée.**
-5 correctifs implémentés + revue adversariale 5 agents passée + revérifiés au navigateur (build vert,
-0 erreur console, 0 débordement). Au prochain démarrage :
-1. Faire **valider visuellement** la passe par Allan (home mobile, `/mes-creations`, `/atelier`).
-2. Après validation : supprimer (via trash, avec accord) les **assets orphelins** : `accueil-{petit-sac,pochette-livres,grand-sac,editions-speciales}.png` + les **originaux à fond** `accueil-mini-1/2/3.png` (remplacés par leurs versions `-detoure`). ⚠️ `accueil-hero.png` reste utilisé (bannière `/atelier`).
-3. Remplacer la photo `/atelier` (réutilise `accueil-hero.png` à fond = même visuel que la home) par une photo distincte de `Ref/catalogue/` (ou la détourer aussi).
-4. Puis : configurateur (Allan), slogan/CTA « Shop ton sac », harmonisation des en-têtes.
+**Phase = refonte complète terminée et vérifiée (branche `feat/refonte-accueil`), commitée en local NON poussée.**
+Au prochain démarrage :
+1. **Valider visuellement** la refonte avec Allan (home, `/mes-creations` scroll, lisibilité).
+2. **Mettre à jour `CLAUDE.md`** : il décrit encore le configurateur (supprimé), l'ancienne home éditoriale et le split-screen GSAP avec mode détail (remplacé par du scroll-snap). → lancer `/init` ou une passe de mise à jour.
+3. Brancher l'auto-deploy Netlify↔GitHub (qu'Allan fera lui-même) ; en attendant, redéployer en manuel après chaque modif (`netlify deploy --prod --dir=dist`).
 
 ## ✅ Fait (jalons — détail dans JOURNAL.md)
 
-- Scaffold Astro (config + design system + pages + composants).
-- **Configurateur PNG** (masque + dégradé, couleurs illimitées).
-- **Split-screen** SANDQVIST-like (GSAP) sur `/mes-creations` ; **home « split éditorial »** sur `/index`.
-- 3 familles d'images de sacs (détourées / accueil recolorisé / calques `sim-*`).
-- **Passe qualité (27/06)** sur `feat/refonte-accueil` :
-  - Home **scrollable sur mobile** (overflow `:hidden` rendu conditionnel via prop `fixe` d'`Immersif` ; seul `/mes-creations` est `fixe`).
-  - Barre de contrôle `/mes-creations` **réparée en mobile** (colonne, bouton dans le viewport, 0 débordement).
-  - **Fin de l'effet « rectangle »** : sacs **détourés** (`m.photo`) sur panneau coloré + ombre portée CSS (au lieu des `accueil-<slug>.png` recolorés).
-  - Typo titres **resserrée** (`letter-spacing` négatif h1/h2).
-  - Couche **`polish.css`** premium (halo de fond, liseré citron des sur-titres, ombre carte) + **photo bannière `/atelier`**.
-  - **Home sans bloc photo** : sac héros + 3 vignettes **détourés** (rembg `isnet-general-use`), posés sur le crème continu (halo citron + ombre) → plus aucun fond carré.
-  - Flèches `.arrow` passées à **44px** (cible tactile).
-  - **Revue adversariale 5 agents** (mobile, a11y, spécificité CSS, premium, assets) → 5 vrais correctifs appliqués (pièges de spécificité Astro).
+- Scaffold Astro + design system (`global.css` + `polish.css`).
+- **Landing `/index`** (layout Base, Nav verte + Footer) : hero sac flottant + halo, 3 valeurs, aperçu catalogue (4 cartes), teasers atelier & éditions, bandeau final. CTAs « Commander » → **DM Instagram**.
+- **`/mes-creations`** refait en **scroll-snap plein écran** : 1 sac = 1 section couleur, infos écrites dessus (texte blanc lisible, **plus de rectangle blanc**), indicateur « Défiler ↓ » qui s'efface, **plus de boutons/flèches/GSAP**, lien discret « Commander en DM ».
+- **Personnalisation supprimée** : page `/personnaliser`, composant `Configurateur`, `CarteModele` (mort), 9 calques `sim-*.png` retirés ; liens « Personnaliser » + « SHOP TON SAC » repointés sur Instagram.
+- Sacs détourés (rembg) partout (home, créations, atelier) — plus aucun fond carré.
+- Build vert (5 pages), 0 erreur console, 0 débordement, vérifié au navigateur (390 + 1440).
+- 2 workflows multi-agents (ultracode) : implémentation par lots disjoints + revue adversariale.
 
 ## 🔄 En cours / à venir
 
-- **Validation visuelle d'Allan** sur la passe qualité.
-- Nettoyage des 4 assets orphelins (après validation).
-- Photo `/atelier` distincte (catalogue).
-- Slogan citron + CTA « Shop ton sac » ; harmonisation des 2 en-têtes ; Lenis + loader intro ; exploiter `Ref/catalogue/`.
+- **Validation visuelle d'Allan** sur la refonte.
+- **Mise à jour `CLAUDE.md`** (périmé).
+- Auto-deploy Netlify↔GitHub (Allan le branchera) + `netlify.toml` déjà en place.
+- Plus tard : exploiter le reste de `Ref/catalogue/`, slogans/wording, paiement en ligne.
 
 ## 🚧 Blocages / en attente
 
-- ⏳ **Configurateur** : Allan le refait lui-même (rendu « photo recolorée » non validé) — **non touché**.
-- ⏳ **assets orphelins** (plus référencés) : `accueil-{petit-sac,pochette-livres,grand-sac,editions-speciales}.png` + `accueil-mini-1/2/3.png` (originaux) → à supprimer après validation.
-- ⏳ Photo `/atelier` = redite de la home : à remplacer.
-- ⏳ À confirmer cliente : nb couleurs max (présumé 3), structure éditions, logo SVG, mapping prix, canal de commande.
-- ⏳ Paiement : plus tard.
+- ⏳ `CLAUDE.md` périmé (à actualiser).
+- ⏳ Auto-deploy non branché (Allan le fera) → déploiements **manuels** en attendant.
+- ⏳ À confirmer cliente : structure éditions, logo SVG, mapping prix, modalités de commande/paiement.
 
 ## 🧱 Décisions verrouillées
 
-- Stack **Astro** ; commerce **hybride** (vitrine, paiement plus tard, commande on-site).
+- Stack **Astro** ; commerce **hybride**, **commande = DM Instagram** (`@atelier_acidule`), paiement plus tard.
+- **Personnalisation abandonnée** (plus de configurateur).
 - Identité Italie/Méditerranée ; palette sauge/sapin + citron + terracotta sur crème ; Playfair + Fraunces + Nunito.
-- **Premium ≠ plat** : finition via couche `polish.css` chargée en dernier (réf. kit PILOTE).
-- 2 blocs interactifs : split-screen (`/mes-creations`) + Configurateur (`personnaliser`).
-- **`Immersif` plein écran sans scroll = opt-in** (prop `fixe`), pas le défaut.
+- **Home = landing classique** (layout Base, scroll). **`/mes-creations` = scroll-snap** (layout Immersif `fixe`, conteneur interne `.reel`).
+- Premium ≠ plat : couche `polish.css` en dernier.
 
 ## 👥 Qui fait quoi
 
@@ -69,11 +59,11 @@
 
 ## 🌿 Git / liens
 
-- Repo : `github.com/Allan77bot/atelier-acidule` (origin) — branche **`feat/refonte-accueil`** (changements **non commités / non poussés**). `main` = ancienne vitrine.
-- **En ligne : https://atelier-acidule.netlify.app** (Netlify, site `atelier-acidule`, deploy **CLI manuel** du `dist/` — pas encore de déploiement continu git).
-- Serveur local : `npm run dev` → http://localhost:4321
-- Captures avant/après : `docs/audit-shots/`
+- Repo : `github.com/Allan77bot/atelier-acidule` (origin) — branche **`feat/refonte-accueil`** (commits **locaux non poussés** depuis la refonte). `main` = ancienne vitrine.
+- **En ligne : https://atelier-acidule.netlify.app** (Netlify, site `atelier-acidule`, deploy **CLI manuel** — pas d'auto-deploy git).
+- Serveur local : `npm run dev` → http://localhost:4321 (⚠️ après grosses modifs/suppressions, **redémarrer** le serveur sinon overlay HMR périmé).
+- Captures : `docs/audit-shots/` (préfixes `refonte-*` pour la refonte).
 
 ## 📄 Docs clés
 
-`JOURNAL.md` · `../HISTORIQUE.md` · `../CLAUDE.md` · `../CONTEXTE-PROJET.md`
+`JOURNAL.md` · `../HISTORIQUE.md` · `../CLAUDE.md` (⚠️ périmé) · `../CONTEXTE-PROJET.md`
