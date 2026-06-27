@@ -38,7 +38,8 @@ Netlify↔GitHub (Allan).
 
 **Suite (même jour) :** corrigé la **lisibilité des liens du menu mobile** (héritaient du crème clair sur
 panneau crème → forcés en `--sapin`) ; **`CLAUDE.md` actualisé** (refonte : landing, scroll, suppression
-perso, déploiement Netlify, gotcha Windows) ; **commits poussés sur GitHub** (`origin/feat/refonte-accueil`).
+perso, déploiement Netlify, gotcha Windows) ; **commits poussés sur GitHub** (`origin/feat/refonte-accueil`) ;
+**`gsap` + `lenis` désinstallés** (inutilisés depuis la refonte → seule dépendance : `astro`).
 
 ---
 

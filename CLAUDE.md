@@ -40,8 +40,8 @@ Vite périmé (« Unhandled rejection » alors que la console est vide et le `bu
 vert). Tuer **uniquement** le process du port 4321 (pas tout `node`), en PowerShell :
 `Get-NetTCPConnection -LocalPort 4321 -State Listen | %{ Stop-Process -Id $_.OwningProcess -Force }`.
 
-Dépendances : `gsap` et `lenis` sont **encore dans `package.json` mais plus utilisés**
-(GSAP retiré de `/mes-creations` à la refonte ; Lenis jamais branché) → à désinstaller au prochain nettoyage.
+Dépendances : **`astro` uniquement**. (`gsap` et `lenis` ont été **retirés** : GSAP remplacé par du
+scroll-snap CSS dans `/mes-creations`, Lenis jamais branché.)
 
 ### Arborescence code
 

@@ -128,7 +128,8 @@ Redéployé en manuel → live OK. **Piège appris** : après réécriture massi
 le dev server** (overlay HMR « Unhandled rejection » périmé alors que console vide + build vert) — tuer
 le PID du port 4321, pas tout node. **Suite même jour** : lisibilité des liens du **menu mobile** corrigée
 (vert sapin sur panneau crème) ; **`CLAUDE.md` actualisé** (refonte) ; **commits poussés sur GitHub**
-(`origin/feat/refonte-accueil`). Auto-deploy Netlify↔GitHub à brancher par Allan plus tard.
+(`origin/feat/refonte-accueil`) ; **`gsap` + `lenis` désinstallés** (seule dépendance : `astro`).
+Auto-deploy Netlify↔GitHub à brancher par Allan plus tard.
 
 ### 2026-06-27 (suite) — Passe qualité UI/UX (mobile-first, premium), /goal autonome
 Audit Playwright (6 pages, mobile + desktop) → 5 priorités, puis 5 correctifs : home **scrollable
