@@ -33,8 +33,12 @@ périmé** (« Unhandled rejection » alors que la console est vide et le build 
 server** (tuer le PID du port 4321, pas tout node). Le test de scroll programmatique est faussé par
 `scroll-behavior:smooth` → désactiver le smooth pour mesurer.
 
-**Reste / next :** validation Allan ; **mettre à jour `CLAUDE.md`** (périmé) ; brancher l'auto-deploy
+**Reste / next :** validation Allan ; désinstaller `gsap`/`lenis` (inutilisés) ; brancher l'auto-deploy
 Netlify↔GitHub (Allan).
+
+**Suite (même jour) :** corrigé la **lisibilité des liens du menu mobile** (héritaient du crème clair sur
+panneau crème → forcés en `--sapin`) ; **`CLAUDE.md` actualisé** (refonte : landing, scroll, suppression
+perso, déploiement Netlify, gotcha Windows) ; **commits poussés sur GitHub** (`origin/feat/refonte-accueil`).
 
 ---
 

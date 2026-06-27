@@ -8,13 +8,13 @@
 
 ## 📌 État actuel (réécrit à chaque session)
 
-**Phase :** **refonte complète terminée** sur la branche `feat/refonte-accueil` (commits **locaux
-non poussés**) : `/index` est une **vraie landing page** (layout Base, scroll), `/mes-creations` est
-une **expérience scroll-snap** (1 sac = 1 section couleur, plus de GSAP/boutons/mode détail), et la
-**personnalisation est supprimée** (commande = **DM Instagram**). En ligne :
-https://atelier-acidule.netlify.app. `main` garde l'ancienne vitrine. **Snapshot détaillé et à jour :
-`docs/ETAT.md`.** ⚠️ Les notes d'architecture ci-dessous (configurateur, split-screen GSAP, ancienne
-home éditoriale) sont **PÉRIMÉES** par la refonte — à actualiser dans `CLAUDE.md`.
+**Phase :** **refonte complète terminée, déployée et poussée** sur la branche `feat/refonte-accueil` :
+`/index` est une **vraie landing page** (layout Base, scroll), `/mes-creations` est une **expérience
+scroll-snap** (1 sac = 1 section couleur, plus de GSAP/boutons/mode détail), et la **personnalisation
+est supprimée** (commande = **DM Instagram**). En ligne : https://atelier-acidule.netlify.app.
+`main` garde l'ancienne vitrine. **Archi à jour : `CLAUDE.md` (actualisé) + `docs/ETAT.md`.**
+⚠️ Les notes d'architecture détaillées plus bas dans CE fichier (configurateur, split-screen GSAP,
+ancienne home) sont **PÉRIMÉES** — se fier à `CLAUDE.md`.
 
 ### 🚧 Refonte split-screen (branche)
 - **Fondation** : git initialisé, branche dédiée, GSAP 3.15 + Lenis 1.3 installés.
@@ -126,8 +126,9 @@ Instagram**, périmètre **home + créations**, créations = **1 sac / 1 section
 Build vert (5 pages), 0 erreur console, 0 débordement (390 + 1440), lisibilité OK sur les 4 couleurs.
 Redéployé en manuel → live OK. **Piège appris** : après réécriture massive + suppressions, **redémarrer
 le dev server** (overlay HMR « Unhandled rejection » périmé alors que console vide + build vert) — tuer
-le PID du port 4321, pas tout node. Commits **locaux non poussés** (Allan branchera l'auto-deploy plus
-tard). **À faire : actualiser `CLAUDE.md`** (périmé).
+le PID du port 4321, pas tout node. **Suite même jour** : lisibilité des liens du **menu mobile** corrigée
+(vert sapin sur panneau crème) ; **`CLAUDE.md` actualisé** (refonte) ; **commits poussés sur GitHub**
+(`origin/feat/refonte-accueil`). Auto-deploy Netlify↔GitHub à brancher par Allan plus tard.
 
 ### 2026-06-27 (suite) — Passe qualité UI/UX (mobile-first, premium), /goal autonome
 Audit Playwright (6 pages, mobile + desktop) → 5 priorités, puis 5 correctifs : home **scrollable
