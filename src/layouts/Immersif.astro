@@ -3,15 +3,18 @@
 // Pas de Nav/Footer classiques : un header minimal fixe + un tiroir menu.
 // C'est ici qu'on branchera plus tard le loader d'intro et le smooth-scroll Lenis.
 import '../styles/global.css';
+import '../styles/polish.css'; // finition premium, chargée après global
 
 interface Props {
   titre: string;
   description?: string;
+  fixe?: boolean; // true = plein écran sans scroll (réservé à l'expérience split-screen)
 }
 
 const {
   titre,
   description = 'Sacs et accessoires au crochet faits main à la demande — Atelier Acidulé. Une expérience à composer, fil par fil.',
+  fixe = false,
 } = Astro.props;
 
 const liens = [
@@ -38,7 +41,7 @@ const liens = [
       rel="stylesheet"
     />
   </head>
-  <body class="immersif">
+  <body class:list={['immersif', { 'immersif--fixe': fixe }]}>
     <header class="chrome" data-chrome>
       <a class="chrome__wordmark" href="/">
         <img class="chrome__logo" src="/images/logo.png" alt="Atelier Acidulé" width="40" height="40" decoding="async" />
@@ -60,10 +63,9 @@ const liens = [
     <main><slot /></main>
 
     <style>
-      .immersif {
-        margin: 0;
-        overflow: hidden; /* l'expérience tient en plein écran, pas de scroll natif */
-      }
+      .immersif { margin: 0; }
+      /* Plein écran sans scroll : réservé à l'expérience split-screen (prop `fixe`). */
+      .immersif--fixe { overflow: hidden; height: 100dvh; }
       .immersif::before { display: none; } /* pas de mosaïque par-dessus les panneaux */
 
       .chrome {

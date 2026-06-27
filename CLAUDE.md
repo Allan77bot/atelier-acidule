@@ -202,6 +202,29 @@ avant d'affirmer → tracer avant de partir.**
 - **Communication** : français, direct, on explique le *pourquoi* ; niveau
   débutant respecté (on lit le code pour l'utilisateur, pas de dump brut).
 
+## Référence — Kit PILOTE (recettes site web réutilisables)
+
+Carnet de bord transverse d'Allan (méthode + recettes apprises sur d'autres sites) :
+`C:\Users\allan\Projects\PILOTE - Kit Site Web\`. Points d'entrée : son `README.md`
++ `CHECKLISTS.md`.
+
+**Réflexe** : dès qu'on touche à l'un de ces sujets, ouvrir le fichier du kit
+correspondant AVANT d'agir (ne pas réinventer ce qui y est déjà résolu) :
+
+- **Contenu IA** (visuels/vidéos produit ; règle d'or « ne jamais cuire le texte de
+  marque dans une génération IA ») → `02-CONTENU-IA/`
+- **ffmpeg** (ré-encodage, vidéo qui défile au scroll = all-intra, posters) →
+  `02-CONTENU-IA/recettes-ffmpeg.md`
+- **Animations scroll** (scroll-stack, pin sticky, `prefers-reduced-motion`) →
+  `03-DESIGN-ANIMATION/recettes-scroll.md`
+- **Déploiement / preview** (Netlify, validation sur mobile réel) →
+  `04-DEPLOIEMENT-PREVIEW/`
+- **Handoff** (livraison à un dév/client, repo 0 trace IA) → `05-HANDOFF/`
+
+Le kit est une **référence en lecture** (modèle A) : on copie/adapte ses recettes
+ici, on ne code pas dedans. Trace de session au format kit : `docs/ETAT.md` +
+`docs/JOURNAL.md` (en miroir de `HISTORIQUE.md`).
+
 ## Contrainte d'environnement critique
 
 `E:\Git` est le **répertoire d'installation de Git pour Windows**, PAS un projet.

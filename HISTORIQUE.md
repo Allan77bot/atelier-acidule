@@ -8,12 +8,12 @@
 
 ## 📌 État actuel (réécrit à chaque session)
 
-**Phase :** **refonte « split-screen » en cours** sur la branche
-`feat/refonte-split-screen` (inspirée du site SANDQVIST, vidéo de réf. analysée).
-`main` garde encore l'ancienne vitrine multi-pages. Décision validée avec Allan :
-**tout le site** passe en expérience plein écran, les flèches font défiler **les 4
-modèles**, stack **GSAP + Lenis**, parcours **accueil → fiche détail → personnaliser
-→ commander**.
+**Phase :** **passe qualité UI/UX (mobile-first, premium) terminée** sur la branche
+`feat/refonte-accueil` (changements **non commités**, en attente de validation visuelle d'Allan).
+La home `/index` est désormais une **page éditoriale** (accroche + CTA + photo héros) et
+l'**expérience split-screen GSAP** vit sur **`/mes-creations`**. `main` garde l'ancienne
+vitrine multi-pages. **Snapshot détaillé et à jour : `docs/ETAT.md`** (les notes ci-dessous
+restent valables pour l'architecture du split-screen).
 
 ### 🚧 Refonte split-screen (branche)
 - **Fondation** : git initialisé, branche dédiée, GSAP 3.15 + Lenis 1.3 installés.
@@ -110,6 +110,29 @@ texte) + 4 images `public/images/accueil-*.png` (non suivies). Dev server à rel
 ---
 
 ## 🗓️ Log des sessions (append-only)
+
+### 2026-06-27 (suite) — Passe qualité UI/UX (mobile-first, premium), /goal autonome
+Audit Playwright (6 pages, mobile + desktop) → 5 priorités, puis 5 correctifs : home **scrollable
+mobile** (prop `fixe` sur `Immersif` ; le `overflow:hidden` n'est plus le défaut), barre
+`/mes-creations` mobile **en colonne** (bouton dans le viewport), **sacs détourés** posés sur le
+panneau coloré + ombre CSS (fin de l'effet « rectangle »), typo titres **resserrée**, couche
+**`polish.css`** (halo de fond, liseré citron des sur-titres, ombre carte) + **photo bannière
+`/atelier`** + flèches 44px. **Workflow multi-agents adversarial (ultracode)** : 5 lentilles
+(mobile, a11y, spécificité CSS, premium, assets) → 5 correctifs de spécificité Astro appliqués et
+revérifiés. Build vert, **0 erreur console, 0 débordement horizontal**. **Rien commité** (validation
+Allan attendue). **Configurateur non touché** (Allan le refait). Assets devenus orphelins :
+`accueil-{petit-sac,pochette-livres,grand-sac,editions-speciales}.png` (à supprimer après validation).
+Piège appris (**candidat kit PILOTE**) : **les styles scopés Astro battent une couche `polish.css`
+globale** sur les classes page-spécifiques (`[data-astro-cid]` ⇒ spécificité supérieure) ; ne pas
+redéclarer une prop en raccourci qui réinitialise ce que pose polish. Captures : `docs/audit-shots/`.
+**Suite (demande Allan « ne plus voir le fond carré des photos »)** : sac héros + 3 vignettes de
+la home **détourés** (rembg `isnet-general-use`) et posés sur le crème continu (halo citron + ombre)
+→ plus aucun bloc photo. Originaux `accueil-mini-1/2/3.png` + 4 `accueil-<slug>.png` devenus orphelins
+(`accueil-hero.png` reste utilisé par la bannière `/atelier`, à détourer/remplacer plus tard).
+**Vérif UX/UI finale OK** (tiroir-menu immersif, configurateur, états interactifs) puis **mise en
+ligne Netlify** : site `atelier-acidule` créé via CLI, **deploy manuel du `dist/`** →
+**https://atelier-acidule.netlify.app** (live vérifié, 0 erreur console). ⚠️ Déploiement **non
+continu** (pas branché au git) et travail **non commité/non poussé** : à faire pour automatiser.
 
 ### 2026-06-27 — Vraies photos produit, accueil plein couleur, logo
 **Hors projet (début de session)** : install d'**UltraCode-Shim** (outil, PAS un skill)

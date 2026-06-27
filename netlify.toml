@@ -1,0 +1,10 @@
+# Configuration de build Netlify — site Astro statique (Atelier Acidulé)
+# Permet le déploiement continu : à chaque push de la branche de prod,
+# Netlify lance `npm run build` et publie le dossier `dist/`.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"

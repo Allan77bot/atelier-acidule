@@ -5,9 +5,9 @@
 import Immersif from '../layouts/Immersif.astro';
 
 const minis = [
-  { src: '/images/accueil-mini-1.png', alt: 'Sac bordeaux au crochet' },
-  { src: '/images/accueil-mini-2.png', alt: 'Cabas marron aux anses laiton' },
-  { src: '/images/accueil-mini-3.png', alt: 'Sac rose au crochet' },
+  { src: '/images/accueil-mini-1-detoure.png', alt: 'Sac bordeaux au crochet' },
+  { src: '/images/accueil-mini-2-detoure.png', alt: 'Cabas marron aux anses laiton' },
+  { src: '/images/accueil-mini-3-detoure.png', alt: 'Sac rose au crochet' },
 ];
 ---
 
@@ -39,7 +39,7 @@ const minis = [
     <div class="hero__right">
       <img
         class="hero__photo"
-        src="/images/accueil-hero.png"
+        src="/images/accueil-hero-detoure.png"
         alt="Sac au crochet vert anis, anse tressée et charm fleur"
         decoding="async"
         fetchpriority="high"
@@ -113,11 +113,10 @@ const minis = [
       text-decoration: none;
     }
     .hero__gallery img {
-      width: clamp(44px, 5vw, 58px);
-      height: clamp(44px, 5vw, 58px);
-      object-fit: cover;
-      border-radius: 12px;
-      box-shadow: var(--ombre-douce);
+      width: clamp(48px, 6vw, 64px);
+      height: clamp(48px, 6vw, 64px);
+      object-fit: contain;
+      filter: drop-shadow(0 6px 9px rgba(20, 12, 8, 0.18));
       transition: var(--transition);
     }
     .hero__gallery:hover img { transform: translateY(-3px); }
@@ -129,26 +128,43 @@ const minis = [
       margin-left: 0.3rem;
     }
 
-    /* --- Colonne droite : photo --- */
-    .hero__right { position: relative; overflow: hidden; background: var(--creme-2); }
+    /* --- Colonne droite : sac détouré qui flotte sur le crème (pas de bloc photo) --- */
+    .hero__right { position: relative; overflow: hidden; background: transparent; }
+    /* halo doux derrière le sac pour la profondeur (premium, sans cadre) */
+    .hero__right::before {
+      content: '';
+      position: absolute;
+      inset: 12% 8%;
+      z-index: 0;
+      border-radius: 50%;
+      background: radial-gradient(closest-side, color-mix(in srgb, var(--citron) 24%, transparent), transparent 72%);
+      filter: blur(10px);
+    }
     .hero__photo {
+      position: relative;
+      z-index: 1;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      object-position: center 42%;
+      object-fit: contain;
+      padding: clamp(1rem, 3vw, 2.5rem);
+      filter: drop-shadow(0 30px 36px rgba(20, 12, 8, 0.20));
     }
 
-    /* --- Mobile : on empile, photo en haut, et on autorise le scroll --- */
+    /* --- Mobile : on empile (photo en haut), hauteur naturelle, la page scrolle
+       nativement (la home n'est PAS en mode `fixe`, cf. Immersif). --- */
     @media (max-width: 760px) {
-      :global(body.immersif) { overflow-y: auto; height: auto; }
       .hero {
         height: auto;
         min-height: 100dvh;
         grid-template-columns: 1fr;
-        grid-template-rows: 45vh auto;
+        grid-template-rows: auto auto;
       }
-      .hero__right { order: -1; }
-      .hero__left { padding-top: 2.5rem; }
+      .hero__right { order: -1; height: 52dvh; }
+      .hero__left {
+        padding-top: 2rem;
+        padding-bottom: 3.5rem;
+        align-items: start;
+      }
     }
   </style>
 </Immersif>

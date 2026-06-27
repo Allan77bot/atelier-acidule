@@ -7,7 +7,16 @@ import Base from '../layouts/Base.astro';
   description="L'histoire d'Atelier Acidulé : du crochet fait main, sur commande, avec une bonne dose de peps."
 >
   <section class="section">
-    <div class="contenu atelier">
+    <div class="contenu">
+      <figure class="atelier__hero">
+        <img
+          src="/images/atelier-cabas.png"
+          alt="Cabas au crochet multicolore fait main, charm fleur rose"
+          loading="eager"
+          decoding="async"
+        />
+      </figure>
+      <div class="atelier">
       <div class="atelier__texte">
         <p class="surtitre">L'atelier</p>
         <h1>Du fil, des couleurs,<br />beaucoup de peps.</h1>
@@ -47,11 +56,30 @@ import Base from '../layouts/Base.astro';
         </ul>
         <a class="btn btn--primaire" href="/personnaliser">Composer mon sac →</a>
       </aside>
+      </div>
     </div>
   </section>
 </Base>
 
 <style>
+  .atelier__hero {
+    margin: 0 0 clamp(1.6rem, 4vw, 2.6rem);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--ombre);
+    aspect-ratio: 16 / 7;
+    /* dégradé chaud de marque : le cabas détouré flotte dessus (pas de fond photo) */
+    background:
+      radial-gradient(120% 140% at 18% 0%, color-mix(in srgb, var(--citron) 22%, transparent), transparent 55%),
+      linear-gradient(135deg, var(--creme-2), color-mix(in srgb, var(--sauge-clair) 40%, var(--creme)));
+  }
+  .atelier__hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: clamp(0.8rem, 2.5vw, 1.8rem);
+    filter: drop-shadow(0 22px 26px rgba(20, 12, 8, 0.22));
+  }
   .atelier {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
@@ -64,7 +92,7 @@ import Base from '../layouts/Base.astro';
     background: #fff;
     border-radius: var(--radius-lg);
     padding: 2rem;
-    box-shadow: var(--ombre-douce);
+    /* ombre fournie par polish.css (couche de finition) */
     border: 1px solid color-mix(in srgb, var(--sauge) 22%, transparent);
   }
   .atelier__infos { list-style: none; padding: 0; margin: 1.2rem 0 1.6rem; }
@@ -74,6 +102,7 @@ import Base from '../layouts/Base.astro';
     border-bottom: 1px dashed color-mix(in srgb, var(--sauge) 30%, transparent);
   }
   @media (max-width: 760px) {
+    .atelier__hero { aspect-ratio: 4 / 3; }
     .atelier { grid-template-columns: 1fr; }
     .atelier__texte { text-align: center; }
     .atelier__texte p { margin-inline: auto; }
