@@ -6,14 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Site vitrine du client **Atelier Acidulé** (crochet fait à la demande). Phase
 **mise en production démarrée** : projet **Astro scaffoldé à la main** d'après
-le brief validé. Pages livrées : accueil, personnaliser (configurateur SVG
+le brief validé. Pages livrées : accueil (**expérience immersive split-screen**,
+refonte type SANDQVIST), personnaliser (configurateur PNG masque + dégradé
 recolorable), éditions spéciales (galerie), atelier/contact, commander
 (formulaire on-site placeholder, paiement plus tard).
+
+Le site a donc **deux blocs interactifs majeurs**, chacun documenté ci-dessous :
+l'**accueil split-screen** (`src/layouts/Immersif.astro` + `src/pages/index.astro`)
+et le **Configurateur** (`src/components/Configurateur.astro`).
 
 ### Commandes
 
 ```bash
-npm install        # installe les dépendances (Astro 5)
+npm install        # installe les dépendances (Astro 5 + gsap + lenis)
 npm run dev        # serveur de dev (http://localhost:4321)
 npm run build      # build de production -> dist/ (déjà présent)
 npm run preview    # sert le build de prod
@@ -23,12 +28,16 @@ npm run check      # vérif types/diagnostics Astro (astro check)
 Pas encore de tests unitaires : aucun framework de test installé. Quand on en
 ajoutera (Vitest pressenti), documenter ici comment lancer un seul test.
 
+Dépendances runtime : **`gsap`** (anime l'accueil split-screen) et **`lenis`**
+(smooth-scroll, prévu mais pas encore branché — voir commentaire dans `Immersif.astro`).
+
 ### Arborescence code
 
-- `src/pages/` — une page par route (`index`, `personnaliser`, `editions-speciales`, `atelier`, `commander`).
-- `src/layouts/Base.astro` — squelette HTML + polices Google Fonts (Playfair/Fraunces/Nunito) + `Nav`/`Footer` ; prend `titre` et `description` en props.
+- `src/pages/` — une page par route (`index`, `personnaliser`, `editions-speciales`, `atelier`, `commander`). `index.astro` = l'accueil split-screen (markup + CSS + script GSAP en un seul fichier).
+- `src/layouts/Base.astro` — squelette HTML « classique » + polices Google Fonts (Playfair/Fraunces/Nunito) + `Nav`/`Footer` ; prend `titre` et `description` en props. Utilisé par toutes les pages **sauf** l'accueil.
+- `src/layouts/Immersif.astro` — coquille **plein écran sans scroll** pour l'accueil split-screen : header minimal fixe (`wordmark` + burger) + tiroir menu, `overflow:hidden`, pas de mosaïque. Mêmes polices que `Base`. C'est là qu'on branchera le loader d'intro + Lenis.
 - `src/components/` — `Logo`, `Nav`, `Footer`, `CarteModele`, `Configurateur`, `IntroAnim` (intro animée scrollée : logo → citron coupé → jus → wordmark tricoté ; scroll-driven, RAF + lerp ; brief `briefs/intro-citron-scroll.md`).
-- `src/data/modeles.ts` — catalogue (`Modele[]` : slug, nom, baseline, description, prix, anse, photo, personnalisable). Export dérivé `modelesPerso` = `modeles.filter(m => m.personnalisable)`, **source de vérité** des modèles recolorables (utilisé par le Configurateur).
+- `src/data/modeles.ts` — catalogue (`Modele[]` : slug, nom, baseline, description, prix, anse, photo, personnalisable, **`couleur`** = couleur de fond du panneau dans l'accueil split-screen). Export dérivé `modelesPerso` = `modeles.filter(m => m.personnalisable)`, **source de vérité** des modèles recolorables (utilisé par le Configurateur). Les 4 modèles (dont éditions-spéciales) alimentent l'accueil ; les 3 `personnalisable` alimentent le Configurateur.
 - `src/styles/global.css` — tokens couleur/typo + utilitaires ; `:root` définit toute la palette (`--creme`, `--sapin`, `--citron`, `--terracotta`…) et le fond décoratif mosaïque via `body::before`.
 - `public/images/` — assets de prod : `logo.png`, `mosaique-citron.jpg`,
   `petit-sac.png`, `pochette-livres.png`, `grand-sac.png`, `edition-speciale.png`
@@ -56,10 +65,37 @@ ajoutera (Vitest pressenti), documenter ici comment lancer un seul test.
   illimitées » est **réalisée en PNG masque + dégradé CSS** (et non en SVG comme
   envisagé au cadrage) ; les fiches/cartes affichent les **vraies photos**.
 
+## Architecture de l'accueil split-screen
+
+> `src/pages/index.astro` (+ `src/layouts/Immersif.astro`) — à lire en entier
+> avant d'y toucher. Refonte type SANDQVIST. C'est le **deuxième bloc interactif**.
+
+- **Deux états, une seule scène** : `<section data-scene data-mode>` bascule entre
+  `mode="hero"` (le sélecteur de modèle) et `mode="detail"` (la fiche produit). Le
+  `data-mode` pilote des variantes CSS (la nav modèles disparaît en détail, etc.).
+- **Mise en page** : deux panneaux absolus (`.panel--left` blanc, `.panel--right`
+  couleur), un `.stage` central qui empile les 4 photos de sacs (`.bag`, une seule
+  visible via `hidden`), les titres état 1 (`.titles`), la fiche état 2 (`.detail`),
+  et la barre de contrôle (`.controls` : flèches ↑↓ + compteur + bouton Découvrir/Retour).
+- **Couleur du panneau** = `--c` sur la scène, posée depuis `m.couleur`. Le changement
+  de modèle fait un **balayage vertical** (`.wipe`) de l'ancienne vers la nouvelle couleur.
+- **Animations = GSAP** (`import gsap from 'gsap'` dans le `<script>`), pas de CSS
+  scroll-driven ici (à ne pas confondre avec `IntroAnim`). Fonctions clés : `allerVers(dir)`
+  (change de modèle : wipe couleur + fondu/zoom du sac + `maskSwap` des textes),
+  `ouvrirDetail()` / `fermerDetail()` (élargit le panneau gauche à 40 %, révèle la fiche
+  en stagger). Garde-fous : `busy` (verrou pendant une transition) et `wheelLock` (anti-spam molette).
+- **Navigation** : molette, flèches ↑↓, clavier (↑↓ pour changer/fermer, Entrée pour
+  ouvrir, Échap pour fermer). `prefers-reduced-motion` → multiplicateur de durée `D ≈ 0` (quasi instantané).
+- **Couplage data ↔ script** : les modèles sont injectés en JSON via
+  `<script type="application/json" data-models set:html={JSON.stringify(modeles)}>` et
+  relus côté client — **pas** de modèles codés en double. Le CTA fiche pointe vers
+  `/personnaliser?modele=<slug>` (entrée du Configurateur).
+- **Responsive** : sous 760 px le split passe **horizontal** (couleur en haut, blanc en bas).
+
 ## Architecture du Configurateur (la feature centrale)
 
-> `src/components/Configurateur.astro` — à lire en entier avant d'y toucher. C'est
-> le seul bloc vraiment interactif du site.
+> `src/components/Configurateur.astro` — à lire en entier avant d'y toucher.
+> Avec l'accueil split-screen, c'est l'un des deux blocs vraiment interactifs du site.
 
 - **Pas d'îlot Astro hydraté** : l'interactivité est un `<script>` inline classique
   (bundlé par Astro), sans directive `client:*` ni framework UI. Toute la logique
@@ -107,6 +143,9 @@ ajoutera (Vitest pressenti), documenter ici comment lancer un seul test.
   Fichiers lourds — **références d'entrée**, pas des assets de prod ; ne pas les
   modifier sans accord.
 - `Ref/VideoClient/` — vidéos client (`video.MP4`, `POST ATELIER ACIDULE.MP4`).
+- `Ref/catalogue/` — **27 nouvelles photos** produit numérotées (pochettes, cabas,
+  clutchs… en de nombreux coloris) à exploiter pour enrichir le catalogue/les galeries.
+  Encore non triées/intégrées. `Ref/images/` + `Ref/_preview/` — autres entrées de travail.
 - `audit.md` — **modèle de prompt d'audit** (lecture seule) pour un *autre*
   projet (thème Shopify « 9MM »). Gabarit réutilisable, pas lié à ce projet.
 - `skillorganisation.md` — méthode de travail générale d'Allan
@@ -132,12 +171,12 @@ avant d'affirmer → tracer avant de partir.**
   option plutôt qu'un catalogue.
 - **Preuve avant « c'est fait »** : ne jamais affirmer qu'un truc marche sans
   avoir lancé la commande de vérif et lu sa sortie. Si un test échoue, le dire.
-- **Git** : ⚠️ le projet **n'est pas encore un dépôt git** (`.git` absent) — le
-  workflow ci-dessous s'applique une fois `git init` fait (skill `github-init`
-  dispo). `main` reste stable, jamais coder directement dessus ; une préoccupation
-  = une branche (`feat/`, `fix/`, `chore/`, `docs/`) = une PR. **Jamais push /
-  déployer / ouvrir une PR sans accord explicite.** Jamais supprimer de fichiers
-  sans confirmation. Jamais commiter de secret.
+- **Git** : le projet **est un dépôt git** (refonte en cours sur la branche
+  `feat/refonte-split-screen`). `main` reste stable, jamais coder directement dessus ;
+  une préoccupation = une branche (`feat/`, `fix/`, `chore/`, `docs/`) = une PR.
+  **Jamais push / déployer / ouvrir une PR sans accord explicite.** Jamais supprimer
+  de fichiers sans confirmation. Jamais commiter de secret. (Suppression : utiliser
+  `trash`, pas `rm -rf`.)
 - **Communication** : français, direct, on explique le *pourquoi* ; niveau
   débutant respecté (on lit le code pour l'utilisateur, pas de dump brut).
 
