@@ -6,13 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Site vitrine du client **Atelier Acidulé** (crochet fait à la demande). Phase
 **mise en production démarrée** : projet **Astro scaffoldé à la main** d'après
-le brief validé. Pages livrées : accueil (**expérience immersive split-screen**,
-refonte type SANDQVIST), personnaliser (configurateur PNG masque + dégradé
-recolorable), éditions spéciales (galerie), atelier/contact, commander
-(formulaire on-site placeholder, paiement plus tard).
+le brief validé. Pages livrées : accueil (**home « split éditorial »** : accroche +
+CTA à gauche, photo studio héros à droite), mes créations (**expérience immersive
+split-screen**, refonte type SANDQVIST — l'ancien accueil), personnaliser
+(configurateur PNG masque + dégradé recolorable), éditions spéciales (galerie),
+atelier/contact, commander (formulaire on-site placeholder, paiement plus tard).
 
 Le site a donc **deux blocs interactifs majeurs**, chacun documenté ci-dessous :
-l'**accueil split-screen** (`src/layouts/Immersif.astro` + `src/pages/index.astro`)
+le **split-screen** (`src/layouts/Immersif.astro` + `src/pages/mes-creations.astro`)
 et le **Configurateur** (`src/components/Configurateur.astro`).
 
 ### Commandes
@@ -34,26 +35,29 @@ serveur sinon l'image reste introuvable. Tuer le process avec
 `pkill -f "astro.js dev"` (et **pas** `"astro dev"`, qui ne matche pas le node).
 Le FS `/mnt/e` (WSL) est lent : builds et `npm install` prennent leur temps.
 
-Dépendances runtime : **`gsap`** (anime l'accueil split-screen) et **`lenis`**
+Dépendances runtime : **`gsap`** (anime le split-screen de `/mes-creations`) et **`lenis`**
 (smooth-scroll, prévu mais pas encore branché — voir commentaire dans `Immersif.astro`).
 
 ### Arborescence code
 
-- `src/pages/` — une page par route (`index`, `personnaliser`, `editions-speciales`, `atelier`, `commander`). `index.astro` = l'accueil split-screen (markup + CSS + script GSAP en un seul fichier).
-- `src/layouts/Base.astro` — squelette HTML « classique » + polices Google Fonts (Playfair/Fraunces/Nunito) + `Nav`/`Footer` ; prend `titre` et `description` en props. Utilisé par toutes les pages **sauf** l'accueil.
-- `src/layouts/Immersif.astro` — coquille **plein écran sans scroll** pour l'accueil split-screen : header minimal fixe (`wordmark` + burger) + tiroir menu, `overflow:hidden`, pas de mosaïque. Mêmes polices que `Base`. C'est là qu'on branchera le loader d'intro + Lenis.
+- `src/pages/` — une page par route (`index`, `mes-creations`, `personnaliser`, `editions-speciales`, `atelier`, `commander`). `index.astro` = la home « split éditorial » (accroche + CTA à gauche, photo héros à droite ; markup + CSS en un fichier, **pas** de script). `mes-creations.astro` = l'expérience split-screen GSAP (markup + CSS + script GSAP en un seul fichier) — c'est l'**ancien** accueil.
+- `src/layouts/Base.astro` — squelette HTML « classique » + polices Google Fonts (Playfair/Fraunces/Nunito) + `Nav`/`Footer` ; prend `titre` et `description` en props. Utilisé par toutes les pages **sauf** `index` et `mes-creations`.
+- `src/layouts/Immersif.astro` — coquille **plein écran sans scroll** (header minimal fixe `wordmark` + burger + tiroir menu, `overflow:hidden`, pas de mosaïque). Mêmes polices que `Base`. Utilisé par **`index` (home éditoriale) ET `mes-creations` (split-screen)**. C'est là qu'on branchera le loader d'intro + Lenis.
 - `src/components/` — `Logo`, `Nav`, `Footer`, `CarteModele`, `Configurateur`, `IntroAnim` (intro animée scrollée : logo → citron coupé → jus → wordmark tricoté ; scroll-driven, RAF + lerp ; brief `briefs/intro-citron-scroll.md`).
-- `src/data/modeles.ts` — catalogue (`Modele[]` : slug, nom, baseline, description, prix, anse, photo, personnalisable, **`couleur`** = couleur de fond du panneau dans l'accueil split-screen). Export dérivé `modelesPerso` = `modeles.filter(m => m.personnalisable)`, **source de vérité** des modèles recolorables (utilisé par le Configurateur). Les 4 modèles (dont éditions-spéciales) alimentent l'accueil ; les 3 `personnalisable` alimentent le Configurateur.
+- `src/data/modeles.ts` — catalogue (`Modele[]` : slug, nom, baseline, description, prix, anse, photo, personnalisable, **`couleur`** = couleur de fond du panneau dans le split-screen). Export dérivé `modelesPerso` = `modeles.filter(m => m.personnalisable)`, **source de vérité** des modèles recolorables (utilisé par le Configurateur). Les 4 modèles (dont éditions-spéciales) alimentent `/mes-creations` ; les 3 `personnalisable` alimentent le Configurateur.
 - `src/styles/global.css` — tokens couleur/typo + utilitaires ; `:root` définit toute la palette (`--creme`, `--sapin`, `--citron`, `--terracotta`…) et le fond décoratif mosaïque via `body::before`.
 - `public/images/` — assets de prod, **trois familles d'images de sacs à ne pas confondre** :
   - **photos détourées** `<slug>.png` (`petit-sac.png`, `pochette-livres.png`,
     `grand-sac.png`, `edition-speciale.png`) — fond transparent, pour cartes /
     éditions / autres pages.
   - **photos « accueil »** `accueil-<slug>.png` — fond recolorisé = couleur du
-    panneau, chargées par l'accueil split-screen (`src={/images/accueil-${m.slug}.png}`).
+    panneau, chargées par le split-screen `/mes-creations` (`src={/images/accueil-${m.slug}.png}`).
     ⚠️ Nom = **slug exact** : `accueil-editions-speciales.png` (pluriel), **≠** la
     base `edition-speciale.png` (singulier). C'est le seul cas où les deux familles
     divergent — un mauvais nom = sac invisible sans erreur de build.
+    À part : la home `/index` utilise ses propres visuels **hors familles** —
+    `accueil-hero.png` (photo studio héros, colonne droite) et `accueil-mini-1/2/3.png`
+    (vignettes de la mini-galerie « + de créations »).
   - **calques recolorables du Configurateur** : par modèle perso, un couple
     `sim-<slug>-tex.png` (texture maille) + `sim-<slug>-mask.png` (silhouette qui
     masque la couleur). `sim-<slug>.png` = aperçu composite.
@@ -79,10 +83,11 @@ Dépendances runtime : **`gsap`** (anime l'accueil split-screen) et **`lenis`**
   illimitées » est **réalisée en PNG masque + dégradé CSS** (et non en SVG comme
   envisagé au cadrage) ; les fiches/cartes affichent les **vraies photos**.
 
-## Architecture de l'accueil split-screen
+## Architecture du split-screen (`/mes-creations`)
 
-> `src/pages/index.astro` (+ `src/layouts/Immersif.astro`) — à lire en entier
+> `src/pages/mes-creations.astro` (+ `src/layouts/Immersif.astro`) — à lire en entier
 > avant d'y toucher. Refonte type SANDQVIST. C'est le **deuxième bloc interactif**.
+> (C'était l'ancien accueil ; la home `/index` est désormais une simple page éditoriale.)
 
 - **Deux états, une seule scène** : `<section data-scene data-mode>` bascule entre
   `mode="hero"` (le sélecteur de modèle) et `mode="detail"` (la fiche produit). Le
@@ -109,7 +114,7 @@ Dépendances runtime : **`gsap`** (anime l'accueil split-screen) et **`lenis`**
 ## Architecture du Configurateur (la feature centrale)
 
 > `src/components/Configurateur.astro` — à lire en entier avant d'y toucher.
-> Avec l'accueil split-screen, c'est l'un des deux blocs vraiment interactifs du site.
+> Avec le split-screen de `/mes-creations`, c'est l'un des deux blocs vraiment interactifs du site.
 
 - **Pas d'îlot Astro hydraté** : l'interactivité est un `<script>` inline classique
   (bundlé par Astro), sans directive `client:*` ni framework UI. Toute la logique
@@ -144,6 +149,9 @@ Dépendances runtime : **`gsap`** (anime l'accueil split-screen) et **`lenis`**
 ## Contenu actuel
 
 - `HISTORIQUE.md` — suivi de session (existe ; voir « Trace de session »). `CLAUDE.md` — ce fichier.
+- `CONTEXTE-PROJET.md` — **document autonome** (quoi/pourquoi/comment du projet) à
+  donner à une IA ou un nouveau collaborateur **sans le code sous les yeux**. Résume
+  produit, modèle éco, identité ; complète `CLAUDE.md` (archi vivante) et `HISTORIQUE.md` (journal).
 - **Scripts racine `_*.cjs`** (`_assets.cjs`, `_crop.cjs`, `_prod_assets.cjs`,
   `_recolor_test.cjs`…) — helpers **jetables** de génération/retouche des assets
   (notamment les couples `sim-*` du Configurateur). Hors build Astro, pas des
@@ -185,8 +193,8 @@ avant d'affirmer → tracer avant de partir.**
   option plutôt qu'un catalogue.
 - **Preuve avant « c'est fait »** : ne jamais affirmer qu'un truc marche sans
   avoir lancé la commande de vérif et lu sa sortie. Si un test échoue, le dire.
-- **Git** : le projet **est un dépôt git** (refonte en cours sur la branche
-  `feat/refonte-split-screen`). `main` reste stable, jamais coder directement dessus ;
+- **Git** : le projet **est un dépôt git** (travail en cours sur la branche
+  `feat/refonte-accueil`). `main` reste stable, jamais coder directement dessus ;
   une préoccupation = une branche (`feat/`, `fix/`, `chore/`, `docs/`) = une PR.
   **Jamais push / déployer / ouvrir une PR sans accord explicite.** Jamais supprimer
   de fichiers sans confirmation. Jamais commiter de secret. (Suppression : utiliser
