@@ -39,7 +39,10 @@ const liens = [
   </head>
   <body class="immersif">
     <header class="chrome" data-chrome>
-      <a class="chrome__wordmark" href="/">Atelier&nbsp;Acidulé</a>
+      <a class="chrome__wordmark" href="/">
+        <img class="chrome__logo" src="/images/logo.png" alt="Atelier Acidulé" width="40" height="40" decoding="async" />
+        <span class="chrome__name">Atelier&nbsp;Acidulé</span>
+      </a>
       <button class="chrome__burger" data-burger aria-label="Ouvrir le menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -74,11 +77,21 @@ const liens = [
       }
       .chrome > * { pointer-events: auto; }
       .chrome__wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        text-decoration: none;
+      }
+      .chrome__logo {
+        height: clamp(34px, 4.5vw, 44px);
+        width: auto;
+        display: block;
+        /* mix-blend-mode: exclude -> pas d'inversion des couleurs du logo */
+      }
+      .chrome__name {
         font-family: var(--font-wordmark);
         font-style: italic;
         font-size: clamp(1.1rem, 2vw, 1.4rem);
-        color: var(--encre);
-        text-decoration: none;
         letter-spacing: 0.01em;
         mix-blend-mode: difference;
         color: #fff; /* difference -> lisible sur blanc ET sur couleur */

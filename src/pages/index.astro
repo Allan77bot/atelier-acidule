@@ -10,15 +10,14 @@ const premier = modeles[0];
     <!-- Les deux panneaux : gauche blanc, droite couleur du modèle -->
     <div class="panels">
       <div class="panel panel--left" data-left></div>
-      <div class="panel panel--right" data-right>
-        <span class="wipe" data-wipe></span>
-      </div>
+      <div class="panel panel--right" data-right></div>
+      <span class="wipe" data-wipe></span>
     </div>
 
     <!-- Les sacs empilés (un seul visible), centrés sur la ligne -->
     <div class="stage" data-stage>
       {modeles.map((m, i) => (
-        <img class="bag" data-bag={m.slug} src={m.photo} alt={m.nom} hidden={i !== 0} decoding="async" />
+        <img class="bag" data-bag={m.slug} src={`/images/accueil-${m.slug}.png`} alt={m.nom} hidden={i !== 0} decoding="async" />
       ))}
     </div>
 
@@ -65,7 +64,7 @@ const premier = modeles[0];
   /* --- Panneaux --- */
   .panels { position: absolute; inset: 0; }
   .panel { position: absolute; top: 0; height: 100%; }
-  .panel--left { left: 0; width: 50%; background: #fff; }
+  .panel--left { left: 0; width: 50%; background: var(--c); }
   .panel--right { right: 0; width: 50%; background: var(--c); overflow: hidden; }
   .wipe {
     position: absolute;
@@ -93,7 +92,7 @@ const premier = modeles[0];
     width: 100%;
     height: 100%;
     object-fit: contain;
-    filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.35));
+    /* image opaque (fond = couleur du sac) : pas de drop-shadow CSS, l'ombre est dans la photo */
     will-change: transform, opacity;
   }
   .bag[hidden] { display: none; }
@@ -109,17 +108,30 @@ const premier = modeles[0];
     align-items: center;
   }
   .mask { overflow: hidden; padding: 0.1em 0; }
-  .mask--name { grid-column: 1; padding-left: clamp(1.5rem, 5vw, 5rem); }
-  .mask--sub { grid-column: 2; padding-left: clamp(1.5rem, 5vw, 5rem); }
+  /* Titre en haut, baseline en bas : on dégage le sac (centré) pour la lisibilité */
+  .mask--name {
+    grid-column: 1;
+    align-self: start;
+    padding-top: clamp(4.5rem, 13vh, 8rem);
+    padding-left: clamp(1.5rem, 5vw, 5rem);
+  }
+  .mask--sub {
+    grid-column: 2;
+    align-self: end;
+    text-align: right;
+    padding-bottom: clamp(5rem, 14vh, 9rem);
+    padding-right: clamp(1.5rem, 5vw, 5rem);
+  }
   .title {
     margin: 0;
     font-family: var(--font-titre);
     font-weight: 600;
     font-size: clamp(2.4rem, 6vw, 5.5rem);
     line-height: 1;
-    color: var(--encre);
+    color: #fff;
     text-transform: uppercase;
     letter-spacing: -0.01em;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
     will-change: transform, opacity;
   }
   .sub {
@@ -128,6 +140,7 @@ const premier = modeles[0];
     font-style: italic;
     font-size: clamp(1.1rem, 2.2vw, 1.8rem);
     color: #fff;
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.32);
     will-change: transform, opacity;
   }
 
@@ -238,10 +251,10 @@ const premier = modeles[0];
     .panel--right { top: 0; right: 0; width: 100%; height: 58%; }
     .stage { top: 46%; width: min(70vw, 320px); }
     .titles { grid-template-columns: 1fr; align-content: end; padding-bottom: 18%; }
-    .mask--name { grid-column: 1; text-align: center; padding: 0 1rem; }
-    .mask--sub { grid-column: 1; text-align: center; padding: 0.3rem 1rem 0; }
+    .mask--name { grid-column: 1; align-self: auto; text-align: center; padding: 0 1rem; }
+    .mask--sub { grid-column: 1; align-self: auto; text-align: center; padding: 0.3rem 1rem 0; }
     .title { font-size: clamp(2rem, 9vw, 3rem); }
-    .sub { color: var(--encre); }
+    .sub { color: #fff; }
     .detail { top: auto; bottom: 0; width: 100%; transform: none; padding: 1.4rem 1.5rem 6rem; }
     .scene[data-mode='detail'] .stage { top: 30%; }
   }
@@ -266,6 +279,8 @@ const premier = modeles[0];
     );
 
     const right = scene.querySelector<HTMLElement>('[data-right]')!;
+    const panelLeft = scene.querySelector<HTMLElement>('[data-left]')!;
+    const CREAM = getComputedStyle(document.documentElement).getPropertyValue('--creme').trim() || '#f6efdd';
     const wipe = scene.querySelector<HTMLElement>('[data-wipe]')!;
     const stage = scene.querySelector<HTMLElement>('[data-stage]')!;
     const bags = [...scene.querySelectorAll<HTMLElement>('[data-bag]')];
@@ -357,9 +372,9 @@ const premier = modeles[0];
       detail.setAttribute('aria-hidden', 'false');
       moreBtn.textContent = '← Retour';
       const tl = gsap.timeline({ onComplete: () => { busy = false; } });
-      tl.to(scene.querySelector('.panel--left'), { width: '40%', duration: 0.7 * D, ease: 'power3.inOut' }, 0)
+      tl.to(panelLeft, { width: '40%', backgroundColor: CREAM, duration: 0.7 * D, ease: 'power3.inOut' }, 0)
         .to(right, { width: '60%', duration: 0.7 * D, ease: 'power3.inOut' }, 0)
-        .to(stage, { xPercent: 14, scale: 1.06, duration: 0.7 * D, ease: 'power3.inOut' }, 0)
+        .to(stage, { xPercent: 24, scale: 1.06, duration: 0.7 * D, ease: 'power3.inOut' }, 0)
         .to(titles, { autoAlpha: 0, duration: 0.25 * D }, 0)
         .fromTo(detail.children,
           { autoAlpha: 0, y: 26 },
@@ -373,10 +388,14 @@ const premier = modeles[0];
       scene.dataset.mode = 'hero';
       moreBtn.textContent = 'Découvrir →';
       const tl = gsap.timeline({
-        onComplete: () => { detail.setAttribute('aria-hidden', 'true'); busy = false; },
+        onComplete: () => {
+          detail.setAttribute('aria-hidden', 'true');
+          panelLeft.style.removeProperty('background-color'); // reprend var(--c)
+          busy = false;
+        },
       });
       tl.to(detail.children, { autoAlpha: 0, y: 18, duration: 0.25 * D, ease: 'power2.in' }, 0)
-        .to(scene.querySelector('.panel--left'), { width: '50%', duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
+        .to(panelLeft, { width: '50%', backgroundColor: modeles[i].couleur, duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
         .to(right, { width: '50%', duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
         .to(stage, { xPercent: 0, scale: 1, duration: 0.7 * D, ease: 'power3.inOut' }, 0.05)
         .to(titles, { autoAlpha: 1, duration: 0.4 * D }, 0.3 * D);
