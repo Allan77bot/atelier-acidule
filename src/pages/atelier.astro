@@ -12,12 +12,36 @@ const infos = [
 
 <PageVoeu titre="L'atelier" description="L'histoire d'Atelier Acidulé : du crochet fait main, sur commande, avec une bonne dose de peps.">
   <section class="at-hero">
-    <div class="at-hero__wrap reveal">
-      <p class="eyebrow" style="color:var(--v-jaune-2)">L'atelier</p>
-      <h1 class="display at-hero__title">Du fil, des couleurs,<br /><em>beaucoup de peps.</em></h1>
-      <p>Atelier Acidulé, c'est un petit atelier où chaque sac naît d'une pelote et d'une envie. Inspirées par l'Italie, la Méditerranée et les étals gorgés de citrons, nos créations jouent l'acidulé et le sucré-doux à la fois.</p>
-      <p>Ici, rien n'est produit en série : tu choisis ton modèle et tes couleurs, et la pièce est crochetée à la main, rien que pour toi. Le temps d'un sac, on prend soin du détail comme d'une recette de famille.</p>
-      <a class="btn-pill btn-pill--ghost-light" href={IG} target="_blank" rel="noopener">Suivre l'atelier sur Instagram</a>
+    <div class="at-hero__wrap">
+      <div class="at-hero__texte reveal">
+        <p class="eyebrow" style="color:var(--v-jaune-2)">L'atelier</p>
+        <h1 class="display at-hero__title">Du fil, des couleurs,<br /><em>beaucoup de peps.</em></h1>
+        <p>Atelier Acidulé, c'est un petit atelier où chaque sac naît d'une pelote et d'une envie. Inspirées par l'Italie, la Méditerranée et les étals gorgés de citrons, nos créations jouent l'acidulé et le sucré-doux à la fois.</p>
+        <p>Ici, rien n'est produit en série : tu choisis ton modèle et tes couleurs, et la pièce est crochetée à la main, rien que pour toi. Le temps d'un sac, on prend soin du détail comme d'une recette de famille.</p>
+        <a class="btn-pill btn-pill--ghost-light" href={IG} target="_blank" rel="noopener">Suivre l'atelier sur Instagram</a>
+      </div>
+
+      {/* Boucle d'ambiance (muette, 3,5 s). Le poster s'affiche seul tant que la
+          vidéo n'est pas chargée, et reste seul si l'utilisateur a demandé à
+          réduire les animations (voir le script en bas de page). */}
+      <div class="at-hero__media reveal">
+        <video
+          class="at-hero__video"
+          data-ambiance
+          poster="/images/atelier-citrons-poster.webp"
+          width="720"
+          height="1280"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label="Des citrons dans une coupe, à côté des cartes de l'atelier"
+        >
+          <source src="/videos/atelier-citrons.webm" type="video/webm" />
+          <source src="/videos/atelier-citrons.mp4" type="video/mp4" />
+        </video>
+      </div>
     </div>
   </section>
 
@@ -40,7 +64,23 @@ const infos = [
 
 <style>
   .at-hero { background: var(--v-vert); color: var(--v-creme); padding: clamp(3rem, 7vw, 5.5rem) clamp(1.1rem, 4vw, 3rem); }
-  .at-hero__wrap { max-width: 780px; margin-inline: auto; }
+  .at-hero__wrap {
+    max-width: 1050px; margin-inline: auto;
+    display: grid; grid-template-columns: 1.15fr 0.85fr;
+    gap: clamp(1.8rem, 4vw, 3.5rem); align-items: center;
+  }
+  .at-hero__texte { min-width: 0; }
+
+  /* Cadre arrondi de la boucle d'ambiance. Le ratio est réservé en CSS pour
+     qu'aucun décalage n'apparaisse pendant le chargement. */
+  .at-hero__media { min-width: 0; }
+  .at-hero__video {
+    display: block; width: 100%; height: auto;
+    aspect-ratio: 720 / 1280; max-height: 62vh;
+    object-fit: cover; border-radius: 18px;
+    background: var(--v-creme-2);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  }
   .at-hero__title { color: var(--v-creme); font-size: clamp(2.2rem, 5vw, 3.6rem); margin-bottom: 1.4rem; }
   .at-hero__title em { font-style: normal; color: var(--v-jaune); }
   .at-hero p { color: rgba(245,239,224,.82); max-width: 60ch; }
@@ -57,5 +97,32 @@ const infos = [
 
   @media (max-width: 820px) {
     .at-info__wrap { grid-template-columns: 1fr; }
+    /* Le texte d'abord : la vidéo est une ambiance, pas une information. */
+    .at-hero__wrap { grid-template-columns: 1fr; }
+    .at-hero__video { max-height: 52vh; }
   }
 </style>
+
+<script>
+  // « Réduire les animations » : on n'impose pas une boucle en fond. Le poster
+  // (première image) reste affiché, la vidéo ne se lance pas.
+  const reduit = matchMedia('(prefers-reduced-motion: reduce)');
+  const clips = document.querySelectorAll<HTMLVideoElement>('video[data-ambiance]');
+
+  const appliquer = () => {
+    clips.forEach((v) => {
+      if (reduit.matches) {
+        v.removeAttribute('autoplay');
+        v.pause();
+        v.currentTime = 0;
+      } else {
+        // play() peut être refusé (onglet en fond, économiseur de batterie) :
+        // sans le catch, la promesse rejetée remonte en erreur console.
+        v.play().catch(() => {});
+      }
+    });
+  };
+
+  appliquer();
+  reduit.addEventListener('change', appliquer);
+</script>
