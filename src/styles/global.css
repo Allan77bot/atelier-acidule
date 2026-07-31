@@ -66,18 +66,10 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Fond décoratif : mosaïque citron en très faible opacité */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url('/images/mosaique-citron.jpg');
-  background-size: 420px;
-  background-repeat: repeat;
-  opacity: 0.06;
-  z-index: -1;
-  pointer-events: none;
-}
+/* Le fond décoratif « mosaïque citron » (body::before, opacité 6 %) a été
+   retiré : sur les aplats vert foncé, le motif transparaissait comme un
+   pictogramme parasite. La DA repose désormais sur des fonds pleins par
+   section. Le fichier public/images/mosaique-citron.jpg n'est plus référencé. */
 
 h1,
 h2,

@@ -39,8 +39,8 @@ const {
 </html>
 
 <style is:global>
-  /* La page vitrine remplace le décor mosaïque par des fonds pleins par section. */
-  body.vitrine::before { display: none; }
+  /* La DA vitrine travaille en fonds pleins par section (le décor mosaïque a
+     été retiré de global.css, cette surcharge n'a donc plus lieu d'être). */
   body.vitrine {
     --v-creme: #f5efe0;
     --v-creme-2: #efe7d3;
