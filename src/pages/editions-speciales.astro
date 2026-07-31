@@ -2,12 +2,14 @@
 // Éditions spéciales — DA « voeu ». Galerie de pièces uniques, contenu réel conservé.
 import PageVoeu from '../layouts/PageVoeu.astro';
 
+import { catalogue } from '../data/catalogue';
+
 const IG = 'https://www.instagram.com/atelier_acidule';
-const pieces = [
-  { titre: "Édition Limonade d'été", note: 'Pièce unique', photo: '/images/grand-sac.webp', dispo: true },
-  { titre: 'Pochette Provence', note: 'Série de 3', photo: '/images/pochette-livres.webp', dispo: true },
-  { titre: 'Petit sac Méditerranée', note: 'Pièce unique', photo: '/images/petit-sac.webp', dispo: false },
-];
+
+// Les vraies photos d'éditions spéciales du Drive. On ne leur invente ni nom
+// ni statut de disponibilité : ces pièces changent au fil des saisons et seule
+// la cliente sait ce qui reste — la réservation passe par le DM.
+const pieces = catalogue.find((c) => c.slug === 'editions-speciales')?.photos ?? [];
 ---
 
 <PageVoeu titre="Éditions spéciales" description="Des pièces uniques au crochet, en quantité limitée. Quand elles sont parties, elles sont parties.">
@@ -21,23 +23,23 @@ const pieces = [
 
   <section class="ed-gallery-sec">
     <div class="ed-gallery">
-      {pieces.map((p) => (
-        <article class:list={['ed-piece reveal', { 'ed-piece--epuise': !p.dispo }]}>
-          <div class="ed-piece__media">
-            <img src={p.photo} alt={p.titre} loading="lazy" decoding="async" />
-            {!p.dispo && <span class="ed-piece__badge">Épuisé</span>}
-          </div>
-          <div class="ed-piece__corps">
-            <p class="ed-piece__note">{p.note}</p>
-            <h3 class="ed-piece__titre">{p.titre}</h3>
-            {p.dispo ? (
-              <a class="btn-pill btn-pill--jaune" href={IG} target="_blank" rel="noopener">Réserver en DM</a>
-            ) : (
-              <span class="ed-piece__indispo">Plus disponible</span>
-            )}
-          </div>
-        </article>
+      {pieces.map((p, i) => (
+        <figure class="ed-piece reveal">
+          <img
+            src={p.thumb}
+            width={p.tw}
+            height={p.th}
+            alt={`Édition spéciale — pièce ${i + 1}`}
+            loading={i < 6 ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+        </figure>
       ))}
+    </div>
+
+    <div class="ed-cta reveal">
+      <p>Une pièce te fait de l'œil&nbsp;? Elles partent vite — envoie-moi un message pour savoir si elle est encore là.</p>
+      <a class="btn-pill btn-pill--jaune" href={IG} target="_blank" rel="noopener">Réserver en DM</a>
     </div>
   </section>
 </PageVoeu>
@@ -50,18 +52,19 @@ const pieces = [
   .ed-head p { color: rgba(245,239,224,.8); }
 
   .ed-gallery-sec { padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.1rem, 4vw, 3rem); }
-  .ed-gallery { max-width: 1050px; margin-inline: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
-  .ed-piece { background: var(--v-creme-2); border-radius: 18px; overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); }
+  .ed-gallery {
+    max-width: 1150px; margin-inline: auto;
+    display: grid; gap: clamp(0.6rem, 1.5vw, 1.1rem);
+    grid-template-columns: repeat(auto-fill, minmax(clamp(150px, 22vw, 250px), 1fr));
+  }
+  .ed-piece {
+    margin: 0; background: var(--v-creme-2); border-radius: 18px; overflow: hidden;
+    aspect-ratio: 3 / 4;
+    transition: transform var(--transition), box-shadow var(--transition);
+  }
   .ed-piece:hover { transform: translateY(-4px); box-shadow: 0 22px 50px -30px rgba(43,42,34,.5); }
-  .ed-piece__media { position: relative; aspect-ratio: 1; background: var(--v-creme); }
-  .ed-piece__media img { width: 100%; height: 100%; object-fit: cover; }
-  .ed-piece--epuise .ed-piece__media img { filter: grayscale(.6) opacity(.7); }
-  .ed-piece__badge { position: absolute; top: 12px; left: 12px; background: var(--v-encre); color: var(--v-creme); font-family: 'Archivo', sans-serif; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.3rem 0.7rem; border-radius: 999px; }
-  .ed-piece__corps { padding: 1.3rem 1.4rem 1.5rem; }
-  .ed-piece__note { font-family: 'Archivo', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; font-weight: 700; color: var(--v-jaune-2); margin: 0 0 0.35rem; }
-  .ed-piece__titre { font-family: 'Archivo', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--v-encre); margin: 0 0 1rem; }
-  .ed-piece__indispo { color: var(--v-doux); font-weight: 700; font-size: 0.85rem; }
+  .ed-piece img { width: 100%; height: 100%; object-fit: cover; }
 
-  @media (max-width: 860px) { .ed-gallery { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) { .ed-gallery { grid-template-columns: 1fr; max-width: 400px; } }
+  .ed-cta { max-width: 620px; margin: clamp(2.2rem, 5vw, 3.4rem) auto 0; text-align: center; }
+  .ed-cta p { color: var(--v-doux); margin-bottom: 1.1rem; }
 </style>

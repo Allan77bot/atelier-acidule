@@ -8,6 +8,7 @@ import Vitrine from '../layouts/Vitrine.astro';
 const nav = [
   { href: '/', label: 'Accueil' },
   { href: '/mes-creations', label: 'Collection' },
+  { href: '/catalogue', label: 'Catalogue' },
   { href: '/atelier', label: 'À propos' },
   { href: '/commander', label: 'Contact' },
 ];
@@ -216,7 +217,7 @@ const icon = (k: string): string => icons[k] ?? '';
 
       <div class="foot-col">
         <h4>Navigation</h4>
-        <a href="/">Accueil</a><a href="/mes-creations">Collection</a><a href="/atelier">À propos</a><a href="/commander">Contact</a>
+        <a href="/">Accueil</a><a href="/mes-creations">Collection</a><a href="/catalogue">Catalogue</a><a href="/atelier">À propos</a><a href="/commander">Contact</a>
       </div>
       <div class="foot-col">
         <h4>Informations</h4>
