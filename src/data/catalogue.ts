@@ -1,11 +1,11 @@
 // Catalogue photo — GÉNÉRÉ depuis le Drive « Photo sac » d'Allan (31/07/2026).
-// 223 photos converties en WebP (max 1600 px, q78) par le script
-// scratchpad/convert.py. Les libellés reprennent les noms de dossiers
-// de la cliente : aucune description produit n'est inventée ici.
+// 223 photos converties en WebP (max 1600 px, q78) par scratchpad/convert.py.
+// Les libellés reprennent les noms de dossiers de la cliente : aucune
+// description produit n'est inventée ici.
 
 export interface PhotoCatalogue {
   src: string;
-  /** largeur en px, pour réserver le ratio et éviter le CLS */
+  /** dimensions du fichier, pour réserver le ratio et éviter le CLS */
   w: number;
   h: number;
 }
@@ -255,7 +255,7 @@ export const catalogue: CategorieCatalogue[] = [
     slug: "homepage",
     libelle: "Visuels page d'accueil",
     photos: [
-      { src: "/images/catalogue/homepage/homepage-01.webp", w: 902, h: 1600 },
+      { src: "/images/catalogue/homepage/homepage-01.webp", w: 1016, h: 1600 },
       { src: "/images/catalogue/homepage/homepage-02.webp", w: 768, h: 1364 },
       { src: "/images/catalogue/homepage/homepage-03.webp", w: 768, h: 1364 },
       { src: "/images/catalogue/homepage/homepage-04.webp", w: 768, h: 1364 },
