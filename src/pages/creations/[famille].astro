@@ -1,0 +1,169 @@
+---
+// Page d'une famille de créations : toutes ses photos, et le chemin direct
+// vers la personnalisation. C'est ici que la profondeur du catalogue vit —
+// le hub /creations ne fait que donner à voir et orienter.
+import PageVoeu from '../../layouts/PageVoeu.astro';
+import { catalogue } from '../../data/catalogue';
+import { familles, groupes } from '../../data/familles';
+
+export function getStaticPaths() {
+  return familles.map((f) => ({ params: { famille: f.slug }, props: { f } }));
+}
+
+const { f } = Astro.props;
+const photos = catalogue.find((c) => c.slug === f.categorie)?.photos ?? [];
+const groupe = groupes.find((g) => g.slug === f.groupe);
+
+// Les autres familles du même univers : on garde la cliente dans son rayon
+// plutôt que de la renvoyer au hub à chaque fois.
+const voisines = familles.filter((v) => v.groupe === f.groupe && v.slug !== f.slug);
+---
+
+<PageVoeu
+  titre={f.nom}
+  description={`${f.nom} au crochet, fait main sur commande — ${f.detail} Atelier Acidulé.`}
+>
+  <section class="fa-head">
+    <div class="fa-head__wrap reveal">
+      <p class="eyebrow" style="color:var(--v-jaune-2)">
+        <a href="/creations" class="fa-fil">Les créations</a> · {groupe?.nom}
+      </p>
+      <h1 class="display fa-head__title">{f.nom}</h1>
+      <p>{f.detail} Chaque pièce est crochetée après ta commande, dans les couleurs que tu choisis.</p>
+      <div class="fa-head__actions">
+        <a class="btn-pill btn-pill--jaune" href={`/commander?modele=${f.slug}`}>{f.cta} →</a>
+        {voisines.length > 0 && (
+          <div class="fa-voisines">
+            {voisines.map((v) => (
+              <a class="btn-pill btn-pill--ghost-light" href={`/creations/${v.slug}`}>{v.nom}</a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="fa-photos">
+    <ul class="fa-grille">
+      {photos.map((p, i) => (
+        <li>
+          <button
+            type="button"
+            class="fa-vignette"
+            data-voir
+            data-src={p.src}
+            data-legende={`${f.nom} — photo ${i + 1}`}
+            aria-label={`Agrandir la photo ${i + 1} sur ${photos.length}`}
+          >
+            <img
+              src={p.thumb}
+              width={p.tw}
+              height={p.th}
+              alt={`${f.nom} — photo ${i + 1}`}
+              loading={i < 8 ? 'eager' : 'lazy'}
+              decoding="async"
+            />
+          </button>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="fa-fin">
+    <div class="fa-fin__wrap reveal">
+      <h2 class="display fa-fin__titre">Tu as vu la tienne&nbsp;?</h2>
+      <p>Ces photos sont des pièces déjà parties. La tienne sera crochetée pour toi, dans tes couleurs.</p>
+      <a class="btn-pill btn-pill--jaune" href={`/commander?modele=${f.slug}`}>{f.cta} →</a>
+    </div>
+  </section>
+
+  <dialog class="fa-vue" data-vue aria-label="Photo agrandie">
+    <button type="button" class="fa-vue__fermer" data-fermer aria-label="Fermer">×</button>
+    <button type="button" class="fa-vue__nav fa-vue__nav--prec" data-prec aria-label="Photo précédente">‹</button>
+    <img class="fa-vue__img" data-vue-img alt="" />
+    <button type="button" class="fa-vue__nav fa-vue__nav--suiv" data-suiv aria-label="Photo suivante">›</button>
+    <p class="fa-vue__legende" data-vue-legende></p>
+  </dialog>
+</PageVoeu>
+
+<style>
+  .fa-head { background: var(--v-vert); color: var(--v-creme); padding: clamp(2.6rem, 6vw, 4.4rem) clamp(1.1rem, 4vw, 3rem); }
+  .fa-head__wrap { max-width: 1050px; margin-inline: auto; }
+  .fa-head__title { color: var(--v-creme); font-size: clamp(2rem, 4.6vw, 3.2rem); margin-bottom: 0.9rem; }
+  .fa-head p { color: rgba(245, 239, 224, 0.82); max-width: 56ch; }
+  .fa-fil { color: inherit; }
+  .fa-head__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem; margin-top: 1.5rem; }
+  .fa-voisines { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .fa-voisines .btn-pill { font-size: 0.72rem; padding: 0.55rem 1rem; }
+
+  .fa-photos { padding: clamp(1.8rem, 4vw, 3rem) clamp(1.1rem, 4vw, 3rem) 0; }
+  .fa-grille {
+    max-width: 1150px; margin-inline: auto; list-style: none; padding: 0;
+    display: grid; gap: clamp(0.5rem, 1.4vw, 0.9rem);
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 20vw, 230px), 1fr));
+  }
+  .fa-grille li { margin: 0; }
+  .fa-vignette {
+    display: block; width: 100%; padding: 0; border: 0; cursor: zoom-in;
+    background: var(--v-creme-2); border-radius: 14px; overflow: hidden; aspect-ratio: 3 / 4;
+  }
+  .fa-vignette img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s ease; }
+  .fa-vignette:hover img { transform: scale(1.05); }
+
+  .fa-fin { padding: clamp(2.6rem, 6vw, 4.4rem) clamp(1.1rem, 4vw, 3rem); text-align: center; }
+  .fa-fin__wrap { max-width: 560px; margin-inline: auto; }
+  .fa-fin__titre { font-size: clamp(1.5rem, 3vw, 2.1rem); margin-bottom: 0.5rem; }
+  .fa-fin p { color: var(--v-doux); margin-bottom: 1.2rem; }
+
+  .fa-vue { border: 0; padding: 0; width: 100%; height: 100%; max-width: 100vw; max-height: 100vh; background: rgba(28, 36, 30, 0.94); }
+  .fa-vue::backdrop { background: rgba(28, 36, 30, 0.8); }
+  .fa-vue__img { display: block; margin: auto; max-width: min(92vw, 900px); max-height: 84vh; object-fit: contain; border-radius: 10px; }
+  .fa-vue__legende { position: absolute; left: 0; right: 0; bottom: 1.1rem; text-align: center; color: rgba(245, 239, 224, 0.78); font-size: 0.85rem; margin: 0; }
+  .fa-vue__fermer, .fa-vue__nav { position: absolute; border: 0; cursor: pointer; color: var(--v-creme); background: rgba(255, 255, 255, 0.12); border-radius: 999px; line-height: 1; }
+  .fa-vue__fermer { top: 1rem; right: 1rem; width: 44px; height: 44px; font-size: 1.7rem; }
+  .fa-vue__nav { top: 50%; transform: translateY(-50%); width: 48px; height: 48px; font-size: 2rem; }
+  .fa-vue__nav--prec { left: clamp(0.5rem, 2vw, 1.5rem); }
+  .fa-vue__nav--suiv { right: clamp(0.5rem, 2vw, 1.5rem); }
+  .fa-vue__fermer:hover, .fa-vue__nav:hover { background: rgba(255, 255, 255, 0.24); }
+
+  @media (max-width: 620px) { .fa-vue__nav { width: 40px; height: 40px; font-size: 1.6rem; } }
+</style>
+
+<script>
+  const vue = document.querySelector<HTMLDialogElement>('[data-vue]');
+  const img = document.querySelector<HTMLImageElement>('[data-vue-img]');
+  const legende = document.querySelector<HTMLElement>('[data-vue-legende]');
+  const boutons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-voir]'));
+
+  if (vue && img && legende && boutons.length) {
+    let courant = 0;
+
+    const montrer = (i: number) => {
+      courant = (i + boutons.length) % boutons.length;
+      const b = boutons[courant];
+      img.src = b.dataset.src ?? '';
+      img.alt = b.dataset.legende ?? '';
+      legende.textContent = `${b.dataset.legende ?? ''} · ${courant + 1} / ${boutons.length}`;
+    };
+
+    boutons.forEach((b, i) =>
+      b.addEventListener('click', () => {
+        montrer(i);
+        vue.showModal();
+      }),
+    );
+
+    document.querySelector('[data-fermer]')?.addEventListener('click', () => vue.close());
+    document.querySelector('[data-prec]')?.addEventListener('click', () => montrer(courant - 1));
+    document.querySelector('[data-suiv]')?.addEventListener('click', () => montrer(courant + 1));
+    vue.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') montrer(courant - 1);
+      if (e.key === 'ArrowRight') montrer(courant + 1);
+    });
+    vue.addEventListener('click', (e) => {
+      if (e.target === vue) vue.close();
+    });
+    // Le focus revient sur la vignette d'origine, sinon on repart en haut de page.
+    vue.addEventListener('close', () => boutons[courant]?.focus());
+  }
+</script>

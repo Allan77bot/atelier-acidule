@@ -4,11 +4,13 @@
 // Header + footer inline pour coller pixel-près à la maquette. Un seul <script>
 // (burger + carrousel d'avis + reveal au scroll).
 import Vitrine from '../layouts/Vitrine.astro';
+import { catalogue } from '../data/catalogue';
+import { groupes, famillesDuGroupe } from '../data/familles';
 
 const nav = [
   { href: '/', label: 'Accueil' },
-  { href: '/mes-creations', label: 'Collection' },
-  { href: '/catalogue', label: 'Catalogue' },
+  { href: '/creations', label: 'Les créations' },
+  { href: '/editions-speciales', label: 'Éditions spéciales' },
   { href: '/atelier', label: 'À propos' },
   { href: '/commander', label: 'Contact' },
 ];
@@ -29,13 +31,29 @@ const valeurs = [
   { i: 'coeur', t: 'Petites séries', d: "Des créations en petites quantités pour plus d'authenticité." },
 ];
 
-// Collection — VRAIS modèles / prix / anses (source : site en ligne + modeles.ts).
-const produits = [
-  { nom: 'Le petit sac',          prix: 'dès 35 €', detail: 'Anneaux laiton',        img: '/images/petit-sac.webp',       dot: '#c75c39', href: '/commander?modele=petit-sac' },
-  { nom: 'La pochette à livres',  prix: 'dès 40 €', detail: 'Fermeture nouée laine', img: '/images/pochette-livres.webp', dot: '#6f7c3c', href: '/commander?modele=pochette-livres' },
-  { nom: 'Le grand sac de plage', prix: 'dès 45 €', detail: 'Bandoulière + franges', img: '/images/grand-sac.webp',       dot: '#7b2d3a', href: '/commander?modele=grand-sac' },
-  { nom: 'Éditions spéciales',    prix: 'dès 45 €', detail: 'Pièces uniques',        img: '/images/edition-speciale.webp',dot: '#2f4334', href: '/editions-speciales' },
-];
+// Collection — les 4 univers réellement fabriqués, tels que Marine range ses
+// photos. La page présentait jusqu'ici 4 « modèles » qui ne correspondaient pas
+// à sa production : ni porte-verres, ni pochettes.
+// La vignette est la photo choisie via `vignette` (les porte-verres commencent
+// par des visuels promo), sinon la première du dossier.
+const APERCU: Record<string, { dot: string; detail: string }> = {
+  'sacs':          { dot: '#c75c39', detail: 'Anse bois, crochetée ou dorée' },
+  'sacs-de-plage': { dot: '#7b2d3a', detail: 'Grand format, porté épaule' },
+  'porte-verres':  { dot: '#6f7c3c', detail: 'Se porte en sautoir' },
+  'pochettes':     { dot: '#2f4334', detail: 'Livre, téléphone, ordinateur' },
+};
+const produits = groupes.map((g) => {
+  const premiere = famillesDuGroupe(g.slug)[0];
+  const ph = catalogue.find((c) => c.slug === premiere.categorie)?.photos ?? [];
+  const photo = ph[premiere.vignette ?? 0] ?? ph[0];
+  return {
+    nom: g.nom,
+    detail: APERCU[g.slug].detail,
+    dot: APERCU[g.slug].dot,
+    img: photo?.thumb ?? '',
+    href: `/creations#${g.slug}`,
+  };
+});
 
 // Avis clientes
 const avis = [
@@ -100,7 +118,7 @@ const icon = (k: string): string => icons[k] ?? '';
           <p class="hero__sub">Des sacs et accessoires au crochet, faits à la demande, dans les couleurs que tu choisis. Des pièces uniques, à l'esprit sucré-doux.</p>
           <div class="hero__cta">
             <a class="btn-pill btn-pill--jaune" href="/commander">Commander mon sac</a>
-            <a class="btn-pill btn-pill--ghost" href="/mes-creations">Voir mes créations</a>
+            <a class="btn-pill btn-pill--ghost" href="/creations">Voir les créations</a>
           </div>
           <ul class="hero__atouts">
             {atouts.map((a) => (
@@ -135,8 +153,8 @@ const icon = (k: string): string => icons[k] ?? '';
       <div class="collection__wrap">
         <aside class="collection__intro reveal">
           <p class="eyebrow">Collection</p>
-          <h2 class="display collection__title">Nos sacs<br />en crochet</h2>
-          <a class="btn-pill btn-pill--jaune" href="/mes-creations">Voir toute la collection</a>
+          <h2 class="display collection__title">Nos créations<br />au crochet</h2>
+          <a class="btn-pill btn-pill--jaune" href="/creations">Voir toutes les créations</a>
         </aside>
 
         <div class="cards" role="list">
@@ -147,7 +165,7 @@ const icon = (k: string): string => icons[k] ?? '';
                 <span class="card__nom">{p.nom}</span>
                 <span class="card__dot" style={`--d:${p.dot}`}></span>
               </span>
-              <span class="card__prix"><strong>{p.prix}</strong> · {p.detail}</span>
+              <span class="card__prix">{p.detail}</span>
             </a>
           ))}
         </div>
@@ -211,7 +229,7 @@ const icon = (k: string): string => icons[k] ?? '';
 
       <div class="foot-col">
         <h4>Navigation</h4>
-        <a href="/">Accueil</a><a href="/mes-creations">Collection</a><a href="/catalogue">Catalogue</a><a href="/atelier">À propos</a><a href="/commander">Contact</a>
+        <a href="/">Accueil</a><a href="/creations">Les créations</a><a href="/editions-speciales">Éditions spéciales</a><a href="/atelier">À propos</a><a href="/commander">Contact</a>
       </div>
       <div class="foot-col">
         <h4>Informations</h4>

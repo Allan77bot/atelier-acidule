@@ -1,0 +1,132 @@
+---
+// Hub des créations : les 4 univers de l'atelier, chacun ouvrant sur ses
+// familles. Remplace l'ancien /catalogue, qui déversait tout à plat.
+//
+// Le site présentait jusqu'ici 4 « modèles » qui ne correspondaient pas à ce
+// que Marine fabrique : ni porte-verres, ni pochettes, et des sacs classés par
+// taille alors qu'elle les range par anse. Cette page suit son classement.
+import PageVoeu from '../../layouts/PageVoeu.astro';
+import { catalogue } from '../../data/catalogue';
+import { groupes, famillesDuGroupe } from '../../data/familles';
+
+const photosDe = (categorie: string) =>
+  catalogue.find((c) => c.slug === categorie)?.photos ?? [];
+
+const univers = groupes.map((g) => {
+  const familles = famillesDuGroupe(g.slug).map((f) => {
+    const photos = photosDe(f.categorie);
+    return { ...f, photos, apercu: photos[f.vignette ?? 0] ?? photos[0] };
+  });
+  return { ...g, familles, total: familles.reduce((n, f) => n + f.photos.length, 0) };
+});
+---
+
+<PageVoeu
+  titre="Les créations"
+  description="Sacs, sacs de plage, porte-verres et pochettes au crochet, faits main sur commande dans les couleurs de ton choix."
+>
+  <section class="cr-head">
+    <div class="cr-head__wrap reveal">
+      <p class="eyebrow" style="color:var(--v-jaune-2)">Fait main, sur commande</p>
+      <h1 class="display cr-head__title">Les <em>créations.</em></h1>
+      <p>
+        Rien n'est fabriqué à l'avance. Choisis la pièce qui te plaît, dis-moi tes
+        couleurs, et je la crochète pour toi.
+      </p>
+    </div>
+  </section>
+
+  {univers.map((g, iu) => (
+    <section class="cr-univers" id={g.slug}>
+      <div class="cr-univers__wrap">
+        <header class="cr-univers__head reveal">
+          <h2 class="display cr-univers__titre">{g.nom}</h2>
+          <p>{g.accroche}</p>
+        </header>
+
+        <div class="cr-familles">
+          {g.familles.map((f, i) => (
+            <article class="cr-carte reveal">
+              <a class="cr-carte__lien" href={`/creations/${f.slug}`}>
+                <span class="cr-carte__media">
+                  {f.apercu && (
+                    <img
+                      src={f.apercu.thumb}
+                      width={f.apercu.tw}
+                      height={f.apercu.th}
+                      alt=""
+                      loading={iu === 0 && i < 3 ? 'eager' : 'lazy'}
+                      decoding="async"
+                    />
+                  )}
+                </span>
+                <span class="cr-carte__corps">
+                  <span class="cr-carte__nom">{f.nom}</span>
+                  <span class="cr-carte__detail">{f.detail}</span>
+                </span>
+              </a>
+              <a class="cr-carte__cta btn-pill btn-pill--jaune" href={`/commander?modele=${f.slug}`}>
+                {f.cta} →
+              </a>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="cr-uniques">
+    <div class="cr-uniques__wrap reveal">
+      <p class="eyebrow" style="color:var(--v-jaune-2)">En quantité limitée</p>
+      <h2 class="display cr-uniques__titre">Et les éditions spéciales.</h2>
+      <p>
+        Des pièces déjà composées, en série très limitée. Celles-là ne se
+        personnalisent pas&nbsp;: elles partent comme elles sont.
+      </p>
+      <a class="btn-pill btn-pill--jaune" href="/editions-speciales">Voir les éditions spéciales →</a>
+    </div>
+  </section>
+</PageVoeu>
+
+<style>
+  .cr-head { background: var(--v-vert); color: var(--v-creme); padding: clamp(3rem, 7vw, 5rem) clamp(1.1rem, 4vw, 3rem); }
+  .cr-head__wrap { max-width: 780px; margin-inline: auto; }
+  .cr-head__title { color: var(--v-creme); font-size: clamp(2.2rem, 5vw, 3.6rem); margin-bottom: 1rem; }
+  .cr-head__title em { font-style: normal; color: var(--v-jaune); }
+  .cr-head p { color: rgba(245, 239, 224, 0.82); max-width: 52ch; }
+
+  .cr-univers { padding: clamp(2.4rem, 5vw, 3.8rem) clamp(1.1rem, 4vw, 3rem) 0; }
+  .cr-univers__wrap { max-width: 1150px; margin-inline: auto; }
+  .cr-univers__head { margin-bottom: 1.3rem; }
+  .cr-univers__titre { font-size: clamp(1.5rem, 3.2vw, 2.2rem); margin-bottom: 0.3rem; }
+  .cr-univers__head p { color: var(--v-doux); max-width: 52ch; }
+
+  .cr-familles {
+    display: grid; gap: clamp(0.9rem, 2vw, 1.5rem);
+    grid-template-columns: repeat(auto-fill, minmax(clamp(230px, 28vw, 310px), 1fr));
+  }
+  /* La carte est une grille en 2 rangées : le CTA se cale en bas, donc les
+     cartes d'une même rangée alignent leurs boutons même si les textes
+     n'ont pas la même longueur. */
+  .cr-carte { display: grid; grid-template-rows: 1fr auto; gap: 0.9rem; }
+  .cr-carte__lien { display: block; text-decoration: none; color: inherit; }
+  .cr-carte__media {
+    display: block; aspect-ratio: 4 / 5; border-radius: 18px; overflow: hidden;
+    background: var(--v-creme-2);
+  }
+  .cr-carte__media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+  .cr-carte__lien:hover .cr-carte__media img { transform: scale(1.04); }
+  .cr-carte__corps { display: block; padding-top: 0.8rem; }
+  .cr-carte__nom { display: block; font-family: 'Archivo', sans-serif; font-weight: 700; color: var(--v-encre); }
+  .cr-carte__detail { display: block; color: var(--v-doux); font-size: 0.88rem; margin-top: 0.2rem; }
+  .cr-carte__cta { justify-self: start; }
+
+  .cr-uniques { padding: clamp(3rem, 6vw, 4.5rem) clamp(1.1rem, 4vw, 3rem); }
+  .cr-uniques__wrap {
+    max-width: 1150px; margin-inline: auto; margin-top: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--v-creme-2); border-radius: 22px;
+    padding: clamp(1.8rem, 4vw, 3rem); text-align: center;
+  }
+  .cr-uniques__titre { font-size: clamp(1.5rem, 3vw, 2.1rem); margin-bottom: 0.5rem; }
+  .cr-uniques p { color: var(--v-doux); max-width: 46ch; margin-inline: auto; margin-bottom: 1.2rem; }
+</style>
