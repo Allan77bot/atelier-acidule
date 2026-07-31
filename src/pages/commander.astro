@@ -1,7 +1,10 @@
 ---
 // Commander — DA « voeu ». Formulaire on-site placeholder (paiement branché plus tard).
 import PageVoeu from '../layouts/PageVoeu.astro';
-import { modelesPerso } from '../data/modeles';
+// La liste vient des familles réellement fabriquées, pas des 3 modèles
+// historiques : sinon les boutons « Personnaliser mon porte-verres » du
+// catalogue arriveraient ici sans rien présélectionner.
+import { familles } from '../data/familles';
 const IG = 'https://www.instagram.com/atelier_acidule';
 ---
 
@@ -17,7 +20,7 @@ const IG = 'https://www.instagram.com/atelier_acidule';
       <form class="cmd__form reveal" data-commande>
         <label>Ton modèle
           <select name="modele" required>
-            {modelesPerso.map((m) => <option value={m.slug}>{m.nom} — dès {m.prix} €</option>)}
+            {familles.map((f) => <option value={f.slug}>{f.nom}</option>)}
           </select>
         </label>
         <label>Couleurs souhaitées (jusqu'à 3)

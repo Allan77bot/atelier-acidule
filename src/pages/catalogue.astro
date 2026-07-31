@@ -5,9 +5,16 @@
 // la page d'accueil et les logos servent ailleurs et n'ont rien à faire ici.
 import PageVoeu from '../layouts/PageVoeu.astro';
 import { catalogue } from '../data/catalogue';
+import { familleDe } from '../data/familles';
 
 const HORS_CATALOGUE = ['divers', 'homepage', 'racine'];
-const sections = catalogue.filter((c) => !HORS_CATALOGUE.includes(c.slug));
+
+// 5 photos par famille au maximum : le catalogue donne un aperçu de chaque
+// famille et renvoie vers la personnalisation, il ne déverse pas les 179 photos.
+const MAX = 5;
+const sections = catalogue
+  .filter((c) => !HORS_CATALOGUE.includes(c.slug))
+  .map((c) => ({ ...c, photos: c.photos.slice(0, MAX), fonds: c.photos.length }));
 const total = sections.reduce((n, c) => n + c.photos.length, 0);
 
 // Ancre utilisable dans l'URL : « basics/anse-bois » -> « basics-anse-bois ».
@@ -22,12 +29,12 @@ const IG = 'https://www.instagram.com/atelier_acidule';
 >
   <section class="ca-head">
     <div class="ca-head__wrap reveal">
-      <p class="eyebrow" style="color:var(--v-jaune-2)">{total} photos</p>
+      <p class="eyebrow" style="color:var(--v-jaune-2)">{sections.length} familles</p>
       <h1 class="display ca-head__title">Le <em>catalogue.</em></h1>
       <p>
-        Toutes les pièces sorties de l'atelier, rangées par famille. Chaque modèle
-        existe dans d'autres coloris&nbsp;: si tu ne trouves pas le tien, on en parle
-        en DM.
+        Un aperçu de chaque famille sortie de l'atelier. Chaque pièce se décline
+        dans les couleurs et les anses de ton choix&nbsp;: choisis une famille, et
+        on compose la tienne.
       </p>
     </div>
   </section>
@@ -37,7 +44,7 @@ const IG = 'https://www.instagram.com/atelier_acidule';
   <nav class="ca-filtres" aria-label="Familles de créations">
     <ul>
       {sections.map((c) => (
-        <li><a href={`#${ancre(c.slug)}`}>{c.libelle}<span> · {c.photos.length}</span></a></li>
+        <li><a href={`#${ancre(c.slug)}`}>{c.libelle}</a></li>
       ))}
     </ul>
   </nav>
@@ -47,10 +54,9 @@ const IG = 'https://www.instagram.com/atelier_acidule';
       <div class="ca-sec__wrap">
         <header class="ca-sec__head reveal">
           <h2 class="display ca-sec__titre">{c.libelle}</h2>
-          <p class="ca-sec__compte">{c.photos.length} photos</p>
         </header>
 
-        <ul class="ca-grille">
+        <ul class="ca-grille" data-nb={c.photos.length}>
           {c.photos.map((p, i) => (
             <li class="ca-case">
               <button
@@ -75,6 +81,18 @@ const IG = 'https://www.instagram.com/atelier_acidule';
             </li>
           ))}
         </ul>
+
+        {/* Les éditions spéciales ne se personnalisent pas : chaque pièce est
+            déjà composée et unique. Leur bouton mène donc à la réservation. */}
+        <div class="ca-sec__cta">
+          {c.slug === 'editions-speciales' ? (
+            <a class="btn-pill btn-pill--jaune" href="/editions-speciales">Voir les éditions spéciales →</a>
+          ) : (
+            <a class="btn-pill btn-pill--jaune" href={`/commander?modele=${familleDe(c.slug)?.slug ?? ''}`}>
+              {familleDe(c.slug)?.cta ?? 'Personnaliser ma pièce'} →
+            </a>
+          )}
+        </div>
       </div>
     </section>
   ))}
@@ -133,12 +151,21 @@ const IG = 'https://www.instagram.com/atelier_acidule';
   .ca-sec__titre { font-size: clamp(1.4rem, 3vw, 2.1rem); }
   .ca-sec__compte { color: var(--v-doux); font-size: 0.85rem; white-space: nowrap; }
 
+  /* Colonnes explicites, pas d'auto-fill : avec 5 photos par famille, une
+     grille adaptative laissait une vignette orpheline sur une deuxième ligne. */
   .ca-grille {
     list-style: none; margin: 0; padding: 0;
     display: grid; gap: clamp(0.5rem, 1.4vw, 0.9rem);
-    grid-template-columns: repeat(auto-fill, minmax(clamp(130px, 20vw, 210px), 1fr));
+    grid-template-columns: repeat(5, 1fr);
   }
+  @media (max-width: 900px) { .ca-grille { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 560px) { .ca-grille { grid-template-columns: repeat(2, 1fr); } }
+  /* 5 photos maximum : sans borne haute, les vignettes s'étireraient sur toute
+     la largeur en très grand écran et écraseraient le rythme de la page. */
+  .ca-grille { max-width: 1060px; }
   .ca-case { margin: 0; }
+
+  .ca-sec__cta { margin-top: clamp(1.1rem, 2.5vw, 1.6rem); }
   .ca-vignette {
     display: block; width: 100%; padding: 0; border: 0; cursor: zoom-in;
     background: var(--v-creme-2); border-radius: 14px; overflow: hidden;
