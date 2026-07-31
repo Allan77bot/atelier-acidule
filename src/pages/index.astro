@@ -112,12 +112,6 @@ const icon = (k: string): string => icons[k] ?? '';
         <div class="hero__visual reveal">
           <div class="hero__panel">
             <img src="/images/hero-crochet.webp" alt="Sac en crochet fait main aux motifs fleuris" decoding="async" fetchpriority="high" />
-            <span class="badge" aria-hidden="true">
-              <svg viewBox="0 0 100 100"><defs><path id="circ" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" /></defs>
-                <text><textPath href="#circ">· PIÈCES UNIQUES · PIÈCES UNIQUES </textPath></text>
-              </svg>
-              <span class="badge__heart" set:html={icon('coeur')} />
-            </span>
           </div>
         </div>
       </div>
@@ -350,15 +344,10 @@ const icon = (k: string): string => icons[k] ?? '';
   .hero__atouts li { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 600; color: var(--v-encre); }
   .hero__atouts .ic { color: var(--v-jaune-2); display: inline-flex; }
 
-  .hero__panel { position: relative; background: var(--v-vert); border-radius: 220px 220px 26px 26px; padding: 2.2rem; aspect-ratio: 4/5; display: grid; place-items: center; overflow: hidden; }
-  .hero__panel img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 24px 40px rgba(0,0,0,.35)); }
-  .badge { position: absolute; top: 1rem; left: 1rem; width: 92px; height: 92px; background: var(--v-creme); border-radius: 50%; display: grid; place-items: center; }
-  .badge svg { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 14s linear infinite; }
-  .badge text { font-family: 'Archivo', sans-serif; font-size: 8.5px; font-weight: 700; letter-spacing: 1px; fill: var(--v-encre); }
-  .badge__heart { color: var(--v-jaune-2); display: inline-flex; }
-  .badge__heart svg { position: static; width: 26px; height: 26px; animation: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  @media (prefers-reduced-motion: reduce){ .badge svg { animation: none; } }
+  .hero__panel { position: relative; background: var(--v-vert); border-radius: 26px; padding: 2.2rem; aspect-ratio: 4/5; display: grid; place-items: center; overflow: hidden; }
+  /* La photo a son propre fond crème : on arrondit ses coins comme ceux du
+     panneau, sinon on voit deux rectangles imbriqués aux angles différents. */
+  .hero__panel img { width: 100%; height: 100%; object-fit: contain; border-radius: 14px; }
 
   /* ---------- bandeau valeurs ---------- */
   .valeurs { background: var(--v-vert); color: var(--v-creme); }
@@ -445,14 +434,12 @@ const icon = (k: string): string => icons[k] ?? '';
     /* le CTA reste visible : seul chemin d'achat permanent sur mobile */
     .head-cta { padding: 0.72rem 1.15rem; font-size: 0.72rem; }
 
-    /* hero : titre -> visuel (arche conservée) -> sous-titre + CTA */
+    /* hero : titre -> visuel -> sous-titre + CTA */
     .hero { padding-top: 1.4rem; }
     .hero__wrap { grid-template-columns: 1fr; grid-template-areas: 'head' 'visual' 'body'; }
     .hero__head { text-align: center; }
     .hero__title { font-size: clamp(1.85rem, 8.4vw, 2.9rem); }
     .hero__panel { max-width: min(70vw, 320px); margin-inline: auto; margin-top: 1.2rem; padding: 1.5rem; }
-    /* badge posé au sommet de l'arche (à gauche il était rogné par la courbe) */
-    .badge { width: 72px; height: 72px; top: 0.7rem; left: 50%; transform: translateX(-50%); }
     .hero__sub { margin-top: 1.6rem; }
     .hero__body { justify-items: center; display: grid; text-align: center; }
     .hero__cta { justify-content: center; }
