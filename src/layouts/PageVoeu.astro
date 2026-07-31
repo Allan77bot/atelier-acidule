@@ -1,0 +1,133 @@
+---
+// Layout des pages de contenu en DA « voeu » (header vert sombre + footer),
+// d'après Ref/_preview/AtelierAcidule_voeu.jpeg. Enveloppe Vitrine (head + polices
+// + primitives .btn-pill/.eyebrow/.display). Les pages fournissent leurs sections.
+import Vitrine from './Vitrine.astro';
+
+interface Props {
+  titre: string;
+  description?: string;
+}
+const { titre, description } = Astro.props;
+
+const nav = [
+  { href: '/', label: 'Accueil' },
+  { href: '/mes-creations', label: 'Mes créations' },
+  { href: '/editions-speciales', label: 'Éditions spéciales' },
+  { href: '/atelier', label: "L'atelier" },
+];
+const IG = 'https://www.instagram.com/atelier_acidule';
+---
+
+<Vitrine titre={titre} description={description}>
+  <header class="pv-head" data-head>
+    <a class="pv-brand" href="/" aria-label="Atelier Acidulé — accueil">
+      <img src="/images/logo.png" alt="" width="50" height="50" decoding="async" />
+      <span class="pv-brand__txt"><small>L'ATELIER</small><strong>ACIDULÉ</strong></span>
+    </a>
+    <nav class="pv-nav" aria-label="Navigation principale">
+      {nav.map((l) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+    <a class="btn-pill btn-pill--jaune pv-cta" href={IG} target="_blank" rel="noopener">Commander en DM</a>
+    <button class="pv-burger" data-burger aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="pv-drawer">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <nav id="pv-drawer" class="pv-drawer" data-drawer aria-hidden="true" aria-label="Menu">
+    <div class="pv-drawer__inner">
+      {nav.map((l) => <a href={l.href}>{l.label}</a>)}
+      <a class="btn-pill btn-pill--jaune pv-drawer__cta" href={IG} target="_blank" rel="noopener">Commander en DM</a>
+    </div>
+  </nav>
+
+  <main class="pv-main"><slot /></main>
+
+  <footer class="pv-foot">
+    <div class="pv-foot__wrap">
+      <a class="pv-brand pv-brand--foot" href="/">
+        <img src="/images/logo.png" alt="" width="44" height="44" decoding="async" />
+        <span class="pv-brand__txt"><small>L'ATELIER</small><strong>ACIDULÉ</strong></span>
+      </a>
+      <p class="pv-foot__tag">Des créations qui ne manquent pas de piquant 🍋‍🟩<br /><span>Sacs au crochet · Personnalisation sur demande</span></p>
+      <div class="pv-foot__links">
+        <a href={IG} target="_blank" rel="noopener">@atelier_acidule</a>
+        <a href="/atelier">Mentions légales</a>
+      </div>
+    </div>
+    <p class="pv-foot__legal">© 2026 Atelier Acidulé · fait main avec amour en France</p>
+  </footer>
+
+  <style>
+    .pv-main { display: block; }
+
+    /* header */
+    .pv-head { position: sticky; top: 0; z-index: 60; display: flex; align-items: center; gap: 1.4rem; padding: 0.8rem clamp(1.1rem, 4vw, 3rem); background: var(--v-vert); transition: box-shadow .3s ease; }
+    .pv-head[data-scrolled] { box-shadow: 0 10px 30px -20px rgba(0,0,0,.6); }
+    .pv-brand { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .pv-brand img { height: 44px; width: auto; }
+    .pv-brand__txt { display: flex; flex-direction: column; line-height: 0.92; font-family: 'Archivo', sans-serif; color: var(--v-creme); }
+    .pv-brand__txt small { font-size: 0.6rem; letter-spacing: 0.18em; font-weight: 600; }
+    .pv-brand__txt strong { font-size: 1.22rem; letter-spacing: 0.02em; font-weight: 900; }
+    .pv-nav { display: flex; gap: clamp(1rem, 2.2vw, 1.9rem); margin-inline: auto; }
+    .pv-nav a { font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--v-creme); padding: 0.4rem 0; position: relative; text-decoration: none; }
+    .pv-nav a::after { content:''; position:absolute; left:0; right:100%; bottom:-2px; height:2px; background: var(--v-jaune); transition: right .25s ease; }
+    .pv-nav a:hover::after { right: 0; }
+    .pv-burger { display: none; flex-direction: column; gap: 5px; width: 42px; padding: 9px; background: none; border: 0; cursor: pointer; }
+    .pv-burger span { height: 2px; width: 100%; background: var(--v-creme); border-radius: 2px; transition: transform .25s ease, opacity .2s ease; }
+    .pv-burger[aria-expanded='true'] span:nth-child(1){ transform: translateY(7px) rotate(45deg); }
+    .pv-burger[aria-expanded='true'] span:nth-child(2){ opacity: 0; }
+    .pv-burger[aria-expanded='true'] span:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
+
+    .pv-drawer { position: fixed; inset: 0; z-index: 55; background: var(--v-vert-2); display: grid; place-items: center; opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s ease; }
+    .pv-drawer[aria-hidden='false'] { opacity: 1; visibility: visible; }
+    .pv-drawer__inner { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+    .pv-drawer__inner a { font-family: 'Archivo', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: clamp(1.5rem, 6.5vw, 2.2rem); color: var(--v-creme); padding: 0.35rem 0; text-decoration: none; }
+    .pv-drawer__inner a:hover { color: var(--v-jaune); }
+    .pv-drawer__cta { margin-top: 1.2rem; font-size: 0.9rem; color: var(--v-encre); }
+
+    /* footer */
+    .pv-foot { background: var(--v-vert-2); color: var(--v-creme); padding: clamp(2rem, 4vw, 3rem) clamp(1.1rem, 4vw, 3rem) 1.4rem; }
+    .pv-foot__wrap { max-width: 1150px; margin-inline: auto; display: flex; align-items: center; gap: 1.6rem; flex-wrap: wrap; }
+    .pv-brand--foot .pv-brand__txt { color: var(--v-creme); }
+    .pv-foot__tag { margin: 0; margin-inline: auto; text-align: center; font-size: 0.9rem; color: rgba(245,239,224,.85); }
+    .pv-foot__tag span { color: rgba(245,239,224,.55); font-size: 0.82rem; }
+    .pv-foot__links { display: flex; gap: 1.2rem; }
+    .pv-foot__links a { color: rgba(245,239,224,.75); font-size: 0.85rem; text-decoration: none; }
+    .pv-foot__links a:hover { color: var(--v-creme); }
+    .pv-foot__legal { max-width: 1150px; margin: 1.8rem auto 0; padding-top: 1.2rem; border-top: 1px solid rgba(245,239,224,.14); font-size: 0.78rem; color: rgba(245,239,224,.55); text-align: center; }
+
+    @media (max-width: 900px) {
+      .pv-nav, .pv-cta { display: none; }
+      .pv-brand { margin-right: auto; }
+      .pv-burger { display: flex; }
+      .pv-foot__wrap { justify-content: center; text-align: center; }
+      .pv-foot__tag { width: 100%; order: 3; margin-inline: 0; }
+    }
+  </style>
+
+  <script>
+    const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+    const drawer = document.querySelector<HTMLElement>('[data-drawer]');
+    burger?.addEventListener('click', () => {
+      const open = burger.getAttribute('aria-expanded') === 'true';
+      burger.setAttribute('aria-expanded', String(!open));
+      drawer?.setAttribute('aria-hidden', String(open));
+      document.body.style.overflow = open ? '' : 'hidden';
+    });
+    drawer?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => {
+      burger?.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }));
+    const head = document.querySelector<HTMLElement>('[data-head]');
+    const onScroll = () => head?.toggleAttribute('data-scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    const io = new IntersectionObserver(
+      (es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
+      { threshold: 0.14 }
+    );
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+</Vitrine>

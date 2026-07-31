@@ -1,120 +1,86 @@
 ---
-import Base from '../layouts/Base.astro';
+// Commander — DA « voeu ». Formulaire on-site placeholder (paiement branché plus tard).
+import PageVoeu from '../layouts/PageVoeu.astro';
 import { modelesPerso } from '../data/modeles';
+const IG = 'https://www.instagram.com/atelier_acidule';
 ---
 
-<Base
-  titre="Commander"
-  description="Finalise ta commande de sac au crochet personnalisé — Atelier Acidulé."
->
-  <section class="section">
-    <div class="contenu commande">
-      <header class="entete">
-        <p class="surtitre">Dernière étape</p>
-        <h1>Finalise ta commande</h1>
-        <p class="entete__sous">
-          Le paiement en ligne arrive bientôt. En attendant, laisse-nous tes
-          envies : on confirme la couleur exacte et le délai en DM avant de
-          lancer le crochet.
-        </p>
+<PageVoeu titre="Commander" description="Finalise ta commande de sac au crochet personnalisé — Atelier Acidulé.">
+  <section class="cmd">
+    <div class="cmd__wrap">
+      <header class="cmd__head reveal">
+        <p class="eyebrow" style="color:var(--v-jaune-2)">Dernière étape</p>
+        <h1 class="display cmd__title">Finalise ta <em>commande.</em></h1>
+        <p class="cmd__sous">Le paiement en ligne arrive bientôt. En attendant, laisse-nous tes envies : on confirme la couleur exacte et le délai en DM avant de lancer le crochet.</p>
       </header>
 
-      <!-- Formulaire on-site (branchement back-end à venir) -->
-      <form class="form" data-commande>
-        <label>
-          Ton modèle
+      <form class="cmd__form reveal" data-commande>
+        <label>Ton modèle
           <select name="modele" required>
             {modelesPerso.map((m) => <option value={m.slug}>{m.nom} — dès {m.prix} €</option>)}
           </select>
         </label>
-        <label>
-          Couleurs souhaitées (jusqu'à 3)
+        <label>Couleurs souhaitées (jusqu'à 3)
           <input type="text" name="couleurs" placeholder="ex. citron · sauge · terracotta" />
         </label>
-        <label>
-          Type d'anse
+        <label>Type d'anse
           <select name="anse">
             <option value="laine">Anse en laine</option>
             <option value="laiton">Anneaux laiton</option>
           </select>
         </label>
-        <label>
-          Pseudo Instagram (pour le suivi)
+        <label>Pseudo Instagram (pour le suivi)
           <input type="text" name="instagram" placeholder="@toncompte" />
         </label>
-        <label>
-          Un mot pour nous (optionnel)
+        <label>Un mot pour nous (optionnel)
           <textarea name="message" rows="3" placeholder="Une occasion, une idée, une question…"></textarea>
         </label>
-        <button type="submit" class="btn btn--primaire">Envoyer ma demande</button>
-        <p class="form__note" data-statut role="status"></p>
+        <button type="submit" class="btn-pill btn-pill--jaune">Envoyer ma demande</button>
+        <p class="cmd__note" data-statut role="status"></p>
       </form>
 
-      <p class="commande__alt">
-        Tu préfères discuter de vive voix&nbsp;?
-        <a href="https://www.instagram.com/atelier_acidule" target="_blank" rel="noopener noreferrer">
-          Écris-nous en DM Instagram</a>.
-      </p>
+      <p class="cmd__alt">Tu préfères discuter de vive voix&nbsp;? <a href={IG} target="_blank" rel="noopener">Écris-nous en DM Instagram</a>.</p>
     </div>
   </section>
-</Base>
+</PageVoeu>
 
 <style>
-  .commande { max-width: 640px; margin-inline: auto; }
-  .entete { text-align: center; margin-bottom: 2rem; }
-  .entete__sous { color: var(--texte-doux); }
-  .form {
-    display: grid;
-    gap: 1.1rem;
-    background: #fff;
-    padding: 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--ombre-douce);
-    border: 1px solid color-mix(in srgb, var(--sauge) 22%, transparent);
-  }
-  .form label {
-    display: grid;
-    gap: 0.4rem;
-    font-weight: 700;
-    color: var(--sapin);
-    font-size: 0.95rem;
-  }
-  .form input, .form select, .form textarea {
-    font-family: var(--font-corps);
-    font-size: 1rem;
-    padding: 0.7rem 0.9rem;
-    border-radius: 12px;
-    border: 1.5px solid color-mix(in srgb, var(--sauge) 40%, transparent);
-    background: var(--creme);
-    color: var(--texte);
-  }
-  .form input:focus, .form select:focus, .form textarea:focus {
-    border-color: var(--terracotta);
-    outline: none;
-  }
-  .form button { justify-self: start; }
-  .form__note { margin: 0; font-weight: 700; color: var(--olive); min-height: 1.2em; }
-  .commande__alt { text-align: center; margin-top: 1.5rem; color: var(--texte-doux); }
+  .cmd { background: var(--v-vert); color: var(--v-creme); padding: clamp(3rem, 6vw, 5rem) clamp(1.1rem, 4vw, 3rem); }
+  .cmd__wrap { max-width: 640px; margin-inline: auto; }
+  .cmd__head { text-align: center; margin-bottom: 2rem; }
+  .cmd__title { color: var(--v-creme); font-size: clamp(2rem, 4.6vw, 3.2rem); margin-bottom: 0.9rem; }
+  .cmd__title em { font-style: normal; color: var(--v-jaune); }
+  .cmd__sous { color: rgba(245,239,224,.8); }
+
+  .cmd__form { display: grid; gap: 1.1rem; background: var(--v-creme); padding: 2rem; border-radius: 20px; }
+  .cmd__form label { display: grid; gap: 0.4rem; font-family: 'Archivo', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; color: var(--v-encre); }
+  .cmd__form input, .cmd__form select, .cmd__form textarea { font-family: var(--font-corps); font-weight: 400; text-transform: none; letter-spacing: normal; font-size: 1rem; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1.5px solid rgba(43,42,34,.2); background: #fff; color: var(--v-encre); }
+  .cmd__form input:focus, .cmd__form select:focus, .cmd__form textarea:focus { border-color: var(--v-jaune-2); outline: none; }
+  .cmd__form button { justify-self: start; margin-top: 0.3rem; }
+  .cmd__note { margin: 0; font-weight: 700; color: var(--olive); min-height: 1.2em; }
+  .cmd__alt { text-align: center; margin-top: 1.5rem; color: rgba(245,239,224,.8); }
+  .cmd__alt a { color: var(--v-jaune); text-decoration: underline; }
 
   @media (max-width: 560px) {
-    .form { padding: 1.4rem; border-radius: var(--radius); }
-    .form input, .form select, .form textarea { font-size: 16px; padding: 0.75rem 0.8rem; }
-    .form button { width: 100%; justify-content: center; }
-    .commande__alt { font-size: 0.95rem; }
+    .cmd__form { padding: 1.4rem; }
+    .cmd__form input, .cmd__form select, .cmd__form textarea { font-size: 16px; }
+    .cmd__form button { width: 100%; }
   }
 </style>
 
 <script>
-  // Placeholder : pas encore de back-end. On confirme la réception côté UI
-  // et on renvoie vers le DM Instagram (commerce hybride, paiement plus tard).
   const form = document.querySelector<HTMLFormElement>('[data-commande]');
   const statut = document.querySelector<HTMLElement>('[data-statut]');
+
+  // Présélectionne le modèle si on arrive via /commander?modele=<slug>
+  // (les CTA de l'accueil et de /mes-creations passent ce paramètre).
+  const slug = new URLSearchParams(location.search).get('modele');
+  const select = form?.querySelector<HTMLSelectElement>('select[name="modele"]');
+  if (slug && select?.querySelector(`option[value="${slug}"]`)) select.value = slug;
+
   form?.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (statut) {
-      statut.textContent =
-        'Merci ! 🍋 Demande enregistrée — on te confirme tout en DM Instagram très vite.';
-    }
+    if (statut) statut.textContent = 'Merci ! 🍋 Demande enregistrée — on te confirme tout en DM Instagram très vite.';
     form.reset();
   });
 </script>

@@ -1,420 +1,575 @@
 ---
-// Landing page « Atelier Acidulé » — page qui scrolle, layout classique (Nav + Footer).
-// Hero produit flottant, valeurs, aperçu catalogue, teasers atelier & éditions,
-// bandeau d'appel final. Mobile-first, 0 overflow-x, tokens du design system uniquement.
-import Base from '../layouts/Base.astro';
-import { modeles } from '../data/modeles';
+// Accueil — reproduction fidèle de la maquette Ref/_preview/AtelierAcidule_ref.jpeg
+// (boutique de sacs crochet). Page vitrine longue, scroll classique, mobile-first.
+// Header + footer inline pour coller pixel-près à la maquette. Un seul <script>
+// (burger + carrousel d'avis + reveal au scroll).
+import Vitrine from '../layouts/Vitrine.astro';
 
-const instagram = 'https://www.instagram.com/atelier_acidule';
+const nav = [
+  { href: '/', label: 'Accueil' },
+  { href: '/mes-creations', label: 'Collection' },
+  { href: '/atelier', label: 'À propos' },
+  { href: '/commander', label: 'Contact' },
+];
+
+// Atouts du hero (mini-rangée sous les CTA)
+const atouts = [
+  { i: 'coeur', t: 'Fait main avec amour' },
+  { i: 'feuille', t: 'Matériaux durables' },
+  { i: 'etoile', t: 'Pièces uniques' },
+  { i: 'france', t: 'Fabriqué en France' },
+];
+
+// Bandeau vert : 4 valeurs
+const valeurs = [
+  { i: 'main', t: 'Fait main', d: 'Chaque pièce est réalisée à la main avec soin.' },
+  { i: 'feuille', t: 'Éco-responsable', d: 'Des fils sélectionnés avec attention pour la planète.' },
+  { i: 'palette', t: 'Design unique', d: 'Des modèles originaux et intemporels.' },
+  { i: 'coeur', t: 'Petites séries', d: "Des créations en petites quantités pour plus d'authenticité." },
+];
+
+// Collection — VRAIS modèles / prix / anses (source : site en ligne + modeles.ts).
+const produits = [
+  { nom: 'Le petit sac',          prix: 'dès 35 €', detail: 'Anneaux laiton',        img: '/images/petit-sac.webp',       dot: '#c75c39', href: '/commander?modele=petit-sac' },
+  { nom: 'La pochette à livres',  prix: 'dès 40 €', detail: 'Fermeture nouée laine', img: '/images/pochette-livres.webp', dot: '#6f7c3c', href: '/commander?modele=pochette-livres' },
+  { nom: 'Le grand sac de plage', prix: 'dès 45 €', detail: 'Bandoulière + franges', img: '/images/grand-sac.webp',       dot: '#7b2d3a', href: '/commander?modele=grand-sac' },
+  { nom: 'Éditions spéciales',    prix: 'dès 45 €', detail: 'Pièces uniques',        img: '/images/edition-speciale.webp',dot: '#2f4334', href: '/editions-speciales' },
+];
+
+// Avis clientes
+const avis = [
+  { txt: 'Sac magnifique, encore plus beau en vrai ! Finitions parfaites.', nom: 'Claire' },
+  { txt: 'Une création unique et de qualité. Je recommande à 100 % !', nom: 'Marion' },
+  { txt: "J'adore mon sac, il attire tous les regards !", nom: 'Laura' },
+];
+
+// Petites icônes SVG inline (stroke = currentColor), rendues via set:html.
+const S = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"';
+const icons: Record<string, string> = {
+  coeur: `<svg ${S}><path d="M12 20s-7-4.6-9.4-8.9A5 5 0 0 1 12 6.2 5 5 0 0 1 21.4 11C19 15.4 12 20 12 20z"/></svg>`,
+  feuille: `<svg ${S}><path d="M11 20A7 7 0 0 1 4 13C4 7 12 4 20 4c0 8-3 16-9 16z"/><path d="M8.5 16.5C12 13 14 11 16 9"/></svg>`,
+  etoile: `<svg ${S}><path d="M12 3l2.2 5.2L20 9l-4 3.8L17 19l-5-2.9L7 19l1-6.2L4 9l5.8-.8L12 3z"/></svg>`,
+  france: `<svg ${S}><path d="M12 3l7 4v6c0 4-3 6.5-7 8-4-1.5-7-4-7-8V7l7-4z"/></svg>`,
+  main: `<svg ${S}><circle cx="12" cy="8" r="4"/><path d="M12 12v9"/><path d="M9 21h6"/></svg>`,
+  palette: `<svg ${S}><path d="M12 3a9 9 0 1 0 0 18c1.4 0 2-1 2-2 0-1.4 1-2 2.2-2H18a3 3 0 0 0 3-3 8 8 0 0 0-9-8z"/><circle cx="7.5" cy="12" r="1"/><circle cx="10" cy="7.5" r="1"/><circle cx="15" cy="7.5" r="1"/></svg>`,
+  gauche: `<svg ${S}><path d="M15 18l-6-6 6-6"/></svg>`,
+  droite: `<svg ${S}><path d="M9 6l6 6-6 6"/></svg>`,
+  envoi: `<svg ${S}><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`,
+};
+const icon = (k: string): string => icons[k] ?? '';
 ---
 
-<Base
-  titre="Accueil"
-  description="Sacs et accessoires au crochet faits main à la demande — Atelier Acidulé. Pièces uniques, esprit méditerranéen sucré-doux."
->
-  <!-- 1) HERO ----------------------------------------------------------- -->
-  <section class="hero">
-    <div class="contenu hero__grille">
-      <div class="hero__texte">
-        <p class="surtitre">Crochet fait main · Méditerranée</p>
-        <h1>Une pointe d'acidulé, cousue main rien que pour toi.</h1>
-        <p class="hero__accroche">
-          Des sacs et accessoires au crochet, faits à la demande, dans les
-          couleurs que tu choisis. Des pièces uniques, à l'esprit sucré-doux.
-        </p>
-        <div class="hero__cta">
-          <a class="btn btn--primaire" href={instagram} target="_blank" rel="noopener noreferrer">
-            Commander sur Instagram
-          </a>
-          <a class="btn btn--ghost" href="/mes-creations">Voir mes créations</a>
+<Vitrine titre="Accueil" description="Sacs en crochet faits main, uniques et durables — L'Atelier Acidulé. L'art du crochet, la douceur du fait main.">
+  <!-- ============================ HEADER ============================ -->
+  <header class="site-head" data-head>
+    <a class="brand" href="/" aria-label="L'Atelier Acidulé — accueil">
+      <img class="brand__logo" src="/images/logo.png" alt="" width="52" height="52" decoding="async" />
+      <span class="brand__txt"><small>L'ATELIER</small><strong>ACIDULÉ</strong></span>
+    </a>
+
+    <nav class="site-nav" aria-label="Navigation principale">
+      {nav.map((l) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+
+    <a class="btn-pill btn-pill--jaune head-cta" href="/commander">Commander</a>
+
+    <button class="burger" data-burger aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="drawer">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- tiroir mobile -->
+  <nav id="drawer" class="drawer" data-drawer aria-hidden="true" aria-label="Menu">
+    <div class="drawer__inner">
+      {nav.map((l) => <a href={l.href}>{l.label}</a>)}
+      <a class="btn-pill btn-pill--jaune drawer__cta" href="/commander">Commander</a>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ============================ HERO ============================ -->
+    <section class="hero">
+      <div class="hero__wrap">
+        <div class="hero__head reveal">
+          <p class="eyebrow">Crochet fait main · Méditerranée</p>
+          <h1 class="display hero__title">Une pointe d'<em>acidulé,</em><br />cousue main rien que pour toi.</h1>
+        </div>
+
+        <div class="hero__body reveal">
+          <p class="hero__sub">Des sacs et accessoires au crochet, faits à la demande, dans les couleurs que tu choisis. Des pièces uniques, à l'esprit sucré-doux.</p>
+          <div class="hero__cta">
+            <a class="btn-pill btn-pill--jaune" href="/commander">Commander mon sac</a>
+            <a class="btn-pill btn-pill--ghost" href="/mes-creations">Voir mes créations</a>
+          </div>
+          <ul class="hero__atouts">
+            {atouts.map((a) => (
+              <li><span class="ic" set:html={icon(a.i)} /> {a.t}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="hero__visual reveal">
+          <div class="hero__panel">
+            <img src="/images/hero-crochet.webp" alt="Sac en crochet fait main aux motifs fleuris" decoding="async" fetchpriority="high" />
+            <span class="badge" aria-hidden="true">
+              <svg viewBox="0 0 100 100"><defs><path id="circ" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" /></defs>
+                <text><textPath href="#circ">· PIÈCES UNIQUES · PIÈCES UNIQUES </textPath></text>
+              </svg>
+              <span class="badge__heart" set:html={icon('coeur')} />
+            </span>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="hero__visuel">
-        <img
-          class="hero__photo"
-          src="/images/accueil-hero-detoure.png"
-          alt="Sac au crochet vert sauge fait main, posé sur fond crème"
-          decoding="async"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
-
-  <!-- 2) VALEURS --------------------------------------------------------- -->
-  <section class="section">
-    <div class="contenu">
-      <div class="valeurs__grille">
-        <article class="valeur">
-          <span class="valeur__ico" aria-hidden="true">🧶</span>
-          <h3 class="valeur__titre">Fait main à la demande</h3>
-          <p class="valeur__txt">Chaque pièce est crochetée pour toi, après commande.</p>
-        </article>
-        <article class="valeur">
-          <span class="valeur__ico" aria-hidden="true">🎨</span>
-          <h3 class="valeur__titre">Les couleurs que tu choisis</h3>
-          <p class="valeur__txt">On compose ensemble la palette de ton sac, fil par fil.</p>
-        </article>
-        <article class="valeur">
-          <span class="valeur__ico" aria-hidden="true">🍋</span>
-          <h3 class="valeur__titre">Esprit méditerranéen</h3>
-          <p class="valeur__txt">Inspiration Italie, citron acidulé et douceur sucrée.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3) MES CRÉATIONS (aperçu) ----------------------------------------- -->
-  <section class="section creations">
-    <div class="contenu">
-      <div class="creations__tete">
-        <p class="surtitre">Le catalogue</p>
-        <h2>Mes créations</h2>
-      </div>
-
-      <div class="creations__grille">
-        {modeles.map((m) => (
-          <article class="carte">
-            <div class="carte__media">
-              <img src={m.photo} alt={`${m.nom} — ${m.baseline}`} loading="lazy" decoding="async" />
-            </div>
-            <div class="carte__corps">
-              <div class="carte__tete">
-                <h3 class="carte__nom">{m.nom}</h3>
-                <span class="carte__prix">dès {m.prix} €</span>
-              </div>
-              <p class="carte__anse">
-                <span aria-hidden="true">🧶</span>{m.anse}
-              </p>
-            </div>
-          </article>
+    <!-- ======================= BANDEAU VALEURS ======================= -->
+    <section class="valeurs">
+      <div class="valeurs__grid">
+        {valeurs.map((v) => (
+          <div class="valeur reveal">
+            <span class="valeur__ic" set:html={icon(v.i)} />
+            <h3 class="valeur__t">{v.t}</h3>
+            <p class="valeur__d">{v.d}</p>
+          </div>
         ))}
       </div>
+    </section>
 
-      <div class="creations__cta">
-        <a class="btn btn--primaire" href="/mes-creations">Voir toutes mes créations</a>
+    <!-- ========================= COLLECTION ========================= -->
+    <section class="collection">
+      <div class="collection__wrap">
+        <aside class="collection__intro reveal">
+          <p class="eyebrow">Collection</p>
+          <h2 class="display collection__title">Nos sacs<br />en crochet</h2>
+          <a class="btn-pill btn-pill--jaune" href="/mes-creations">Voir toute la collection</a>
+        </aside>
+
+        <div class="cards" role="list">
+          {produits.map((p) => (
+            <a class="card reveal" href={p.href} role="listitem">
+              <span class="card__media"><img src={p.img} alt={p.nom} loading="lazy" decoding="async" /></span>
+              <span class="card__row">
+                <span class="card__nom">{p.nom}</span>
+                <span class="card__dot" style={`--d:${p.dot}`}></span>
+              </span>
+              <span class="card__prix"><strong>{p.prix}</strong> · {p.detail}</span>
+            </a>
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- 4) TEASER ATELIER -------------------------------------------------- -->
-  <section class="section">
-    <div class="contenu atelier__grille">
-      <div class="atelier__texte">
-        <p class="surtitre">L'atelier</p>
-        <h2>Du fil, des couleurs, beaucoup de peps.</h2>
-        <p>
-          Tout part d'une pelote et d'une envie. Je crochète chaque pièce à la
-          main, près de chez moi, en soignant le moindre détail.
-        </p>
-        <a class="btn btn--ghost" href="/atelier">Découvrir l'atelier</a>
+    <!-- =========================== À PROPOS ========================== -->
+    <section class="apropos">
+      <div class="apropos__img reveal">
+        <img src="/images/about-atelier.webp" alt="Sac en crochet en cours de création, pelote et crochet" loading="lazy" decoding="async" />
       </div>
-
-      <div class="atelier__media">
-        <img
-          src="/images/atelier-cabas.png"
-          alt="Cabas au crochet multicolore fait main"
-          loading="lazy"
-          decoding="async"
-        />
+      <div class="apropos__text reveal">
+        <p class="eyebrow eyebrow--jaune">L'atelier</p>
+        <h2 class="display apropos__title">Du fil, des couleurs,<br />beaucoup de peps.</h2>
+        <p>Tout part d'une pelote et d'une envie. Je crochète chaque pièce à la main, près de chez moi, en soignant le moindre détail.</p>
+        <p>Inspiré par l'Italie et la Méditerranée : l'acidulé et le sucré-doux à la fois.</p>
+        <a class="btn-pill btn-pill--jaune" href="/atelier">Découvrir l'atelier</a>
+        <svg class="apropos__lemon" viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="62" cy="66" rx="34" ry="30" /><path d="M38 46c8-14 24-20 40-16" /><path d="M74 30c6-6 16-8 22-4-2 8-10 14-18 14" /></svg>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- 5) TEASER ÉDITIONS SPÉCIALES -------------------------------------- -->
-  <section class="section editions">
-    <div class="contenu">
-      <p class="surtitre">En quantité limitée</p>
-      <h2>Éditions spéciales</h2>
-      <p>Des pièces uniques, composées à la main au gré des saisons.</p>
-      <a class="btn btn--ghost" href="/editions-speciales">Voir les éditions</a>
-    </div>
-  </section>
+    <!-- ============================ AVIS ============================ -->
+    <section class="avis">
+      <div class="avis__wrap">
+        <div class="avis__head reveal">
+          <p class="eyebrow">Elles en parlent</p>
+          <h2 class="display avis__title">Vos avis</h2>
+        </div>
+        <button class="nav-arrow" data-avis-prev aria-label="Avis précédent" set:html={icon('gauche')}></button>
+        <div class="avis__track" data-avis-track>
+          {avis.map((a) => (
+            <figure class="temoignage">
+              <div class="stars" aria-label="5 sur 5">{'★★★★★'}</div>
+              <blockquote>{a.txt}</blockquote>
+              <figcaption>{a.nom}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <button class="nav-arrow" data-avis-next aria-label="Avis suivant" set:html={icon('droite')}></button>
+        <div class="avis__dots" data-avis-dots aria-hidden="true"></div>
+      </div>
+    </section>
 
-  <!-- 6) BANDEAU FINAL --------------------------------------------------- -->
-  <section class="section final">
-    <div class="contenu">
-      <h2>Commande ta pièce unique</h2>
-      <p>Fait main en France, sur commande. On confirme couleurs et délai en DM.</p>
-      <a class="btn btn--citron" href={instagram} target="_blank" rel="noopener noreferrer">
-        Commander sur Instagram
+    <!-- ========================= CTA JAUNE ========================= -->
+    <section class="cta-band">
+      <div class="cta-band__wrap">
+        <h2 class="display cta-band__title">Commande ta pièce<br />unique.</h2>
+        <p class="cta-band__txt">Fait main en France, sur commande. On confirme couleurs et délai en DM.</p>
+        <a class="btn-pill btn-pill--sombre" href="https://instagram.com/atelier_acidule" target="_blank" rel="noopener">Commander sur Instagram</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================ FOOTER ============================ -->
+  <footer class="site-foot">
+    <div class="site-foot__wrap">
+      <a class="brand brand--foot" href="/">
+        <img class="brand__logo" src="/images/logo.png" alt="" width="48" height="48" decoding="async" />
+        <span class="brand__txt"><small>L'ATELIER</small><strong>ACIDULÉ</strong></span>
       </a>
+
+      <div class="foot-col">
+        <h4>Navigation</h4>
+        <a href="/">Accueil</a><a href="/mes-creations">Collection</a><a href="/atelier">À propos</a><a href="/commander">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h4>Informations</h4>
+        <a href="/commander">Livraison &amp; retours</a><a href="/atelier">Conditions générales</a><a href="/atelier">FAQ</a>
+      </div>
+      <div class="foot-col">
+        <h4>Suivez-nous</h4>
+        <a href="https://instagram.com/atelier_acidule" target="_blank" rel="noopener">@atelier_acidule</a><a href="https://instagram.com/atelier_acidule" target="_blank" rel="noopener">Commander en DM</a>
+      </div>
+
+      <form class="newsletter" onsubmit="return false">
+        <h4>Recevez nos nouveautés</h4>
+        <div class="newsletter__row">
+          <input type="email" placeholder="Votre email" aria-label="Votre email" required />
+          <button type="submit" aria-label="S'inscrire" set:html={icon('envoi')}></button>
+        </div>
+      </form>
     </div>
-  </section>
+    <p class="site-foot__legal">© 2026 L'Atelier Acidulé. Tous droits réservés.</p>
+  </footer>
+</Vitrine>
 
-  <style>
-    /* ====================================================================
-       1) HERO — produit détouré qui flotte sur le crème (pas de cadre photo)
-       ==================================================================== */
-    .hero {
-      position: relative;
-      overflow: hidden; /* le halo reste contenu, jamais d'overflow-x */
-      background: var(--creme);
-    }
-    .hero__grille {
-      display: grid;
-      gap: clamp(1.2rem, 5vw, 3rem);
-      align-items: center;
-      padding-block: clamp(2.5rem, 7vw, 4.5rem);
-    }
-    .hero h1 {
-      margin-bottom: 0.55rem;
-    }
-    .hero__accroche {
-      color: var(--texte-doux);
-      font-size: clamp(1rem, 1.4vw, 1.15rem);
-      max-width: 46ch;
-      margin-bottom: 1.8rem;
-    }
-    .hero__cta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.8rem;
-    }
+<style>
+  main { display: block; }
 
-    /* Visuel : sac détouré centré, halo citron doux derrière, ombre portée */
-    .hero__visuel {
-      position: relative;
-      order: -1; /* mobile : visuel en premier pour l'impact de marque */
-      display: grid;
-      place-items: center;
-      min-height: 34vh;
-    }
-    .hero__visuel::before {
-      content: '';
-      position: absolute;
-      inset: 6%;
-      z-index: 0;
-      border-radius: 50%;
-      background: radial-gradient(
-        closest-side,
-        color-mix(in srgb, var(--citron) 30%, transparent),
-        transparent 72%
-      );
-      filter: blur(14px);
-    }
-    .hero__photo {
-      position: relative;
-      z-index: 1;
-      width: min(78%, 320px);
-      height: auto;
-      object-fit: contain;
-      filter: drop-shadow(0 24px 32px rgba(20, 12, 8, 0.22));
-    }
+  /* ---------- primitives ---------- */
+  .eyebrow {
+    font-family: 'Archivo', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--v-doux);
+    margin: 0 0 0.9rem;
+  }
+  .eyebrow--jaune { color: var(--v-jaune); }
 
-    @media (min-width: 820px) {
-      .hero {
-        display: grid;
-        align-items: center;
-        min-height: 78vh;
-      }
-      .hero__grille {
-        grid-template-columns: 1.05fr 0.95fr;
-        padding-block: clamp(3rem, 6vw, 5rem);
-      }
-      .hero__visuel {
-        order: 0; /* desktop : texte gauche, visuel droite */
-        min-height: 0;
-      }
-      .hero__photo {
-        width: min(100%, 420px);
-      }
-    }
+  .btn-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.95rem 1.7rem;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform var(--transition), background-color var(--transition), color var(--transition), box-shadow var(--transition);
+    white-space: nowrap;
+  }
+  .btn-pill--jaune { background: var(--v-jaune); color: var(--v-encre); }
+  .btn-pill--jaune:hover { background: var(--v-jaune-2); transform: translateY(-2px); color: var(--v-encre); }
+  .btn-pill--ghost { background: transparent; color: var(--v-encre); border-color: rgba(43,42,34,0.35); }
+  .btn-pill--ghost:hover { background: var(--v-encre); color: var(--v-creme); }
+  .btn-pill--sombre { background: var(--v-vert); color: var(--v-creme); }
+  .btn-pill--sombre:hover { background: var(--v-vert-2); transform: translateY(-2px); color: var(--v-creme); }
 
-    /* ====================================================================
-       2) VALEURS
-       ==================================================================== */
-    .valeurs__grille {
-      display: grid;
-      gap: clamp(1rem, 3vw, 1.8rem);
-    }
-    @media (min-width: 720px) {
-      .valeurs__grille {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    .valeur {
-      text-align: center;
-      padding: clamp(1.4rem, 3vw, 2rem);
-      background: color-mix(in srgb, var(--creme-2) 70%, transparent);
-      border: 1px solid color-mix(in srgb, var(--sauge) 24%, transparent);
-      border-radius: var(--radius-lg);
-    }
-    .valeur__ico {
-      display: block;
-      font-size: 2.4rem;
-      line-height: 1;
-      margin-bottom: 0.6rem;
-    }
-    .valeur__titre {
-      margin: 0 0 0.4rem;
-      font-size: clamp(1.15rem, 2vw, 1.4rem);
-    }
-    .valeur__txt {
-      margin: 0;
-      color: var(--texte-doux);
-    }
+  .ic svg, .valeur__ic svg { display: block; }
+  .ic svg { width: 18px; height: 18px; }
 
-    /* ====================================================================
-       3) MES CRÉATIONS — cartes premium
-       ==================================================================== */
-    .creations__tete {
-      text-align: center;
-      margin-bottom: clamp(1.8rem, 4vw, 3rem);
-    }
-    .creations__tete h2 {
-      margin: 0;
-    }
-    .creations__grille {
-      display: grid;
-      gap: clamp(1.1rem, 3vw, 1.8rem);
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    }
-    .carte {
-      display: flex;
-      flex-direction: column;
-      background: var(--creme);
-      border: 1px solid color-mix(in srgb, var(--sauge) 18%, transparent);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--ombre-douce);
-      transition: transform var(--transition), box-shadow var(--transition);
-    }
-    .carte:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--ombre);
-    }
-    .carte__media {
-      aspect-ratio: 4 / 3;
-      display: grid;
-      place-items: center;
-      padding: 1.2rem;
-      background: var(--creme-2);
-    }
-    .carte__media img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .carte__corps {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 1rem 1.1rem 1.2rem;
-    }
-    .carte__tete {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 0.6rem;
-    }
-    .carte__nom {
-      margin: 0;
-      font-size: clamp(1.1rem, 1.6vw, 1.3rem);
-    }
-    .carte__prix {
-      flex-shrink: 0;
-      align-self: center;
-      background: var(--citron);
-      color: var(--sapin);
-      font-family: var(--font-corps);
-      font-weight: 800;
-      font-size: 0.78rem;
-      padding: 0.25rem 0.7rem;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-    .carte__anse {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin: 0;
-      color: var(--texte-doux);
-      font-size: 0.92rem;
-    }
-    .creations__cta {
-      text-align: center;
-      margin-top: clamp(1.8rem, 4vw, 3rem);
-    }
+  /* reveal au scroll */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.is-in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
 
-    /* ====================================================================
-       4) TEASER ATELIER — texte + cabas flottant sur dégradé chaud
-       ==================================================================== */
-    .atelier__grille {
-      display: grid;
-      gap: clamp(1.4rem, 4vw, 3rem);
-      align-items: center;
-    }
-    .atelier__texte h2 {
-      margin-bottom: 0.6rem;
-    }
-    .atelier__texte p {
-      color: var(--texte-doux);
-      margin-bottom: 1.6rem;
-    }
-    .atelier__media {
-      order: -1; /* mobile : visuel d'abord */
-      display: grid;
-      place-items: center;
-      padding: clamp(1.5rem, 4vw, 2.5rem);
-      min-height: 200px;
-      border-radius: var(--radius-lg);
-      background: linear-gradient(
-        140deg,
-        var(--creme-2),
-        color-mix(in srgb, var(--sauge-clair) 45%, var(--creme))
-      );
-    }
-    .atelier__media img {
-      width: min(80%, 320px);
-      object-fit: contain;
-      filter: drop-shadow(0 22px 30px rgba(20, 12, 8, 0.2));
-    }
-    @media (min-width: 820px) {
-      .atelier__grille {
-        grid-template-columns: 1fr 1fr;
-      }
-      .atelier__media {
-        order: 0; /* desktop : texte à gauche, visuel à droite */
-      }
-    }
+  /* ---------- header ---------- */
+  .site-head {
+    position: sticky; top: 0; z-index: 60;
+    display: flex; align-items: center; gap: 1.4rem;
+    padding: 0.8rem clamp(1.1rem, 4vw, 3rem);
+    background: rgba(245,239,224,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: box-shadow .3s ease, border-color .3s ease;
+  }
+  .site-head[data-scrolled] { box-shadow: 0 10px 30px -22px rgba(43,42,34,.5); border-color: var(--v-ligne); }
+  .brand { display: inline-flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+  .brand__logo { height: 46px; width: auto; border-radius: 50%; }
+  .brand__txt { display: flex; flex-direction: column; line-height: 0.92; font-family: 'Archivo', sans-serif; color: var(--v-encre); }
+  .brand__txt small { font-size: 0.62rem; letter-spacing: 0.18em; font-weight: 600; }
+  .brand__txt strong { font-size: 1.28rem; letter-spacing: 0.02em; font-weight: 900; }
 
-    /* ====================================================================
-       5) TEASER ÉDITIONS SPÉCIALES — bande crème claire centrée
-       ==================================================================== */
-    .editions {
-      text-align: center;
-      background: var(--creme-2);
-    }
-    .editions .contenu {
-      max-width: 640px;
-    }
-    .editions h2 {
-      margin: 0 0 0.5rem;
-    }
-    .editions p {
-      color: var(--texte-doux);
-      margin-bottom: 1.6rem;
-    }
+  .site-nav { display: flex; gap: clamp(1rem, 2.4vw, 2rem); margin-inline: auto; }
+  .site-nav a {
+    font-family: 'Archivo', sans-serif; font-weight: 600; font-size: 0.8rem;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--v-encre);
+    padding: 0.4rem 0; position: relative;
+  }
+  .site-nav a::after { content:''; position:absolute; left:0; right:100%; bottom:-2px; height:2px; background: var(--v-jaune); transition: right .25s ease; }
+  .site-nav a:hover { color: var(--v-encre); }
+  .site-nav a:hover::after { right: 0; }
+  .head-cta { margin-left: 0; }
 
-    /* ====================================================================
-       6) BANDEAU FINAL — pleine largeur, fond sapin, texte clair
-       ==================================================================== */
-    .final {
-      text-align: center;
-      background: var(--sapin);
+  .burger { display: none; flex-direction: column; justify-content: center; gap: 5px; width: 44px; min-height: 44px; padding: 9px; background: none; border: 0; cursor: pointer; }
+  .burger span { height: 2px; width: 100%; background: var(--v-encre); border-radius: 2px; transition: transform .25s ease, opacity .2s ease; }
+  .burger[aria-expanded='true'] span:nth-child(1){ transform: translateY(7px) rotate(45deg); }
+  .burger[aria-expanded='true'] span:nth-child(2){ opacity: 0; }
+  .burger[aria-expanded='true'] span:nth-child(3){ transform: translateY(-7px) rotate(-45deg); }
+
+  .drawer { position: fixed; inset: 0; z-index: 55; background: var(--v-vert); display: grid; place-items: center; opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility .35s ease; }
+  .drawer[aria-hidden='false'] { opacity: 1; visibility: visible; }
+  .drawer__inner { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+  .drawer__inner a { font-family: 'Archivo', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: clamp(1.6rem, 7vw, 2.4rem); color: var(--v-creme); padding: 0.4rem 0; }
+  .drawer__inner a:hover { color: var(--v-jaune); }
+  .drawer__cta { margin-top: 1.2rem; font-size: 0.9rem; color: var(--v-encre); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: clamp(2rem, 6vw, 4.5rem) clamp(1.1rem, 4vw, 3rem) clamp(3rem, 7vw, 5rem); }
+  /* head (eyebrow+titre) et body (sub+CTA+atouts) séparés pour pouvoir
+     intercaler le visuel entre les deux sur mobile. */
+  .hero__wrap {
+    max-width: 1200px; margin-inline: auto; display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    grid-template-areas: 'head visual' 'body visual';
+    column-gap: clamp(2rem, 5vw, 4rem); row-gap: 0;
+    align-items: center;
+  }
+  .hero__head { grid-area: head; align-self: end; }
+  .hero__body { grid-area: body; align-self: start; }
+  .hero__visual { grid-area: visual; }
+  .hero__title { font-size: clamp(2.4rem, 6.2vw, 4.4rem); }
+  .hero__title em { font-style: normal; color: var(--v-jaune); }
+  .hero__sub { max-width: 30rem; margin: 1.4rem 0 2rem; color: var(--v-doux); font-size: 1.05rem; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+  .hero__atouts { list-style: none; margin: 2.4rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: clamp(1rem, 3vw, 2.2rem); }
+  .hero__atouts li { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.82rem; font-weight: 600; color: var(--v-encre); }
+  .hero__atouts .ic { color: var(--v-jaune-2); display: inline-flex; }
+
+  .hero__panel { position: relative; background: var(--v-vert); border-radius: 220px 220px 26px 26px; padding: 2.2rem; aspect-ratio: 4/5; display: grid; place-items: center; overflow: hidden; }
+  .hero__panel img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 24px 40px rgba(0,0,0,.35)); }
+  .badge { position: absolute; top: 1rem; left: 1rem; width: 92px; height: 92px; background: var(--v-creme); border-radius: 50%; display: grid; place-items: center; }
+  .badge svg { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 14s linear infinite; }
+  .badge text { font-family: 'Archivo', sans-serif; font-size: 8.5px; font-weight: 700; letter-spacing: 1px; fill: var(--v-encre); }
+  .badge__heart { color: var(--v-jaune-2); display: inline-flex; }
+  .badge__heart svg { position: static; width: 26px; height: 26px; animation: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){ .badge svg { animation: none; } }
+
+  /* ---------- bandeau valeurs ---------- */
+  .valeurs { background: var(--v-vert); color: var(--v-creme); }
+  .valeurs__grid { max-width: 1200px; margin-inline: auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+  .valeur { padding: clamp(2rem, 4vw, 3rem) clamp(1.1rem, 2.5vw, 2rem); border-left: 1px solid rgba(245,239,224,.14); }
+  .valeur:first-child { border-left: 0; }
+  .valeur__ic { color: var(--v-jaune); display: inline-flex; margin-bottom: 1rem; }
+  .valeur__ic svg { width: 30px; height: 30px; }
+  .valeur__t { font-family: 'Archivo', sans-serif; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.95rem; font-weight: 700; color: var(--v-creme); margin: 0 0 0.5rem; }
+  .valeur__d { color: rgba(245,239,224,.7); font-size: 0.9rem; margin: 0; }
+
+  /* ---------- collection ---------- */
+  .collection { --px: clamp(1.1rem, 4vw, 3rem); padding: clamp(3rem, 7vw, 5.5rem) var(--px); }
+  .collection__wrap { max-width: 1200px; margin-inline: auto; display: grid; grid-template-columns: 240px 1fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: start; }
+  .collection__title { font-size: clamp(2rem, 3.6vw, 2.8rem); margin: 0 0 1.6rem; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(0.8rem, 1.6vw, 1.3rem); }
+  .card { display: flex; flex-direction: column; text-decoration: none; color: var(--v-encre); }
+  .card__media { display: block; background: var(--v-creme-2); border-radius: 14px; overflow: hidden; aspect-ratio: 3/4; }
+  .card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+  .card:hover .card__media img { transform: scale(1.05); }
+  .card__row { display: flex; align-items: center; justify-content: space-between; margin-top: 0.8rem; }
+  .card__nom { font-family: 'Archivo', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; font-size: 0.82rem; }
+  .card__dot { width: 12px; height: 12px; border-radius: 50%; background: var(--d); box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+  .card__prix { color: var(--v-doux); font-size: 0.85rem; margin-top: 0.15rem; }
+  .card__prix strong { color: var(--v-encre); font-weight: 800; }
+
+  /* ---------- à propos ---------- */
+  .apropos { display: grid; grid-template-columns: 1fr 1fr; background: var(--v-vert); color: var(--v-creme); }
+  .apropos__img img { width: 100%; height: 100%; object-fit: cover; min-height: 320px; }
+  .apropos__text { position: relative; padding: clamp(2.5rem, 6vw, 5rem); align-self: center; overflow: hidden; }
+  .apropos__title { color: var(--v-creme); font-size: clamp(1.9rem, 3.6vw, 2.8rem); margin: 0 0 1.2rem; }
+  .apropos__text p { color: rgba(245,239,224,.82); max-width: 34rem; }
+  .apropos__text .btn-pill { margin-top: 1.2rem; }
+  .apropos__lemon { position: absolute; right: -10px; top: 50%; transform: translateY(-50%); width: 190px; height: 190px; fill: none; stroke: rgba(245,239,224,.2); stroke-width: 2; pointer-events: none; }
+
+  /* ---------- avis ---------- */
+  .avis { padding: clamp(3rem, 6vw, 5rem) clamp(1.1rem, 4vw, 3rem); }
+  .avis__wrap { max-width: 1200px; margin-inline: auto; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: clamp(1rem, 3vw, 2.4rem); }
+  .avis__head { grid-column: 2; margin-bottom: 0.5rem; }
+  .avis__title { font-size: clamp(1.8rem, 3.4vw, 2.6rem); }
+  .avis__title::after { content:''; display:block; width: 46px; height: 3px; background: var(--v-jaune); margin-top: 0.7rem; }
+  .avis__track { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.4rem, 3vw, 2.6rem); }
+  .nav-arrow { grid-row: 1 / span 2; align-self: center; width: 52px; height: 52px; border-radius: 50%; border: 1.5px solid var(--v-ligne); background: transparent; cursor: pointer; display: grid; place-items: center; color: var(--v-encre); transition: background .25s ease, color .25s ease; }
+  .nav-arrow:hover { background: var(--v-vert); color: var(--v-creme); }
+  [data-avis-prev] { grid-column: 1; }
+  [data-avis-next] { grid-column: 3; }
+  .temoignage { margin: 0; }
+  .avis__dots { display: none; }
+  .avis__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--v-ligne); transition: background .25s ease, transform .25s ease; }
+  .avis__dot.actif { background: var(--v-jaune-2); transform: scale(1.25); }
+  .stars { color: var(--v-jaune); letter-spacing: 2px; margin-bottom: 0.7rem; }
+  .temoignage blockquote { margin: 0 0 0.9rem; font-style: italic; color: var(--v-encre); }
+  .temoignage figcaption { font-family: 'Archivo', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; font-size: 0.78rem; }
+
+  /* ---------- CTA jaune ---------- */
+  .cta-band { background: var(--v-jaune); }
+  .cta-band__wrap { max-width: 1200px; margin-inline: auto; padding: clamp(2.4rem, 5vw, 3.6rem) clamp(1.1rem, 4vw, 3rem); display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 1.4rem 2rem; }
+  .cta-band__title { grid-row: 1; color: var(--v-encre); font-size: clamp(1.7rem, 3.4vw, 2.6rem); }
+  .cta-band__txt { grid-column: 1; grid-row: 2; margin: 0; max-width: 30rem; color: rgba(43,42,34,.8); }
+  .cta-band .btn-pill { grid-column: 2; grid-row: 1 / span 2; }
+
+  /* ---------- footer ---------- */
+  .site-foot { background: var(--v-vert-2); color: var(--v-creme); padding: clamp(2.5rem, 5vw, 3.6rem) clamp(1.1rem, 4vw, 3rem) 1.6rem; }
+  .site-foot__wrap { max-width: 1200px; margin-inline: auto; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1.6fr; gap: clamp(1.4rem, 3vw, 2.4rem); }
+  .brand--foot .brand__txt, .brand--foot .brand__txt strong, .brand--foot .brand__txt small { color: var(--v-creme); }
+  .foot-col { display: flex; flex-direction: column; gap: 0.5rem; }
+  .foot-col h4, .newsletter h4 { font-family: 'Archivo', sans-serif; text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.72rem; font-weight: 700; color: var(--v-jaune); margin: 0 0 0.4rem; }
+  .foot-col a { color: rgba(245,239,224,.78); font-size: 0.9rem; }
+  .foot-col a:hover { color: var(--v-creme); }
+  .newsletter__row { display: flex; gap: 0; background: rgba(245,239,224,.1); border-radius: 999px; padding: 4px; max-width: 320px; }
+  .newsletter input { flex: 1; background: none; border: 0; color: var(--v-creme); padding: 0.6rem 1rem; font: inherit; font-size: 0.9rem; }
+  .newsletter input::placeholder { color: rgba(245,239,224,.55); }
+  .newsletter input:focus { outline: none; }
+  .newsletter button { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--v-jaune); color: var(--v-encre); cursor: pointer; display: grid; place-items: center; }
+  .site-foot__legal { max-width: 1200px; margin: 2.4rem auto 0; padding-top: 1.4rem; border-top: 1px solid rgba(245,239,224,.14); font-size: 0.8rem; color: rgba(245,239,224,.6); }
+
+  /* =========================================================
+     RESPONSIVE
+     ========================================================= */
+  @media (max-width: 960px) {
+    .site-nav { display: none; }
+    .burger { display: flex; }
+    .brand { margin-right: auto; }
+    /* le CTA reste visible : seul chemin d'achat permanent sur mobile */
+    .head-cta { padding: 0.72rem 1.15rem; font-size: 0.72rem; }
+
+    /* hero : titre -> visuel (arche conservée) -> sous-titre + CTA */
+    .hero { padding-top: 1.4rem; }
+    .hero__wrap { grid-template-columns: 1fr; grid-template-areas: 'head' 'visual' 'body'; }
+    .hero__head { text-align: center; }
+    .hero__title { font-size: clamp(1.85rem, 8.4vw, 2.9rem); }
+    .hero__panel { max-width: min(70vw, 320px); margin-inline: auto; margin-top: 1.2rem; padding: 1.5rem; }
+    /* badge posé au sommet de l'arche (à gauche il était rogné par la courbe) */
+    .badge { width: 72px; height: 72px; top: 0.7rem; left: 50%; transform: translateX(-50%); }
+    .hero__sub { margin-top: 1.6rem; }
+    .hero__body { justify-items: center; display: grid; text-align: center; }
+    .hero__cta { justify-content: center; }
+    .hero__atouts { justify-content: center; }
+
+    .valeurs__grid { grid-template-columns: repeat(2, 1fr); }
+    .valeur:nth-child(3) { border-left: 0; }
+    .valeur:nth-child(odd) { border-left: 0; }
+    .valeur:nth-child(even) { border-left: 1px solid rgba(245,239,224,.14); }
+    .valeur { border-top: 1px solid rgba(245,239,224,.14); }
+    .valeur:nth-child(1), .valeur:nth-child(2) { border-top: 0; }
+    .collection__wrap { grid-template-columns: 1fr; }
+    .collection__intro { text-align: center; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .apropos { grid-template-columns: 1fr; }
+    .apropos__img { order: -1; }
+
+    /* avis : tout le carrousel est tactile -> flèches inutiles, points indicateurs */
+    .avis__wrap { grid-template-columns: 1fr; }
+    .avis__head, .avis__track { grid-column: 1; }
+    .avis__head { text-align: center; }
+    .avis__title::after { margin-inline: auto; }
+    .avis__track { grid-row: auto; grid-auto-flow: column; grid-auto-columns: 88%; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .avis__track::-webkit-scrollbar { display: none; }
+    .temoignage { scroll-snap-align: center; text-align: center; }
+    .nav-arrow { display: none; }
+    .avis__dots { display: flex; justify-content: center; gap: 8px; grid-column: 1; margin-top: 1.4rem; }
+
+    .cta-band__wrap { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+    .cta-band__title, .cta-band__txt, .cta-band .btn-pill { grid-column: 1; }
+    .cta-band .btn-pill { grid-row: 3; }
+    .site-foot__wrap { grid-template-columns: 1fr 1fr; }
+    .brand--foot, .newsletter { grid-column: 1 / -1; }
+    .newsletter input { font-size: 16px; } /* < 16px = zoom auto iOS au focus */
+  }
+
+  /* collection : carrousel plein-bleed avec aperçu de la carte suivante */
+  @media (max-width: 700px) {
+    .cards {
+      grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 72%;
+      overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; gap: 0.9rem;
+      margin-inline: calc(var(--px) * -1); padding-inline: var(--px);
     }
-    .final .contenu {
-      max-width: 640px;
-    }
-    .final h2 {
-      color: var(--creme);
-      margin: 0 0 0.5rem;
-    }
-    .final p {
-      color: color-mix(in srgb, var(--creme) 85%, transparent);
-      margin-bottom: 1.8rem;
-    }
-  </style>
-</Base>
+    .cards::-webkit-scrollbar { display: none; }
+    .card { scroll-snap-align: center; }
+    .card__nom { font-size: 0.9rem; }
+    .card__prix { font-size: 0.95rem; }
+  }
+
+  @media (max-width: 520px) {
+    .hero__atouts { gap: 0.8rem 1.4rem; }
+    .site-foot__wrap { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  // --- burger / tiroir ---
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const drawer = document.querySelector<HTMLElement>('[data-drawer]');
+  burger?.addEventListener('click', () => {
+    const open = burger.getAttribute('aria-expanded') === 'true';
+    burger.setAttribute('aria-expanded', String(!open));
+    drawer?.setAttribute('aria-hidden', String(open));
+    document.body.style.overflow = open ? '' : 'hidden';
+  });
+  drawer?.querySelectorAll('a').forEach((a) =>
+    a.addEventListener('click', () => {
+      burger?.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    })
+  );
+
+  // --- ombre du header au scroll ---
+  const head = document.querySelector<HTMLElement>('[data-head]');
+  const onScroll = () => head?.toggleAttribute('data-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // --- reveal au scroll ---
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } }),
+    { threshold: 0.14 }
+  );
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // --- carrousel d'avis (mobile : scroll ; flèches partout) ---
+  const track = document.querySelector<HTMLElement>('[data-avis-track]');
+  const step = (dir: number) => {
+    if (!track) return;
+    const card = track.querySelector<HTMLElement>('.temoignage');
+    const w = card ? card.getBoundingClientRect().width + 24 : track.clientWidth;
+    track.scrollBy({ left: dir * w, behavior: 'smooth' });
+  };
+  document.querySelector('[data-avis-prev]')?.addEventListener('click', () => step(-1));
+  document.querySelector('[data-avis-next]')?.addEventListener('click', () => step(1));
+
+  // --- points indicateurs des avis (visibles en mobile, où le carrousel est tactile) ---
+  const dotsWrap = document.querySelector<HTMLElement>('[data-avis-dots]');
+  const slides = track ? Array.from(track.querySelectorAll('.temoignage')) : [];
+  if (dotsWrap && track && slides.length > 1) {
+    slides.forEach(() => {
+      const d = document.createElement('span');
+      d.className = 'avis__dot';
+      dotsWrap.append(d);
+    });
+    const dots = Array.from(dotsWrap.children);
+    const majDots = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      const i = max > 0 ? Math.round((track.scrollLeft / max) * (slides.length - 1)) : 0;
+      dots.forEach((d, j) => d.classList.toggle('actif', j === i));
+    };
+    majDots();
+    track.addEventListener('scroll', majDots, { passive: true });
+  }
+</script>
+
+<script is:inline>
+  // placeholder — l'inscription newsletter est branchée plus tard (commerce hybride)
+</script>

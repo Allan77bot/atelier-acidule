@@ -1,105 +1,67 @@
 ---
-import Base from '../layouts/Base.astro';
+// Éditions spéciales — DA « voeu ». Galerie de pièces uniques, contenu réel conservé.
+import PageVoeu from '../layouts/PageVoeu.astro';
 
-// Galerie de pièces uniques. Pas de configurateur : la cliente compose / la pièce est figée.
-// (Provisoire : on branchera les vraies photos d'éditions au fil des saisons.)
+const IG = 'https://www.instagram.com/atelier_acidule';
 const pieces = [
-  { titre: "Édition Limonade d'été", note: 'Pièce unique', photo: '/images/grand-sac.png', dispo: true },
-  { titre: 'Pochette Provence', note: 'Série de 3', photo: '/images/pochette-livres.png', dispo: true },
-  { titre: 'Petit sac Méditerranée', note: 'Pièce unique', photo: '/images/petit-sac.png', dispo: false },
+  { titre: "Édition Limonade d'été", note: 'Pièce unique', photo: '/images/grand-sac.webp', dispo: true },
+  { titre: 'Pochette Provence', note: 'Série de 3', photo: '/images/pochette-livres.webp', dispo: true },
+  { titre: 'Petit sac Méditerranée', note: 'Pièce unique', photo: '/images/petit-sac.webp', dispo: false },
 ];
 ---
 
-<Base
-  titre="Éditions spéciales"
-  description="Des pièces uniques au crochet, en quantité limitée. Quand elles sont parties, elles sont parties."
->
-  <section class="section">
-    <div class="contenu">
-      <header class="entete">
-        <p class="surtitre">En quantité limitée</p>
-        <h1>Éditions spéciales</h1>
-        <p class="entete__sous">
-          Des créations composées à la main au gré des saisons. Ici, pas de
-          configurateur : chaque pièce est déjà pensée dans ses moindres mailles.
-          Un coup de cœur&nbsp;? Réserve-la vite en DM.
-        </p>
-      </header>
-
-      <div class="galerie">
-        {pieces.map((p) => (
-          <article class:list={['piece', { 'piece--epuise': !p.dispo }]}>
-            <div class="piece__media">
-              <img src={p.photo} alt={p.titre} loading="lazy" />
-              {!p.dispo && <span class="piece__badge">Épuisé</span>}
-            </div>
-            <div class="piece__corps">
-              <p class="piece__note">{p.note}</p>
-              <h3>{p.titre}</h3>
-              {p.dispo ? (
-                <a
-                  class="btn btn--citron"
-                  href="https://www.instagram.com/atelier_acidule"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Réserver en DM
-                </a>
-              ) : (
-                <span class="piece__indispo">Plus disponible</span>
-              )}
-            </div>
-          </article>
-        ))}
-      </div>
+<PageVoeu titre="Éditions spéciales" description="Des pièces uniques au crochet, en quantité limitée. Quand elles sont parties, elles sont parties.">
+  <section class="ed-head">
+    <div class="ed-head__wrap reveal">
+      <p class="eyebrow" style="color:var(--v-jaune-2)">En quantité limitée</p>
+      <h1 class="display ed-head__title">Éditions <em>spéciales.</em></h1>
+      <p>Des créations composées à la main au gré des saisons. Ici, pas de configurateur : chaque pièce est déjà pensée dans ses moindres mailles. Un coup de cœur&nbsp;? Réserve-la vite en DM.</p>
     </div>
   </section>
-</Base>
+
+  <section class="ed-gallery-sec">
+    <div class="ed-gallery">
+      {pieces.map((p) => (
+        <article class:list={['ed-piece reveal', { 'ed-piece--epuise': !p.dispo }]}>
+          <div class="ed-piece__media">
+            <img src={p.photo} alt={p.titre} loading="lazy" decoding="async" />
+            {!p.dispo && <span class="ed-piece__badge">Épuisé</span>}
+          </div>
+          <div class="ed-piece__corps">
+            <p class="ed-piece__note">{p.note}</p>
+            <h3 class="ed-piece__titre">{p.titre}</h3>
+            {p.dispo ? (
+              <a class="btn-pill btn-pill--jaune" href={IG} target="_blank" rel="noopener">Réserver en DM</a>
+            ) : (
+              <span class="ed-piece__indispo">Plus disponible</span>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</PageVoeu>
 
 <style>
-  .entete { text-align: center; max-width: 58ch; margin: 0 auto 2.6rem; }
-  .entete__sous { color: var(--texte-doux); }
-  .galerie {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.6rem;
-  }
-  .piece {
-    background: #fff;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--ombre-douce);
-    border: 1px solid color-mix(in srgb, var(--sauge) 22%, transparent);
-    transition: transform var(--transition), box-shadow var(--transition);
-  }
-  .piece:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--ombre);
-  }
-  .piece__media {
-    position: relative;
-    aspect-ratio: 1;
-    background: var(--creme-2);
-  }
-  .piece__media img { width: 100%; height: 100%; object-fit: cover; }
-  .piece--epuise .piece__media img { filter: grayscale(0.6) opacity(0.7); }
-  .piece__badge {
-    position: absolute; top: 12px; left: 12px;
-    background: var(--encre); color: #fff;
-    font-size: 0.78rem; font-weight: 800;
-    padding: 0.25rem 0.7rem; border-radius: 999px;
-  }
-  .piece__corps { padding: 1.3rem 1.4rem 1.5rem; }
-  .piece__note {
-    font-family: var(--font-wordmark); font-style: italic;
-    color: var(--terracotta); margin: 0 0 0.2rem; font-size: 0.9rem;
-  }
-  .piece__corps h3 { margin: 0 0 1rem; }
-  .piece__indispo { color: var(--texte-doux); font-weight: 700; font-size: 0.9rem; }
+  .ed-head { background: var(--v-vert); color: var(--v-creme); padding: clamp(3rem, 7vw, 5rem) clamp(1.1rem, 4vw, 3rem); text-align: center; }
+  .ed-head__wrap { max-width: 640px; margin-inline: auto; }
+  .ed-head__title { color: var(--v-creme); font-size: clamp(2.2rem, 5vw, 3.4rem); margin-bottom: 1rem; }
+  .ed-head__title em { font-style: normal; color: var(--v-jaune); }
+  .ed-head p { color: rgba(245,239,224,.8); }
 
-  @media (max-width: 860px) { .galerie { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 560px) {
-    .galerie { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
-    .piece__corps { padding: 1.1rem 1.2rem 1.3rem; }
-  }
+  .ed-gallery-sec { padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.1rem, 4vw, 3rem); }
+  .ed-gallery { max-width: 1050px; margin-inline: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6rem; }
+  .ed-piece { background: var(--v-creme-2); border-radius: 18px; overflow: hidden; transition: transform var(--transition), box-shadow var(--transition); }
+  .ed-piece:hover { transform: translateY(-4px); box-shadow: 0 22px 50px -30px rgba(43,42,34,.5); }
+  .ed-piece__media { position: relative; aspect-ratio: 1; background: var(--v-creme); }
+  .ed-piece__media img { width: 100%; height: 100%; object-fit: cover; }
+  .ed-piece--epuise .ed-piece__media img { filter: grayscale(.6) opacity(.7); }
+  .ed-piece__badge { position: absolute; top: 12px; left: 12px; background: var(--v-encre); color: var(--v-creme); font-family: 'Archivo', sans-serif; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.3rem 0.7rem; border-radius: 999px; }
+  .ed-piece__corps { padding: 1.3rem 1.4rem 1.5rem; }
+  .ed-piece__note { font-family: 'Archivo', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.72rem; font-weight: 700; color: var(--v-jaune-2); margin: 0 0 0.35rem; }
+  .ed-piece__titre { font-family: 'Archivo', sans-serif; font-size: 1.05rem; font-weight: 700; color: var(--v-encre); margin: 0 0 1rem; }
+  .ed-piece__indispo { color: var(--v-doux); font-weight: 700; font-size: 0.85rem; }
+
+  @media (max-width: 860px) { .ed-gallery { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .ed-gallery { grid-template-columns: 1fr; max-width: 400px; } }
 </style>

@@ -1,0 +1,93 @@
+---
+// Coquille des pages « vitrine » longues (scroll classique) reproduites d'après
+// les maquettes Ref/_preview. DA : titres en Archivo (grotesque gras, capitales),
+// corps en Nunito Sans. Pas de Nav/Footer partagés : chaque page rend son propre
+// header + footer pour coller pixel-près à sa maquette.
+import '../styles/global.css';
+
+interface Props {
+  titre: string;
+  description?: string;
+}
+
+const {
+  titre,
+  description = 'Sacs et accessoires au crochet faits main à la demande — Atelier Acidulé. Des créations qui ne manquent pas de piquant.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/images/logo.png" />
+    <title>{titre} · Atelier Acidulé</title>
+    <meta name="description" content={description} />
+
+    <!-- Polices maquette : Archivo (display, capitales) + Nunito Sans (corps) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="vitrine">
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* La page vitrine remplace le décor mosaïque par des fonds pleins par section. */
+  body.vitrine::before { display: none; }
+  body.vitrine {
+    --v-creme: #f5efe0;
+    --v-creme-2: #efe7d3;
+    --v-vert: #43512e;      /* bandeau vert olive foncé */
+    --v-vert-2: #38452a;    /* footer, plus sombre */
+    --v-jaune: #f0c02f;     /* boutons / accents */
+    --v-jaune-2: #e2ad1f;
+    --v-encre: #2b2a22;
+    --v-doux: #6f6c5e;
+    --v-ligne: rgba(43, 42, 34, 0.12);
+    font-family: var(--font-corps);
+    color: var(--v-encre);
+    background: var(--v-creme);
+  }
+  /* Titres display calqués sur la maquette (grotesque gras, capitales serrées) */
+  .display {
+    font-family: 'Archivo', system-ui, sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 1.02;
+    color: var(--v-encre);
+    margin: 0;
+  }
+
+  /* --- Primitives partagées par toutes les pages vitrine --- */
+  .eyebrow { font-family: 'Archivo', sans-serif; text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.72rem; font-weight: 700; color: var(--v-doux); margin: 0 0 0.9rem; }
+  .eyebrow--jaune { color: var(--v-jaune-2); }
+  .eyebrow--center { text-align: center; }
+
+  .btn-pill { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.06em; padding: 0.95rem 1.7rem; border-radius: 999px; border: 2px solid transparent; cursor: pointer; transition: transform var(--transition), background-color var(--transition), color var(--transition); white-space: nowrap; text-decoration: none; }
+  .btn-pill--jaune { background: var(--v-jaune); color: var(--v-encre); }
+  .btn-pill--jaune:hover { background: var(--v-jaune-2); transform: translateY(-2px); color: var(--v-encre); }
+  .btn-pill--ghost { background: transparent; color: var(--v-encre); border-color: rgba(43,42,34,0.35); }
+  .btn-pill--ghost:hover { background: var(--v-encre); color: var(--v-creme); }
+  .btn-pill--ghost-light { background: transparent; color: var(--v-creme); border-color: rgba(245,239,224,.4); }
+  .btn-pill--ghost-light:hover { background: var(--v-creme); color: var(--v-encre); }
+  .btn-pill--sombre { background: var(--v-vert); color: var(--v-creme); }
+  .btn-pill--sombre:hover { background: var(--v-vert-2); transform: translateY(-2px); color: var(--v-creme); }
+
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
+  .reveal.is-in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+
+  /* Accessibilité clavier : contour visible uniquement au focus clavier. */
+  :where(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid var(--v-jaune-2);
+    outline-offset: 2px;
+  }
+</style>

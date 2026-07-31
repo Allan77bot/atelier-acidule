@@ -15,10 +15,7 @@ pnpm-debug.log*
 # macOS / Windows
 .DS_Store
 Thumbs.db
+.firecrawl/
 
 # Local Netlify folder
 .netlify
-
-# Artefacts de vérification / outils (non versionnés)
-.playwright-mcp/
-docs/audit-shots/

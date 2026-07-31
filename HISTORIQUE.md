@@ -8,45 +8,62 @@
 
 ## 📌 État actuel (réécrit à chaque session)
 
-**Phase :** **refonte complète terminée, déployée et poussée** sur la branche `feat/refonte-accueil` :
-`/index` est une **vraie landing page** (layout Base, scroll), `/mes-creations` est une **expérience
-scroll-snap** (1 sac = 1 section couleur, plus de GSAP/boutons/mode détail), et la **personnalisation
-est supprimée** (commande = **DM Instagram**). En ligne : https://atelier-acidule.netlify.app.
-`main` garde l'ancienne vitrine. **Archi à jour : `CLAUDE.md` (actualisé) + `docs/ETAT.md`.**
-⚠️ Les notes d'architecture détaillées plus bas dans CE fichier (configurateur, split-screen GSAP,
-ancienne home) sont **PÉRIMÉES** — se fier à `CLAUDE.md`.
+**Phase : refonte accueil en cours** — état au **2026-07-15** (grosse session,
+voir log) :
 
-### 🚧 Refonte split-screen (branche)
-- **Fondation** : git initialisé, branche dédiée, GSAP 3.15 + Lenis 1.3 installés.
-- `src/layouts/Immersif.astro` : coquille immersive (header minimal wordmark + burger
-  + tiroir menu), sans Nav/Footer classiques. À enrichir : loader d'intro + Lenis.
-- `src/pages/index.astro` : **accueil split-screen** complet (état 1 sélecteur 4
-  modèles + état 2 fiche détail), animé GSAP (slide couleur, fondu-zoom du sac,
-  textes masqués, split 50/50↔40/60, reveal en cascade). Molette/clavier/clic.
-- `src/data/modeles.ts` : champ `couleur` ajouté par modèle (terracotta/olive/
-  bordeaux/sapin).
-- **Photos produit refaites** (session 06-27) : les 4 captures Instagram remplacées
-  par les photos studio du catalogue. Mapping : `petit-sac`=16_cabas-marron,
-  `pochette-livres`=01_pochette-livre-ecru, `grand-sac`=13_sac-bordeaux,
-  `edition-speciale`=25_cabas-multicolore.
-  - **Cartes / éditions / autres pages** : versions **détourées** (rembg `isnet-general-use`)
-    `public/images/<slug>.png` (fond transparent).
-  - **Accueil** : versions **fond recolorisé par sac** `public/images/accueil-<slug>.png`
-    (fond crème → couleur du modèle, ombre de contact gardée, champ plat = couleur exacte
-    pour être raccord avec le fond de scène). ⚠️ nom = **slug** (`accueil-editions-speciales.png`,
-    pluriel, ≠ base `edition-speciale.png`).
-  - **Configurateur** : 6 calques `sim-*` régénérés **depuis ces photos** (texture =
-    relief passe-haut auto-calibré par sac via percentile ; masque = alpha silhouette).
-    ⚠️ Allan **n'aime pas** le rendu « photo recolorée » du configurateur → il veut
-    refaire plus propre lui-même (piste : revenir aux dessins au trait `Simulateur_*`).
-- **Accueil plein couleur** : panneau gauche passe blanc→couleur (hero) puis →crème
-  (fiche), logo (pelote+citron) ajouté en haut à gauche, titre décalé en haut /
-  baseline en bas + ombre texte (lisibilité, demandé par Allan).
-- **Build OK** (`npm run build`, 5 pages). ⚠️ FS `/mnt/e` lent.
-- ⚠️ **Gotcha dev WSL** : `astro dev` met `public/` en cache au boot → après ajout
-  d'un asset, **redémarrer** le serveur. Tuer avec `pkill -f "astro.js dev"` (PAS
-  `"astro dev"`, qui ne matche pas le process node).
-- Réf. d'analyse complète : `Pool/ref-sandqvist-structure.md`.
+- **Branche de tête : `feat/mobile-vitrine`** (au-dessus de
+  `feat/retrait-personnalisation`, elle-même au-dessus de `fix/mobile`), poussée
+  sur GitHub et **déployée en prod** (accord explicite d'Alphim, vérifiée par
+  captures Playwright mobile 390×844).
+- **La personnalisation n'existe plus** : `/personnaliser` + `Configurateur.astro`
+  + calques `sim-*` supprimés (rendu jugé « extrêmement laid »). Tous les CTA
+  pointent vers **`/commander`**, qui présélectionne le modèle via `?modele=<slug>`.
+  Le code mort résultant (`Base`/`Nav`/`Footer`/`CarteModele`) est supprimé aussi.
+  Pistes de remplacement : branches `feat/configurateur-2.5d` / `-3d` (locales).
+- **Vitrine mobile refaite** (validée par Alphim sur device + QA visuelle) :
+  hero titre→arche→CTA au-dessus du pli, badge au sommet de l'arche, CTA
+  « Commander » permanent dans le header, collection en carrousel snap plein-bleed,
+  avis avec points indicateurs, `:focus-visible` global, newsletter 16 px.
+- **DA vitrine** (rappel, `848a8f5` du 2026-07-03) : Archivo + Nunito Sans,
+  maquettes `Ref/_preview` ; `index` → layout `Vitrine`,
+  `atelier`/`commander`/`editions-speciales` → `PageVoeu`, `/mes-creations` →
+  split-screen GSAP (Immersif). `main` garde toujours l'état initial pré-refonte.
+- ⚠️ **Allan n'a toujours pas accepté l'invitation GitHub** (vérifié 2 fois le
+  2026-07-15 via API). Deux mails envoyés/préparés (fil du 15/07) : retrait perso
+  + mobile prêt, « modifie toi-même si ça ne convient pas ».
+
+**Dépôt distant + mise en ligne (à jour 2026-07-15) :**
+- GitHub **https://github.com/AmarokRa/atelier-acidule** — **PRIVÉ** (les assets
+  cliente `Ref/` ne sont plus exposés mais restent dans l'historique git).
+  Branche par défaut `feat/refonte-accueil`. Branches poussées : `main` (état
+  initial), `feat/refonte-accueil`, `feat/retrait-personnalisation`,
+  `feat/mobile-vitrine` (tête). Locales seulement : `fix/mobile`,
+  `feat/configurateur-2.5d`, `feat/configurateur-3d`, `feat/refonte-split-screen`
+  (dépassée).
+- **Collaborateur** : Allan (**`Allan77bot`**) invité en **admin** — ⚠️ invitation
+  **toujours en attente** (page `/invitations`) ; il ne voit rien tant qu'il
+  n'accepte pas.
+- **Site en ligne (Netlify)** : **https://atelier-acidule-498.netlify.app** — la
+  prod reflète depuis le **2026-07-15** le build de **`feat/mobile-vitrine`**
+  (commit `5791262`). Team `isaiah-blackcrow`, project id
+  `c1d3c25a-9bc5-4954-aefc-bbccbf47ab39`. Déploiement **manuel via CLI**
+  (`netlify deploy --prod --dir=dist`), **pas** de CI git connectée — pousser ne
+  déploie rien, et chaque déploiement exige l'accord explicite d'Alphim.
+
+### 🧱 Briques du site (état 2026-07-15)
+- **5 pages** : `index` (vitrine longue, Vitrine), `mes-creations` (split-screen
+  GSAP, Immersif — molette/clavier/**swipe tactile**), `editions-speciales`,
+  `atelier`, `commander` (PageVoeu — formulaire placeholder qui n'envoie rien,
+  présélection `?modele=`). L'archi détaillée vit dans `CLAUDE.md` (qui fait foi).
+- **Images** : photos servies en **WebP** (lot `fix/mobile`) ; les PNG d'origine
+  traînent encore dans `public/images/` (ménage possible, voir Next).
+- **Orphelins gardés exprès** : `Logo.astro` (marque) et `IntroAnim.astro`
+  (futur loader d'intro — porte les **57 erreurs `astro check` préexistantes**).
+- ⚠️ **Gotcha dev WSL** : `astro dev` met `public/` en cache au boot → redémarrer
+  après ajout d'asset (`pkill -f "astro.js dev"`). FS `/mnt/e` lent.
+- 🆕 **QA visuelle possible sans sudo** : recette Playwright + libs locales en
+  mémoire Claude (`wsl-verif-visuelle-navigateur`) — captures mobile 390×844,
+  penser à `reduced_motion` à cause des `.reveal`.
 
 ### 📥 Matériel catalogue (déposé 2026-06-26, partiellement exploité)
 `Ref/catalogue/` — **27 photos produit** (désormais **suivies par git**) : beaucoup
@@ -57,49 +74,23 @@ sapin, cabas (teal/marron/perles/crème-bois/beige/crème-doré/multicolore), sa
 rose, jaune, bleu ciel), pochette tél. **À trier/détourer/intégrer à la reprise** —
 pourrait enrichir le catalogue (`modeles.ts`) et alimenter un défilé de coloris.
 
-### ⚠️ Travail NON commité en fin de session 06-27 (branche)
-Commité : `be111ab` (photos+calques+catalogue), `218958b` (CLAUDE.md).
-**Pas encore commité** (à valider/commiter à la reprise) : `src/pages/index.astro`
-+ `src/layouts/Immersif.astro` (logo, accueil plein couleur, fiche crème, décalage
-texte) + 4 images `public/images/accueil-*.png` (non suivies). Dev server à relancer.
-
-### ▶️ Next refonte
-1. **Refaire le configurateur** « plus propre » (Allan s'en charge — rendu photo pas validé).
-2. **Validation visuelle d'Allan** sur l'accueil (état fiche : sac vs panneau crème ;
-   grand-sac ton sur ton ; écart du texte) + commiter le lot ci-dessus.
-3. Brancher un **slogan citron + CTA « Shop ton sac »** (liste proposée en session)
-   à la place de « Découvrir → » / « Personnaliser ce sac → ».
-4. Exploiter le reste de `Ref/catalogue/` (coloris/nouveaux modèles → `modeles.ts`).
-5. Ré-skin des autres pages dans le langage split-screen + loader intro + Lenis.
-6. Polish mobile + `prefers-reduced-motion`.
+### ▶️ Next
+1. **Retour d'Allan** : qu'il accepte l'invitation GitHub, teste le mobile en prod
+   et modifie lui-même ce qui ne lui convient pas (mail du 15/07). S'il refait un
+   configurateur « propre », repartir des branches `feat/configurateur-2.5d`/`-3d`.
+2. **Mettre de l'ordre dans les branches** : merger `feat/mobile-vitrine` (et sa
+   lignée) dans `feat/refonte-accueil` (branche par défaut) — voire enfin dans
+   `main`, resté à l'état initial.
+3. Exploiter le reste de `Ref/catalogue/` (27 photos : coloris/nouveaux modèles
+   → `modeles.ts`).
+4. Loader d'intro (`IntroAnim`) + Lenis dans `Immersif` — et corriger au passage
+   les 57 erreurs `astro check` d'`IntroAnim`.
+5. Ménage à valider : PNG lourds devenus inutiles (`hero-crochet.png` 4,7 Mo,
+   `about-atelier.png`, `accueil-*.png`, photos collection `.png`).
+   Suppression via `trash` uniquement, avec accord nominatif.
+6. Plus tard : brancher l'envoi réel du formulaire commander + paiement.
 
 ---
-
-### Historique pré-refonte (ancienne vitrine, sur `main`)
-
-**Phase :** mise en production démarrée — projet Astro scaffoldé à la main.
-
-### ✅ Fait
-- **Scaffold Astro** : `package.json`, `astro.config.mjs`, `tsconfig.json`, `.gitignore`.
-- **Design system** `src/styles/global.css` : tokens palette (sauge/sapin/citron/terracotta/crème), typos (Playfair/Fraunces/Nunito), boutons, fond mosaïque citron 6%, `prefers-reduced-motion`, touch-friendly targets (min 44px).
-- **Pages** : `index` (hero + valeurs + 4 modèles + bloc perso + teaser éditions), `personnaliser` (configurateur), `editions-speciales` (galerie), `atelier` (histoire + contact), `commander` (formulaire placeholder).
-- **Configurateur** (`Configurateur.astro`) : 3 silhouettes SVG recolorables, pastilles citron, jusqu'à 3 couleurs combinées en rangs, anse laine/laiton, conseils de mariage, `?modele=` URL.
-- **Composants** : `Nav` (sticky vert sapin, burger → X animé + overlay flou, menu slide+opacity), `Footer`, `CarteModele`, `Logo`.
-- **Données** `src/data/modeles.ts` : 4 modèles, 35/40/45 €.
-- **Redesign mobile complet** : Nav sapin + Hero centré (sans mosaïque) + récit vertical + valeurs empilées + cartes full-width + Configurateur responsive (< 400 px compat). Build OK.
-- **Skills globalisés** : `~/.claude/skills/` avec brief-anim, crea-anim, DelBackground, organiser-une-session-claude-code, atelier-web, atelier-klar-design.
-- **Prompt Hieggfield** créé dans `Pool/hieggfield-prompt.md` pour retouche des 6 images produits.
-- **Intro animée scrollée** (`src/components/IntroAnim.astro`) : logo → citron coupé → jus → tricot "Atelier Acidulé" → zoom site. Utilise le vrai logo PNG, animation RAF + lerp fluidifiée, responsive desktop/mobile. Brief validé : `briefs/intro-citron-scroll.md`.
-
-### ⏳ En cours / à valider
-- **Images** : prompt transmis à l'associé pour retouche via Hieggfield — en attente retour.
-- **Validation visuelle mobile + intro** : à checker par Allan sur téléphone réel et desktop.
-- **Ajustements intro** : Allan veut peut-être peaufiner la vitesse/ressenti de l'anim — à voir au prochain retour.
-
-### ▶️ Next
-1. Peaufiner l'intro scrollée après retours visuels d'Allan.
-2. Intégrer les images retouchées une fois reçues.
-3. Plus tard : back-end de commande + paiement.
 
 ### ⚠️ À confirmer côté cliente (via Allan)
 - Nombre de couleurs max (présumé 3).
@@ -112,47 +103,202 @@ texte) + 4 images `public/images/accueil-*.png` (non suivies). Dev server à rel
 
 ## 🗓️ Log des sessions (append-only)
 
-### 2026-06-27 (refonte) — Vraie landing + /mes-creations scroll + suppression perso
-Refonte demandée par Allan (trop d'erreurs sur l'ancienne version). Cadrage validé : commande = **DM
-Instagram**, périmètre **home + créations**, créations = **1 sac / 1 section plein écran** au scroll.
-**Workflow ultracode** (3 lots disjoints en parallèle + revue adversariale → 3× « clean ») :
-- `/index` réécrit en **vraie landing** (layout Base : hero sac flottant + halo, 3 valeurs, aperçu
-  catalogue 4 cartes, teasers atelier/éditions, bandeau final ; CTA « Commander » → Instagram).
-- `/mes-creations` réécrit en **CSS scroll-snap** (conteneur `.reel`, 4 sections couleur plein écran,
-  texte blanc lisible + scrim, indicateur « Défiler ↓ », lien « Commander en DM ») — **GSAP, flèches,
-  bouton Découvrir et mode détail SUPPRIMÉS** → règle le bug du rectangle blanc illisible.
-- **Suppression perso** : `personnaliser.astro`, `Configurateur.astro`, `CarteModele.astro` (mort) + 9
-  `sim-*.png` (git rm) ; liens « Personnaliser »/« SHOP TON SAC » → Instagram ; `/personnaliser` = 404.
-Build vert (5 pages), 0 erreur console, 0 débordement (390 + 1440), lisibilité OK sur les 4 couleurs.
-Redéployé en manuel → live OK. **Piège appris** : après réécriture massive + suppressions, **redémarrer
-le dev server** (overlay HMR « Unhandled rejection » périmé alors que console vide + build vert) — tuer
-le PID du port 4321, pas tout node. **Suite même jour** : lisibilité des liens du **menu mobile** corrigée
-(vert sapin sur panneau crème) ; **`CLAUDE.md` actualisé** (refonte) ; **commits poussés sur GitHub**
-(`origin/feat/refonte-accueil`) ; **`gsap` + `lenis` désinstallés** (seule dépendance : `astro`).
-Auto-deploy Netlify↔GitHub à brancher par Allan plus tard.
+### 2026-07-15 — /init (sync CLAUDE.md) + retrait de la personnalisation + push + message Allan
 
-### 2026-06-27 (suite) — Passe qualité UI/UX (mobile-first, premium), /goal autonome
-Audit Playwright (6 pages, mobile + desktop) → 5 priorités, puis 5 correctifs : home **scrollable
-mobile** (prop `fixe` sur `Immersif` ; le `overflow:hidden` n'est plus le défaut), barre
-`/mes-creations` mobile **en colonne** (bouton dans le viewport), **sacs détourés** posés sur le
-panneau coloré + ombre CSS (fin de l'effet « rectangle »), typo titres **resserrée**, couche
-**`polish.css`** (halo de fond, liseré citron des sur-titres, ombre carte) + **photo bannière
-`/atelier`** + flèches 44px. **Workflow multi-agents adversarial (ultracode)** : 5 lentilles
-(mobile, a11y, spécificité CSS, premium, assets) → 5 correctifs de spécificité Astro appliqués et
-revérifiés. Build vert, **0 erreur console, 0 débordement horizontal**. **Rien commité** (validation
-Allan attendue). **Configurateur non touché** (Allan le refait). Assets devenus orphelins :
-`accueil-{petit-sac,pochette-livres,grand-sac,editions-speciales}.png` (à supprimer après validation).
-Piège appris (**candidat kit PILOTE**) : **les styles scopés Astro battent une couche `polish.css`
-globale** sur les classes page-spécifiques (`[data-astro-cid]` ⇒ spécificité supérieure) ; ne pas
-redéclarer une prop en raccourci qui réinitialise ce que pose polish. Captures : `docs/audit-shots/`.
-**Suite (demande Allan « ne plus voir le fond carré des photos »)** : sac héros + 3 vignettes de
-la home **détourés** (rembg `isnet-general-use`) et posés sur le crème continu (halo citron + ombre)
-→ plus aucun bloc photo. Originaux `accueil-mini-1/2/3.png` + 4 `accueil-<slug>.png` devenus orphelins
-(`accueil-hero.png` reste utilisé par la bannière `/atelier`, à détourer/remplacer plus tard).
-**Vérif UX/UI finale OK** (tiroir-menu immersif, configurateur, états interactifs) puis **mise en
-ligne Netlify** : site `atelier-acidule` créé via CLI, **deploy manuel du `dist/`** →
-**https://atelier-acidule.netlify.app** (live vérifié, 0 erreur console). ⚠️ Déploiement **non
-continu** (pas branché au git) et travail **non commité/non poussé** : à faire pour automatiser.
+1. **`/init`** : `CLAUDE.md` re-vérifié contre le dépôt — mises à jour : lot
+   `fix/mobile` documenté (WebP, swipe, déploiement 04/07), `main` = état initial,
+   branches expérimentales `feat/configurateur-2.5d`/`-3d`, `AUDIT_ACIDULE_ETAT.md`,
+   `_webp_mobile.cjs`. Commité en `docs:` sur `fix/mobile` (`2aa510f`).
+2. **Retrait de la personnalisation** (décision : « extrêmement laid ») — branche
+   **`feat/retrait-personnalisation`** depuis `fix/mobile` :
+   - Supprimés : `src/pages/personnaliser.astro`, `src/components/Configurateur.astro`,
+     les 9 calques `public/images/sim-*.png` (récupérables via git).
+   - Re-routage de **tous** les CTA/liens vers `/commander` : hero accueil
+     (« Commander mon sac »), 3 cartes collection (`?modele=<slug>`), fiche
+     split-screen (« Commander ce sac → »), CTA atelier (+ texte réécrit), navs
+     (`index`, `PageVoeu`, `Immersif`, `Nav`), footer accueil, `CarteModele`.
+   - `commander.astro` : **présélection du modèle** depuis `?modele=<slug>`
+     (3 lignes de script). `modeles.ts` intact (`modelesPerso` sert au `<select>`).
+   - Docs synchronisées : `CLAUDE.md` (section « Configurateur retiré »), HISTORIQUE.
+   - **Ménage (2ᵉ commit, après confirmation explicite d'Alphim)** : suppression du
+     code mort `Base.astro` + `Nav`/`Footer`/`CarteModele` (`Logo` et `IntroAnim`
+     gardés exprès : marque + futur loader d'intro).
+3. **Preuves** : `grep personnaliser src/` = 0 ; `astro check` = 57 erreurs, toutes
+   préexistantes dans l'orphelin `IntroAnim.astro` (baseline inchangée) ; build 5
+   pages OK ; plus de `/personnaliser` dans `dist/`.
+4. **Push** : branche `feat/retrait-personnalisation` poussée sur GitHub (avec
+   l'historique `fix/mobile` qu'elle contient). **Pas de déploiement Netlify** :
+   la prod garde le lot `fix/mobile`.
+5. **Allan** (`morjonallan@gmail.com`) : invitation GitHub toujours **en attente**
+   (vérifiée via API) → brouillon Gmail préparé (lien d'invitation + lien de la
+   branche), envoi à valider par Alphim.
+6. **Ménage code mort** (accord explicite d'Alphim, commit `51b32ec`) : voir §2.
+7. **Vitrine mobile** (« un format mobile qui garde la DA mais plus fonctionnel
+   et attractif ») — branche **`feat/mobile-vitrine`**, audit `design-ui` 5 points
+   validé puis implémenté :
+   - hero mobile : titre d'abord, **arche du panneau conservée** (l'override
+     40 px supprimé), visuel compact entre titre et CTA (zones `hero__head`/`hero__body`) ;
+   - CTA « Commander » permanent dans le header mobile (`.head-cta` n'est plus
+     masqué, pointe sur `/commander`, tap ≥ 44 px, burger 44 px) ;
+   - collection ≤ 700 px : **carrousel scroll-snap** plein-bleed (cartes 72 %,
+     aperçu de la suivante), prix en gras encre ;
+   - avis mobiles : flèches masquées (hack `-68px` supprimé), cartes 88 % avec
+     peek, **points indicateurs** synchronisés au scroll (`data-avis-dots`) ;
+   - craft : `:focus-visible` global (Vitrine), newsletter 16 px anti-zoom iOS.
+   Preuves : check 57 erreurs préexistantes (IntroAnim), build 5 pages, markup
+   vérifié dans `dist/` + preview. ⚠️ Vérif visuelle sur device à faire par
+   Alphim (pas de navigateur headless dispo dans l'environnement WSL).
+8. **Déploiement prod Netlify** (confirmation explicite d'Alphim) : build
+   `feat/mobile-vitrine` → smoke tests OK (`/` 200 + nouveau markup,
+   `/personnaliser` 404, `/commander` 301→200). La prod saute donc de
+   `fix/mobile` à retrait+ménage+mobile d'un coup.
+9. **Captures Playwright débloquées SANS sudo** : `sudo` interdit (permissions +
+   pas de TTY pour `!`) → libs manquantes (`libnspr4`, `libnss3`, `libasound2t64`)
+   récupérées via `apt-get download` + `dpkg -x` + `LD_LIBRARY_PATH` (recette en
+   mémoire Claude). ⚠️ capturer avec `reduced_motion` sinon les sections `.reveal`
+   paraissent vides en full-page. QA visuelle 390×844 → 2 finitions
+   (commit `5791262`) : titre hero 8.4vw (le CTA repasse au-dessus du pli),
+   badge « Pièces uniques » centré au sommet de l'arche (il était rogné par la
+   courbe). **Redéployé en prod** (accord Alphim) et vérifié par capture.
+10. **Mobile validé par Alphim** (« c'est bon pour moi ») + **2ᵉ mail à Allan**
+   (brouillon en réponse au fil du matin, le 1ᵉʳ mail a bien été envoyé) :
+   mobile prêt/déployé, « modifie toi-même si ça ne convient pas », rappel
+   invitation GitHub **toujours pas acceptée** + pas de CI (déploiement manuel).
+
+### 2026-07-04 — Skill audit-projet + audit + QA mobile Firecrawl + lot `fix/mobile` déployé en prod
+
+Session en 4 temps :
+
+1. **`/init`** : `CLAUDE.md` re-vérifié contre le code — 2 mises à jour (la refonte
+   DA n'était plus « non commitée » ; ajout du bloc **dépôt distant & Netlify** :
+   dépôt privé, pas de CI, déploiement = acte manuel avec accord).
+2. **Skill `audit-projet`** créé (généralisation du gabarit `audit.md` 9MM) :
+   version fonctionnelle projet `.claude/skills/audit-projet/`, **globale WSL**
+   `~/.claude/skills/audit-projet/` (tous projets), copie Windows
+   `C:\Users\33648\.claude\skills\`, copie **visible** à la racine `audit-projet/`
+   (les dossiers `.claude` sont cachés dans l'explorateur — demande d'Allan).
+   Exécuté → **`AUDIT_ACIDULE_ETAT.md`** (constats notables : `IntroAnim`/`CarteModele`
+   **orphelins**, formulaire commander qui n'envoie rien — `commander.astro:74-78`,
+   images lourdes). Copie déposée dans `E:\Claude\Claude_Code\Audit_Resum\`.
+3. **QA mobile Firecrawl** (« la version mobile est une catastrophe ») : navigateur
+   piloté en 390×844 sur les 6 pages du site en ligne (captures avant/après scroll,
+   mesures DOM, poids réseau). **Causes racines identifiées** :
+   - C-1 : fiche détail `/mes-creations` cassée — `ouvrirDetail()` posait des
+     **largeurs desktop en inline** (40 %/60 %, `xPercent:24`) qui écrasaient la
+     media query ≤ 760 px (`mes-creations.astro:375-377`) ; `fermerDetail()`
+     laissait du 50 % inline → hero mobile cassé après un aller-retour.
+   - C-2 : **~9,7 Mo** d'images PNG sur la home (hero 4,7 Mo affiché ~330 px).
+   - C-3 : **aucun contrôle tactile** sur le split-screen (molette/clavier/clic).
+   - M-1 : bouton « Découvrir → » coupé (right 409 px / écran 390) ; M-2 titres
+     collés aux contrôles. Pages personnaliser/commander/atelier/éditions : OK.
+4. **Lot `fix/mobile`** (branche dédiée, commit `1620ec3`) :
+   - `mes-creations` : détail mobile animé en **hauteurs** (photo zone couleur en
+     haut, fiche crème pleine largeur en bas), `clearProps` à la fermeture, reset
+     propre au changement de breakpoint, **swipe vertical** (`pointerdown/up`,
+     seuil 48 px, `touch-action`), contrôles compactés sous 760 px, fiche
+     scrollable si trop haute.
+   - **Images WebP** via `_webp_mobile.cjs` (sharp) : hero 4 684→**54 Ko**, about
+     2 420→151 Ko, logo 435→18 Ko (160 px), collection + `accueil-*` converties ;
+     réfs màj dans `index`/`editions-speciales`/`mes-creations`/`modeles.ts`.
+     **Home : ~9,7 Mo → 564 Ko mesurés.** (PNG d'origine conservés, ménage à valider.)
+
+**Preuves** : `astro check` (les 57 erreurs restantes = préexistantes, toutes dans
+l'orphelin `IntroAnim.astro`), build 6 pages, preview + curl 200 sur les 10 WebP,
+**déploiement draft Netlify** re-testé par la même batterie Firecrawl (bouton dans
+l'écran, plus de chevauchement, panneau crème pleine largeur, inline nettoyé,
+swipe synthétique compteur 1→2), puis **`netlify deploy --prod`** + smoke-check.
+
+**À savoir pour la reprise** : `fix/mobile` **non poussée** sur GitHub ;
+`AUDIT_ACIDULE_ETAT.md`, `CLAUDE.md` modifié et `.claude/`+`audit-projet/` encore
+**non commités** ; sur téléphone la molette n'existe pas → navigation split-screen
+= swipe + flèches ; le sandbox `firecrawl interact` est **async** (Python `await`,
+pas de top-level await en Node).
+
+### 2026-07-03 — Dépôt privé + collaborateur Allan (admin) + mise en ligne Netlify + commit du lot vitrine
+Demande d'Allan : « crée/push un git privé, donne l'accès à mon associé Allan
+(morjonallan@gmail.com), puis push le site sur Netlify ». Démarrage `/init` en amont :
+le `CLAUDE.md` avait dérivé (il décrivait encore l'accueil comme « home split
+éditorial » Immersif et `Base` pour toutes les pages sauf index/mes-creations) →
+actualisé pour les **4 layouts réels** (`Vitrine`/`PageVoeu`/`Immersif`/`Base`) et le
+mapping page→layout, + note visuels d'accueil (`hero-crochet.png` etc.).
+
+**Fait (dans l'ordre, avec preuve) :**
+1. **Constat** : un dépôt GitHub **existait déjà** et était **PUBLIC**
+   (`AmarokRa/atelier-acidule`), exposant les assets cliente. Choix validé par Allan :
+   **rendre l'existant privé** (plutôt qu'un nouveau dépôt qui aurait laissé l'ancien exposé).
+2. **Passage en privé** via `gh api -X PATCH /repos/AmarokRa/atelier-acidule -f visibility=private`
+   (le flag `--accept-visibility-change-consequences` n'existe pas sur `gh` 2.45). Vérifié `private: true`.
+3. **Commit + push** du lot DA « vitrine » (`848a8f5`, refonte layouts + sync docs) sur `feat/refonte-accueil`.
+4. **Collaborateur Allan** : ⚠️ en CLI, GitHub invite par **pseudo**, pas par email
+   (`morjonallan@gmail.com` inutilisable tel quel). Allan a fourni le pseudo **`Allan77bot`**
+   → `gh api -X PUT …/collaborators/Allan77bot -f permission=admin` (droit **admin**, « tout
+   faire »). Invitation confirmée **en attente** (à accepter par Allan).
+5. **Netlify** : CLI authentifié (`isaiah.blackcrow@gmail.com`, team `isaiah-blackcrow`).
+   `npm run build` OK (6 pages) → `netlify sites:create --name atelier-acidule` (pris →
+   `atelier-acidule-498`) → `netlify deploy --prod --dir=dist`. Vérifié : **HTTP 200**,
+   `<title>Accueil · Atelier Acidulé</title>`. **URL : https://atelier-acidule-498.netlify.app**.
+6. **Fin de session** : `.netlify` (ajouté au `.gitignore` par Netlify) commité avec cette trace.
+
+**À savoir pour la reprise :** dépôt **privé** ; Allan admin **dès qu'il accepte** l'invit ;
+site en ligne sur Netlify en **déploiement manuel CLI** (re-déployer = `netlify deploy --prod --dir=dist`
+après `npm run build`) ; pas de CI git connectée.
+
+### 2026-07-02 — Preview + trace (nouvelle DA « vitrine » d'après les maquettes)
+Session ouverte sur un `/clear` avec un **gros lot non commité** déjà en place ;
+contexte effacé → trace **reconstituée d'après le diff** (pas de journal en mémoire
+de ce qui a été fait ce jour-là). Demande d'Allan : « lance la preview et mets à
+jour l'historique ».
+
+**Constat via lecture code/diff** — une **nouvelle direction artistique « vitrine »**
+(scroll classique, police **Archivo** display capitales + Nunito corps) est apparue,
+calquée sur les maquettes `Ref/_preview/AtelierAcidule_ref.jpeg` (référence) et
+`AtelierAcidule_voeu.jpeg` (DA « voeu »). Deux **nouveaux layouts** :
+- `src/layouts/Vitrine.astro` — coquille des pages vitrine longues (head + polices
+  Archivo/Nunito + primitives `.btn-pill`/`.eyebrow`/`.display`) ; **chaque page rend
+  son propre header/footer** pour coller pixel-près à sa maquette (pas de Nav/Footer partagés).
+- `src/layouts/PageVoeu.astro` — enveloppe `Vitrine`, ajoute header vert sombre +
+  footer nav commun (DA « voeu »).
+
+**Recâblage des pages** : `index.astro` **quitte `Immersif` pour `Vitrine`** (retour à
+une page vitrine longue : `hero` texte+CTA+atouts+panneau visuel, puis `cta-band` ;
++644/-… lignes). `atelier`, `commander`, `editions-speciales` **passent de `Base` à
+`PageVoeu`**. Inchangés : `mes-creations` (toujours `Immersif` split-screen GSAP),
+`personnaliser` (toujours `Base`). Nouveaux visuels `public/images/hero-crochet.png`
++ `about-atelier.png` ; `logo.png` remplacé (627 Ko → 445 Ko). `.gitignore` +
+`.firecrawl/`. `CLAUDE.md` retouché (note README périmé, `sharp` transitif, pas de lint).
+
+**Fait cette session** : `npm run build` **OK (6 pages, ~6 s)**. Preview lancée —
+`npm run preview` sur **http://localhost:4321/**, les **6 routes répondent 200**
+(`/`, `/mes-creations`, `/personnaliser`, `/atelier`, `/commander`, `/editions-speciales`).
+⚠️ Gotcha : le serveur meurt si lancé « en background » via `&` (tué au retour de tâche) ;
+il faut le **détacher** (`setsid nohup npm run preview &`) pour qu'il survive entre les tours.
+
+**⚠️ Toujours NON commité** — le lot « vitrine » entier reste dans le working tree
+(pas de commit ce jour) : `index/atelier/commander/editions-speciales.astro`,
+`Vitrine.astro`, `PageVoeu.astro`, `hero-crochet.png`, `about-atelier.png`, `logo.png`,
+`.gitignore`, `CLAUDE.md`. À valider visuellement par Allan puis commiter.
+
+### 2026-06-27 (bis) — /init (sync CLAUDE.md) + mise en ligne GitHub publique
+**`/init`** : le `CLAUDE.md` avait dérivé. Constat via lecture du code : le commit
+`1ae2197` a **déplacé le split-screen de `index.astro` vers `mes-creations.astro`** et
+créé une **home éditoriale** dans `index.astro` ; nouvelle branche `feat/refonte-accueil`
+(≠ `feat/refonte-split-screen` du doc) ; nouveaux visuels `accueil-hero.png` +
+`accueil-mini-1/2/3.png` ; nouveau `CONTEXTE-PROJET.md`. CLAUDE.md actualisé en
+conséquence (pages, layouts, familles d'images, section archi renommée « split-screen
+(/mes-creations) », branche git). Commit `1a482ce`.
+
+**Mise en ligne GitHub** : repo **inexistant** (aucun remote). Allan demande « pousse
+le guide, mets en public, envoie le lien ». ⚠️ Signalé que public = exposition des
+assets cliente (`Ref/PhotoClient`, `Ref/VideoClient`). Allan confirme « tout en public »
+→ tentative `gh repo create --public` **bloquée en dur par le classifieur auto-mode**
+(exfiltration de données sensibles, non levable par l'autorisation conversationnelle).
+Allan choisit alors l'**option privée** : `gh repo create atelier-acidule --private`
+créé + push de `feat/refonte-accueil` (défaut) et `main`. Puis Allan **passe lui-même
+en public** via `! gh repo edit … --visibility public` (le flag `--accept-visibility-…`
+n'existe pas sur sa version de `gh`). Vérifié : **visibilité = PUBLIC**.
+URL : https://github.com/AmarokRa/atelier-acidule
+Diligence faite avant push : `.gitignore` couvre `node_modules`/`dist`/`.env`, aucun
+fichier tracké ≥ 50 Mo, vidéos = 1-2 Mo (pas de souci de limite GitHub).
 
 ### 2026-06-27 — Vraies photos produit, accueil plein couleur, logo
 **Hors projet (début de session)** : install d'**UltraCode-Shim** (outil, PAS un skill)
