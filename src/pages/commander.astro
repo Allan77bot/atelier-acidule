@@ -23,6 +23,14 @@ const IG = 'https://www.instagram.com/atelier_acidule';
             {familles.map((f) => <option value={f.slug}>{f.nom}</option>)}
           </select>
         </label>
+        {/* Référence de la pièce cliquée sur une page famille. Le bloc reste
+            masqué tant qu'aucune ?ref= n'est passée : sur une commande
+            sur-mesure, il n'y a pas de pièce de départ. */}
+        <label class="cmd__ref" data-bloc-ref hidden>Référence de la pièce
+          <input type="text" name="reference" data-ref readonly />
+          <span class="cmd__refnote">Tu commandes le même modèle que cette photo. <a href="#" data-oublier-ref>Repartir de zéro</a></span>
+        </label>
+
         <label>Couleurs souhaitées (jusqu'à 3)
           <input type="text" name="couleurs" placeholder="ex. citron · sauge · terracotta" />
         </label>
@@ -60,6 +68,9 @@ const IG = 'https://www.instagram.com/atelier_acidule';
   .cmd__form input, .cmd__form select, .cmd__form textarea { font-family: var(--font-corps); font-weight: 400; text-transform: none; letter-spacing: normal; font-size: 1rem; padding: 0.7rem 0.9rem; border-radius: 12px; border: 1.5px solid rgba(43,42,34,.2); background: #fff; color: var(--v-encre); }
   .cmd__form input:focus, .cmd__form select:focus, .cmd__form textarea:focus { border-color: var(--v-jaune-2); outline: none; }
   .cmd__form button { justify-self: start; margin-top: 0.3rem; }
+  .cmd__ref input { background: var(--v-creme-2); font-family: 'Archivo', sans-serif; font-weight: 700; letter-spacing: 0.06em; }
+  .cmd__refnote { font-family: var(--font-corps); font-weight: 400; text-transform: none; letter-spacing: normal; font-size: 0.78rem; color: var(--v-doux); }
+  .cmd__refnote a { color: var(--v-encre); }
   .cmd__note { margin: 0; font-weight: 700; color: var(--olive); min-height: 1.2em; }
   .cmd__alt { text-align: center; margin-top: 1.5rem; color: rgba(245,239,224,.8); }
   .cmd__alt a { color: var(--v-jaune); text-decoration: underline; }
@@ -75,11 +86,30 @@ const IG = 'https://www.instagram.com/atelier_acidule';
   const form = document.querySelector<HTMLFormElement>('[data-commande]');
   const statut = document.querySelector<HTMLElement>('[data-statut]');
 
+  const params = new URLSearchParams(location.search);
+
   // Présélectionne le modèle si on arrive via /commander?modele=<slug>
   // (les CTA de l'accueil et des pages /creations passent ce paramètre).
-  const slug = new URLSearchParams(location.search).get('modele');
+  const slug = params.get('modele');
   const select = form?.querySelector<HTMLSelectElement>('select[name="modele"]');
   if (slug && select?.querySelector(`option[value="${slug}"]`)) select.value = slug;
+
+  // Référence de la pièce, passée par « Commander cette pièce ».
+  const bloc = document.querySelector<HTMLElement>('[data-bloc-ref]');
+  const champ = document.querySelector<HTMLInputElement>('[data-ref]');
+  const ref = params.get('ref');
+  // On n'accepte que le format attendu : une ?ref= arbitraire finirait
+  // telle quelle dans la demande envoyée à Marine.
+  if (bloc && champ && ref && /^[A-Z0-9-]{3,40}$/.test(ref)) {
+    champ.value = ref;
+    bloc.hidden = false;
+  }
+
+  document.querySelector('[data-oublier-ref]')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (champ) champ.value = '';
+    if (bloc) bloc.hidden = true;
+  });
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault();

@@ -14,6 +14,15 @@ const { f } = Astro.props;
 const photos = catalogue.find((c) => c.slug === f.categorie)?.photos ?? [];
 const groupe = groupes.find((g) => g.slug === f.groupe);
 
+// Référence de la pièce : c'est elle qu'on transmet au formulaire quand la
+// cliente clique « Commander », pour que Marine sache de quelle photo on parle.
+const reference = (i: number) => `${f.slug}-${String(i + 1).padStart(2, '0')}`.toUpperCase();
+
+// 4 exemples en vitrine + la case « personnalise ». Le reste des photos part
+// dans la galerie du bas, pour ne pas noyer le choix.
+const exemples = photos.slice(0, 4);
+const reste = photos.slice(4);
+
 // Les autres familles du même univers : on garde la cliente dans son rayon
 // plutôt que de la renvoyer au hub à chaque fois.
 const voisines = familles.filter((v) => v.groupe === f.groupe && v.slug !== f.slug);
@@ -44,31 +53,87 @@ const voisines = familles.filter((v) => v.groupe === f.groupe && v.slug !== f.sl
     </div>
   </section>
 
-  <section class="fa-photos">
-    <ul class="fa-grille">
-      {photos.map((p, i) => (
-        <li>
-          <button
-            type="button"
-            class="fa-vignette"
-            data-voir
-            data-src={p.src}
-            data-legende={`${f.nom} — photo ${i + 1}`}
-            aria-label={`Agrandir la photo ${i + 1} sur ${photos.length}`}
-          >
-            <img
-              src={p.thumb}
-              width={p.tw}
-              height={p.th}
-              alt={`${f.nom} — photo ${i + 1}`}
-              loading={i < 8 ? 'eager' : 'lazy'}
-              decoding="async"
-            />
-          </button>
+  {/* Vitrine : 4 pièces commandables telles quelles + la case sur-mesure. */}
+  <section class="fa-vitrine">
+    <div class="fa-vitrine__wrap">
+      <h2 class="display fa-vitrine__titre">Quelques pièces déjà réalisées</h2>
+      <p class="fa-vitrine__sous">
+        Commande le même modèle&nbsp;: sa référence part avec ta demande. Ou compose
+        le tien de zéro.
+      </p>
+
+      <ul class="fa-exemples">
+        {exemples.map((p, i) => (
+          <li class="fa-ex">
+            <button
+              type="button"
+              class="fa-ex__media"
+              data-voir
+              data-src={p.src}
+              data-legende={`${f.nom} — réf. ${reference(i)}`}
+              aria-label={`Agrandir la pièce ${reference(i)}`}
+            >
+              <img
+                src={p.thumb}
+                width={p.tw}
+                height={p.th}
+                alt={`${f.nom} — réf. ${reference(i)}`}
+                loading="eager"
+                decoding="async"
+              />
+            </button>
+            <p class="fa-ex__ref">Réf. {reference(i)}</p>
+            <a
+              class="btn-pill btn-pill--jaune fa-ex__cta"
+              href={`/commander?modele=${f.slug}&ref=${reference(i)}`}
+            >
+              Commander cette pièce
+            </a>
+          </li>
+        ))}
+
+        {/* Même gabarit que les vignettes, pour que la case s'aligne dessus. */}
+        <li class="fa-ex fa-ex--perso">
+          <a class="fa-perso" href={`/commander?modele=${f.slug}`}>
+            <span class="fa-perso__plus" aria-hidden="true">+</span>
+            <span class="fa-perso__txt">Personnalise ton sac</span>
+            <span class="fa-perso__note">Tes couleurs, ton anse</span>
+          </a>
         </li>
-      ))}
-    </ul>
+      </ul>
+    </div>
   </section>
+
+  {reste.length > 0 && (
+    <section class="fa-photos">
+      <div class="fa-photos__wrap">
+        <h2 class="display fa-photos__titre">Toutes les réalisations</h2>
+        <ul class="fa-grille">
+          {reste.map((p, i) => (
+            <li>
+              <button
+                type="button"
+                class="fa-vignette"
+                data-voir
+                data-src={p.src}
+                data-legende={`${f.nom} — réf. ${reference(i + 4)}`}
+                aria-label={`Agrandir la pièce ${reference(i + 4)}`}
+              >
+                <img
+                  src={p.thumb}
+                  width={p.tw}
+                  height={p.th}
+                  alt={`${f.nom} — réf. ${reference(i + 4)}`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 
   <section class="fa-fin">
     <div class="fa-fin__wrap reveal">
@@ -101,7 +166,52 @@ const voisines = familles.filter((v) => v.groupe === f.groupe && v.slug !== f.sl
   .fa-voisines { display: flex; flex-wrap: wrap; gap: 0.5rem; }
   .fa-voisines .btn-pill { font-size: 0.72rem; padding: 0.55rem 1rem; }
 
-  .fa-photos { padding: clamp(1.8rem, 4vw, 3rem) clamp(1.1rem, 4vw, 3rem) 0; }
+  .fa-vitrine { padding: clamp(2.2rem, 5vw, 3.4rem) clamp(1.1rem, 4vw, 3rem) 0; }
+  .fa-vitrine__wrap { max-width: 1150px; margin-inline: auto; }
+  .fa-vitrine__titre { font-size: clamp(1.4rem, 3vw, 2rem); margin-bottom: 0.3rem; }
+  .fa-vitrine__sous { color: var(--v-doux); max-width: 54ch; margin-bottom: 1.4rem; }
+
+  /* 5 colonnes : les 4 exemples et la case sur-mesure tiennent sur une rangée. */
+  .fa-exemples {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: clamp(0.7rem, 1.6vw, 1.1rem);
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .fa-ex { display: grid; grid-template-rows: auto auto 1fr; gap: 0.5rem; margin: 0; }
+  .fa-ex__media {
+    display: block; width: 100%; padding: 0; border: 0; cursor: zoom-in;
+    background: var(--v-creme-2); border-radius: 14px; overflow: hidden; aspect-ratio: 3 / 4;
+  }
+  .fa-ex__media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.45s ease; }
+  .fa-ex__media:hover img { transform: scale(1.05); }
+  .fa-ex__ref {
+    margin: 0; font-family: 'Archivo', sans-serif; font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.06em; color: var(--v-doux);
+  }
+  /* .btn-pill force nowrap : dans une colonne de vignette, l'intitulé déborde.
+     On le laisse passer à la ligne et occuper toute la largeur de la case. */
+  .fa-ex__cta {
+    align-self: start; width: 100%; font-size: 0.68rem; padding: 0.6rem 0.7rem;
+    text-align: center; white-space: normal; line-height: 1.25;
+  }
+
+  /* La case sur-mesure occupe la hauteur de l'image, pas de la carte entière. */
+  .fa-ex--perso { grid-template-rows: auto; }
+  .fa-perso {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0.3rem; aspect-ratio: 3 / 4; border-radius: 14px; text-decoration: none;
+    border: 2px dashed rgba(47, 67, 52, 0.3); background: var(--v-creme-2);
+    color: var(--v-encre); text-align: center; padding: 0.8rem;
+    transition: border-color var(--transition), background-color var(--transition);
+  }
+  .fa-perso:hover { border-color: var(--v-jaune-2); background: var(--v-jaune); }
+  .fa-perso__plus { font-family: 'Archivo', sans-serif; font-size: 2.4rem; font-weight: 400; line-height: 1; }
+  .fa-perso__txt { font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.8rem; }
+  .fa-perso__note { color: var(--v-doux); font-size: 0.72rem; }
+
+  .fa-photos { padding: clamp(2.2rem, 5vw, 3.4rem) clamp(1.1rem, 4vw, 3rem) 0; }
+  .fa-photos__wrap { max-width: 1150px; margin-inline: auto; }
+  .fa-photos__titre { font-size: clamp(1.3rem, 2.6vw, 1.7rem); margin-bottom: 1rem; }
   .fa-grille {
     max-width: 1150px; margin-inline: auto; list-style: none; padding: 0;
     display: grid; gap: clamp(0.5rem, 1.4vw, 0.9rem);
@@ -131,7 +241,11 @@ const voisines = familles.filter((v) => v.groupe === f.groupe && v.slug !== f.sl
   .fa-vue__nav--suiv { right: clamp(0.5rem, 2vw, 1.5rem); }
   .fa-vue__fermer:hover, .fa-vue__nav:hover { background: rgba(255, 255, 255, 0.24); }
 
-  @media (max-width: 620px) { .fa-vue__nav { width: 40px; height: 40px; font-size: 1.6rem; } }
+  @media (max-width: 900px) { .fa-exemples { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 620px) {
+    .fa-exemples { grid-template-columns: repeat(2, 1fr); }
+    .fa-vue__nav { width: 40px; height: 40px; font-size: 1.6rem; }
+  }
 </style>
 
 <script>

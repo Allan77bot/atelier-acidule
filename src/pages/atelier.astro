@@ -2,6 +2,16 @@
 // L'atelier — DA « voeu » (Ref/_preview/AtelierAcidule_voeu.jpeg). Contenu réel conservé.
 import PageVoeu from '../layouts/PageVoeu.astro';
 const IG = 'https://www.instagram.com/atelier_acidule';
+
+// Les 4 valeurs de la marque, reprises telles quelles du bandeau de l'accueil
+// (contenu validé avec la cliente).
+const valeurs = [
+  { t: 'Fait main', d: 'Chaque pièce est réalisée à la main, avec soin.' },
+  { t: 'Éco-responsable', d: 'Des fils sélectionnés avec attention pour la planète.' },
+  { t: 'Design unique', d: 'Des modèles originaux et intemporels.' },
+  { t: 'Petites séries', d: "Des créations en petites quantités, pour plus d'authenticité." },
+];
+
 const infos = [
   { i: '📍', t: 'Fait main en France' },
   { i: '⏳', t: 'Pièce crochetée après commande' },
@@ -16,8 +26,7 @@ const infos = [
       <div class="at-hero__texte reveal">
         <p class="eyebrow" style="color:var(--v-jaune-2)">L'atelier</p>
         <h1 class="display at-hero__title">Du fil, des couleurs,<br /><em>beaucoup de peps.</em></h1>
-        <p>Atelier Acidulé, c'est un petit atelier où chaque sac naît d'une pelote et d'une envie. Inspirées par l'Italie, la Méditerranée et les étals gorgés de citrons, nos créations jouent l'acidulé et le sucré-doux à la fois.</p>
-        <p>Ici, rien n'est produit en série : tu choisis ton modèle et tes couleurs, et la pièce est crochetée à la main, rien que pour toi. Le temps d'un sac, on prend soin du détail comme d'une recette de famille.</p>
+        <p>Inspirées par l'Italie, la Méditerranée et les étals gorgés de citrons, nos créations jouent l'acidulé et le sucré-doux à la fois.</p>
         <a class="btn-pill btn-pill--ghost-light" href={IG} target="_blank" rel="noopener">Suivre l'atelier sur Instagram</a>
       </div>
 
@@ -41,6 +50,74 @@ const infos = [
           <source src="/videos/atelier-citrons.webm" type="video/webm" />
           <source src="/videos/atelier-citrons.mp4" type="video/mp4" />
         </video>
+      </div>
+    </div>
+  </section>
+
+  {/* 1 — Pourquoi l'atelier ? (texte à gauche, photo à droite) */}
+  <section class="at-bloc">
+    <div class="at-bloc__wrap reveal">
+      <div class="at-bloc__texte">
+        <p class="eyebrow">L'origine</p>
+        <h2 class="display at-bloc__titre">Pourquoi <em>l'atelier&nbsp;?</em></h2>
+        <p>Atelier Acidulé, c'est un petit atelier où chaque sac naît d'une pelote et d'une envie. Pas une usine, pas un stock&nbsp;: une table, du fil, et le temps qu'il faut.</p>
+        <p>Ici, rien n'est produit en série. Tu choisis ton modèle et tes couleurs, et la pièce est crochetée à la main, rien que pour toi. Le temps d'un sac, on prend soin du détail comme d'une recette de famille.</p>
+        <a class="btn-pill btn-pill--jaune" href="/creations">Voir les créations →</a>
+      </div>
+      <figure class="at-bloc__media">
+        <img
+          src="/images/catalogue/divers/divers-25-min.webp"
+          width="480" height="640"
+          alt="Des pelotes de fil de toutes les couleurs posées sur une couverture"
+          loading="lazy" decoding="async"
+        />
+      </figure>
+    </div>
+  </section>
+
+  {/* 2 — Pelote Citron (texte à gauche, image à droite) */}
+  <section class="at-bloc at-bloc--sombre">
+    <div class="at-bloc__wrap reveal">
+      <div class="at-bloc__texte">
+        <p class="eyebrow" style="color:var(--v-jaune-2)">Le symbole</p>
+        <h2 class="display at-bloc__titre">Pelote <em>Citron.</em></h2>
+        <p>Dans le logo, un citron et une pelote verte se répondent. Ce n'est pas un décor&nbsp;: c'est une seule histoire, racontée en deux objets.</p>
+        <p>Le citron donne son jus. Le filet de jus devient le fil. Le fil devient la pelote — et la pelote devient ton sac. L'acidulé passe du fruit à la laine.</p>
+        <p>Le citron, c'est la Méditerranée&nbsp;: les étals du Sud, la lumière, la pointe d'acide qui réveille. La pelote verte, c'est le geste&nbsp;: le temps, la main, la maille. Ensemble, ils disent exactement ce que fait l'atelier — du sucré-doux avec une bonne dose de peps.</p>
+      </div>
+      <figure class="at-bloc__media at-bloc__media--logo">
+        <img
+          src="/images/catalogue/divers/divers-29-min.webp"
+          width="480" height="480"
+          alt="Le logo de l'atelier : un citron jaune adossé à une pelote de laine verte"
+          loading="lazy" decoding="async"
+        />
+      </figure>
+    </div>
+  </section>
+
+  {/* 3 — Valeurs (image à gauche, texte à droite) */}
+  <section class="at-bloc">
+    <div class="at-bloc__wrap at-bloc__wrap--inverse reveal">
+      <figure class="at-bloc__media">
+        <img
+          src="/images/catalogue/divers/divers-10-min.webp"
+          width="480" height="640"
+          alt="Un sac en crochet écru posé sur un bloc de travertin"
+          loading="lazy" decoding="async"
+        />
+      </figure>
+      <div class="at-bloc__texte">
+        <p class="eyebrow">Ce qui compte</p>
+        <h2 class="display at-bloc__titre">Nos <em>valeurs.</em></h2>
+        <ul class="at-valeurs">
+          {valeurs.map((v) => (
+            <li>
+              <h3>{v.t}</h3>
+              <p>{v.d}</p>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   </section>
@@ -86,6 +163,39 @@ const infos = [
   .at-hero p { color: rgba(245,239,224,.82); max-width: 60ch; }
   .at-hero .btn-pill { margin-top: 1.2rem; }
 
+  /* Les 3 sections récit. Même gabarit à deux colonnes ; la 3e inverse
+     l'ordre visuel sans toucher à l'ordre du DOM (le texte reste lu après
+     l'image, mais l'image passe à gauche). */
+  .at-bloc { padding: clamp(2.6rem, 6vw, 4.6rem) clamp(1.1rem, 4vw, 3rem); }
+  .at-bloc--sombre { background: var(--v-vert); color: var(--v-creme); }
+  .at-bloc__wrap {
+    max-width: 1050px; margin-inline: auto;
+    display: grid; grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.6rem, 4vw, 3.2rem); align-items: center;
+  }
+  .at-bloc__titre { font-size: clamp(1.7rem, 3.6vw, 2.6rem); margin-bottom: 1rem; }
+  .at-bloc__titre em { font-style: normal; color: var(--v-jaune-2); }
+  .at-bloc--sombre .at-bloc__titre { color: var(--v-creme); }
+  .at-bloc--sombre .at-bloc__titre em { color: var(--v-jaune); }
+  .at-bloc__texte p { color: var(--v-doux); max-width: 52ch; }
+  .at-bloc--sombre .at-bloc__texte p { color: rgba(245, 239, 224, 0.82); }
+  .at-bloc__texte .btn-pill { margin-top: 1.2rem; }
+  .at-bloc__media { margin: 0; }
+  .at-bloc__media img {
+    display: block; width: 100%; height: auto; aspect-ratio: 3 / 4;
+    object-fit: cover; border-radius: 18px; background: var(--v-creme-2);
+  }
+  /* Le logo est un aplat sur fond blanc : le cadre doit être blanc lui aussi,
+     sinon on voit un rectangle blanc posé dans un cadre crème. */
+  .at-bloc__media--logo img {
+    aspect-ratio: 1; object-fit: contain; background: #fff;
+    padding: clamp(1.2rem, 3vw, 2.2rem);
+  }
+
+  .at-valeurs { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+  .at-valeurs h3 { font-family: 'Archivo', sans-serif; font-size: 0.95rem; font-weight: 800; color: var(--v-encre); margin: 0 0 0.15rem; }
+  .at-valeurs p { margin: 0; }
+
   .at-info { padding: clamp(3rem, 6vw, 5rem) clamp(1.1rem, 4vw, 3rem); }
   .at-info__wrap { max-width: 1050px; margin-inline: auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(1.6rem, 4vw, 3.5rem); align-items: center; }
   .at-info__title { font-size: clamp(1.7rem, 3.4vw, 2.4rem); margin-bottom: 1rem; }
@@ -97,6 +207,10 @@ const infos = [
 
   @media (max-width: 820px) {
     .at-info__wrap { grid-template-columns: 1fr; }
+    /* En colonne unique, on veut toujours le texte avant l'image — y compris
+       dans la section « Valeurs » où l'image est à gauche sur grand écran. */
+    .at-bloc__wrap { grid-template-columns: 1fr; }
+    .at-bloc__wrap--inverse .at-bloc__media { order: 2; }
     /* Le texte d'abord : la vidéo est une ambiance, pas une information. */
     .at-hero__wrap { grid-template-columns: 1fr; }
     .at-hero__video { max-height: 52vh; }
