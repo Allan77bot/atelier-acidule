@@ -8,6 +8,16 @@
 
 ## 📌 État actuel (réécrit à chaque session)
 
+> ⚠️ **Mise à jour du 2026-07-31** — voir l'entrée du 31/07 dans le log. En bref :
+> le dépôt distant a été réaligné sur la version locale d'Allan, les **223 photos
+> du Drive « Photo sac »** sont intégrées (WebP, rangées par famille), une
+> **page `/catalogue`** les expose (179 photos produit, visionneuse), les
+> **éditions spéciales** affichent enfin les 49 vraies photos au lieu de pièces
+> inventées, et `/atelier` a une **boucle vidéo d'ambiance**. Branche de tête :
+> **`claude/verifier-repo-a-jour-di8c7z`**, poussée sur `Allan77bot/atelier-acidule`.
+> Le site est passé à **6 pages**. ⚠️ **Le site Netlify ne répond plus (404)** :
+> il faut le remettre en ligne. Le reste de cette section date du 15/07.
+
 **Phase : refonte accueil en cours** — état au **2026-07-15** (grosse session,
 voir log) :
 
@@ -74,7 +84,21 @@ sapin, cabas (teal/marron/perles/crème-bois/beige/crème-doré/multicolore), sa
 rose, jaune, bleu ciel), pochette tél. **À trier/détourer/intégrer à la reprise** —
 pourrait enrichir le catalogue (`modeles.ts`) et alimenter un défilé de coloris.
 
-### ▶️ Next
+### ▶️ Next (mis à jour le 2026-07-31)
+0. **Remettre le site en ligne** — la priorité. `atelier-acidule-498.netlify.app`
+   renvoie 404 partout. Deux voies : soit connecter le dépôt GitHub dans Netlify
+   (« Add new site → Import an existing project »), `netlify.toml` fournit déjà
+   `command = npm run build` et `publish = dist` — et chaque push déploiera tout
+   seul ; soit fournir un `NETLIFY_AUTH_TOKEN` pour un déploiement en ligne de
+   commande. ⚠️ Ne pas passer par GitHub Pages sans y réfléchir : le dépôt est
+   privé et les photos brutes de la cliente sont dans l'historique git.
+0b. **Les 10 vidéos du Drive** : une seule est utilisée (`/atelier`). `ffmpeg`
+   est désormais disponible, les 6 `.MOV` sont donc exploitables si besoin.
+0c. **Photos en réserve** : 36 photos « peut-être utile » + 4 visuels de home
+   convertis mais non affichés. `homepage-02` (plan showroom avec toute la gamme)
+   ferait un bien meilleur hero d'accueil que `hero-crochet.webp` — décision de DA
+   laissée à Allan.
+
 1. **Retour d'Allan** : qu'il accepte l'invitation GitHub, teste le mobile en prod
    et modifie lui-même ce qui ne lui convient pas (mail du 15/07). S'il refait un
    configurateur « propre », repartir des branches `feat/configurateur-2.5d`/`-3d`.
@@ -102,6 +126,53 @@ pourrait enrichir le catalogue (`modeles.ts`) et alimenter un défilé de colori
 ---
 
 ## 🗓️ Log des sessions (append-only)
+
+### 2026-07-31 — sync du dépôt + intégration des 223 photos du Drive + page /catalogue + vidéo atelier
+
+Branche : `claude/verifier-repo-a-jour-di8c7z` (poussée sur `Allan77bot/atelier-acidule`).
+
+1. **Dépôt remis à jour** (`f5e82ee`) : l'état du 27/06 sur le remote a été
+   remplacé par la version locale d'Allan, plus avancée de trois lots (refonte DA
+   vitrine 03/07, lot mobile 04/07, vitrine mobile 15/07).
+2. **223 photos récupérées du Drive** « Photo sac » (`1a11512`). Le dossier n'est
+   listable qu'en JavaScript : crawler des pages publiques → 233 fichiers, puis
+   téléchargement parallèle (223 images, 0 échec). **74 étaient en HEIC** : le
+   libvips embarqué par `sharp` lit le conteneur HEIF mais n'a pas le décodeur
+   HEVC compilé — passé par `pillow-heif`. Converties en WebP (1600 px, q78),
+   orientation EXIF respectée : **229 Mo → 23 Mo**.
+   Catégories = dossiers de la cliente (basics anse bois/crochetée/dorée, sacs de
+   plage, porte-verres, pochettes livre/portable, éditions spéciales, visuels
+   home, réserve, logos). Index généré dans `src/data/catalogue.ts`.
+3. **Recadrage** (`71015eb`) : vérification sur les 223 photos via une planche
+   contact des bandeaux supérieurs → **une seule** capture d'écran (barre d'état
+   iPhone), recadrée par mesure de luminance. Le recadrage vit dans le script.
+4. **Vidéo d'ambiance sur `/atelier`** (`d975ece`). Constat : **aucune des 10
+   vidéos ne montre de mains en train de crocheter** (30 images extraites +
+   mesure du mouvement par scene score). Retenu : le travelling sur la coupe de
+   citrons avec les cartes `#SHOPTONSAC`, qui illustre littéralement le texte de
+   la page. Clip de 1,75 s monté en **boucle aller-retour de 3,5 s** (sinon
+   coupure sèche), 720×1280 : MP4 179 Ko + WebM 76 Ko + poster 23 Ko. Dérive
+   colorimétrique HLG/BT.2020 → BT.709 mesurée à 1 %. Muette, `playsinline`,
+   et **arrêtée sous `prefers-reduced-motion`** (poster seul).
+5. **Page `/catalogue`** (`fa3d84b`) : les photos étaient commitées mais
+   orphelines. 179 photos produit, 8 familles, barre de familles sticky,
+   **vignettes 480 px** générées exprès pour la grille (+4 Mo) et pleine
+   résolution réservée à la visionneuse `<dialog>` (Échap + piège à focus natifs,
+   flèches, retour du focus sur la vignette d'origine).
+   **`/editions-speciales`** : les 3 pièces inventées (« Limonade d'été »,
+   « Pochette Provence »…) et leurs dispos fictives remplacées par les 49 vraies
+   photos, sans leur inventer de nom ni de statut — réservation en DM.
+   « Catalogue » ajouté aux deux navs et au footer.
+
+**Outillage débloqué dans le conteneur** : `pillow-heif` (décodage HEIC) et
+`imageio-ffmpeg` (ffmpeg 7.0.2, donc les `.MOV` ne sont plus un obstacle).
+QA visuelle Playwright avec le Chromium préinstallé
+(`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`) — la version npm ne
+correspond pas au binaire présent, il faut passer `executablePath`.
+
+⚠️ **Le site Netlify `atelier-acidule-498.netlify.app` ne répond plus** (404 sur
+toutes les routes, vérifié le 31/07) : il a été supprimé ou dépublié. Aucun jeton
+Netlify dans ce conteneur → remise en ligne à faire (voir « Next »).
 
 ### 2026-07-15 — /init (sync CLAUDE.md) + retrait de la personnalisation + push + message Allan
 
