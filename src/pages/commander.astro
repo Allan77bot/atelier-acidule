@@ -76,7 +76,7 @@ const IG = 'https://www.instagram.com/atelier_acidule';
   const statut = document.querySelector<HTMLElement>('[data-statut]');
 
   // Présélectionne le modèle si on arrive via /commander?modele=<slug>
-  // (les CTA de l'accueil et de /mes-creations passent ce paramètre).
+  // (les CTA de l'accueil et des pages /creations passent ce paramètre).
   const slug = new URLSearchParams(location.search).get('modele');
   const select = form?.querySelector<HTMLSelectElement>('select[name="modele"]');
   if (slug && select?.querySelector(`option[value="${slug}"]`)) select.value = slug;

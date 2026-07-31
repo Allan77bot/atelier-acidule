@@ -5,7 +5,7 @@
 // (burger + carrousel d'avis + reveal au scroll).
 import Vitrine from '../layouts/Vitrine.astro';
 import { catalogue } from '../data/catalogue';
-import { groupes, famillesDuGroupe } from '../data/familles';
+import { groupes, famillesDuGroupe, libellePrix } from '../data/familles';
 
 const nav = [
   { href: '/', label: 'Accueil' },
@@ -43,11 +43,19 @@ const APERCU: Record<string, { dot: string; detail: string }> = {
   'pochettes':     { dot: '#2f4334', detail: 'Livre, téléphone, ordinateur' },
 };
 const produits = groupes.map((g) => {
-  const premiere = famillesDuGroupe(g.slug)[0];
+  const dansGroupe = famillesDuGroupe(g.slug);
+  const premiere = dansGroupe[0];
+  // Prix d'appel de l'univers : le plus bas de ses familles. Si aucune n'a de
+  // tarif établi, on annonce le sur-mesure plutôt qu'un chiffre inventé.
+  const connus = dansGroupe.filter((f) => f.prix);
+  const prix = connus.length
+    ? libellePrix(connus.reduce((a, b) => (a.prix! <= b.prix! ? a : b)))
+    : 'Prix sur mesure';
   const ph = catalogue.find((c) => c.slug === premiere.categorie)?.photos ?? [];
   const photo = ph[premiere.vignette ?? 0] ?? ph[0];
   return {
     nom: g.nom,
+    prix,
     detail: APERCU[g.slug].detail,
     dot: APERCU[g.slug].dot,
     img: photo?.thumb ?? '',
@@ -165,7 +173,7 @@ const icon = (k: string): string => icons[k] ?? '';
                 <span class="card__nom">{p.nom}</span>
                 <span class="card__dot" style={`--d:${p.dot}`}></span>
               </span>
-              <span class="card__prix">{p.detail}</span>
+              <span class="card__prix"><strong>{p.prix}</strong> · {p.detail}</span>
             </a>
           ))}
         </div>

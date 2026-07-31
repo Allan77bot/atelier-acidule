@@ -10,5 +10,6 @@ export default defineConfig({
   // de laisser un 404 : le lien a pu être partagé, et il est dans l'aperçu.
   redirects: {
     '/catalogue': '/creations',
+    '/mes-creations': '/creations',
   },
 });

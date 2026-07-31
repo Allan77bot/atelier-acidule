@@ -7,7 +7,7 @@
 // taille alors qu'elle les range par anse. Cette page suit son classement.
 import PageVoeu from '../../layouts/PageVoeu.astro';
 import { catalogue } from '../../data/catalogue';
-import { groupes, famillesDuGroupe } from '../../data/familles';
+import { groupes, famillesDuGroupe, libellePrix } from '../../data/familles';
 
 const photosDe = (categorie: string) =>
   catalogue.find((c) => c.slug === categorie)?.photos ?? [];
@@ -63,6 +63,7 @@ const univers = groupes.map((g) => {
                 <span class="cr-carte__corps">
                   <span class="cr-carte__nom">{f.nom}</span>
                   <span class="cr-carte__detail">{f.detail}</span>
+                  <span class="cr-carte__prix">{libellePrix(f)}</span>
                 </span>
               </a>
               <a class="cr-carte__cta btn-pill btn-pill--jaune" href={`/commander?modele=${f.slug}`}>
@@ -119,6 +120,10 @@ const univers = groupes.map((g) => {
   .cr-carte__corps { display: block; padding-top: 0.8rem; }
   .cr-carte__nom { display: block; font-family: 'Archivo', sans-serif; font-weight: 700; color: var(--v-encre); }
   .cr-carte__detail { display: block; color: var(--v-doux); font-size: 0.88rem; margin-top: 0.2rem; }
+  .cr-carte__prix {
+    display: block; margin-top: 0.4rem; color: var(--v-encre);
+    font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 0.82rem;
+  }
   .cr-carte__cta { justify-self: start; }
 
   .cr-uniques { padding: clamp(3rem, 6vw, 4.5rem) clamp(1.1rem, 4vw, 3rem); }

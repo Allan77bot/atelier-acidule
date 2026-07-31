@@ -7,9 +7,10 @@
 // modèle que le formulaire ne connaît pas, et la présélection échouerait en
 // silence.
 //
-// Pas de prix ici : on n'en connaît que pour les 3 modèles historiques
-// (`modeles.ts`), et il n'est pas question d'en inventer pour les
-// porte-verres ou les pochettes.
+// Prix : seuls les tarifs historiques du site sont repris (petit sac 35 €,
+// pochette à livres 40 €, grand sac de plage 45 €). Les familles sans tarif
+// établi — porte-verres, pochette téléphone — affichent « Prix sur mesure »
+// plutôt qu'un chiffre inventé. À faire confirmer par Marine.
 
 export interface Famille {
   /** slug de la catégorie photo (voir catalogue.ts) */
@@ -30,7 +31,17 @@ export interface Famille {
    * (affiches, pas produits) : on prend la première photo portée à la place.
    */
   vignette?: number;
+  /**
+   * Prix de départ en euros, uniquement quand il est ÉTABLI (repris des tarifs
+   * historiques du site). Absent = « Prix sur mesure » : on préfère l'annoncer
+   * plutôt que d'afficher un chiffre inventé.
+   */
+  prix?: number;
 }
+
+/** Ce qu'on affiche comme prix : le tarif de départ, ou le sur-mesure. */
+export const libellePrix = (f: Famille) =>
+  f.prix ? `dès ${f.prix} €` : 'Prix sur mesure';
 
 /** Les 4 univers du hub, dans l'ordre d'affichage. */
 export const groupes = [
@@ -64,6 +75,7 @@ export const familles: Famille[] = [
     cta: 'Personnaliser mon sac',
     groupe: 'sacs',
     detail: 'Anses en bambou, rondes et chaudes.',
+    prix: 35,
   },
   {
     categorie: 'basics/anse-crochet',
@@ -72,6 +84,7 @@ export const familles: Famille[] = [
     cta: 'Personnaliser mon sac',
     groupe: 'sacs',
     detail: 'Anse crochetée dans le même fil que le sac.',
+    prix: 35,
   },
   {
     categorie: 'basics/anse-doree',
@@ -80,6 +93,7 @@ export const familles: Famille[] = [
     cta: 'Personnaliser mon sac',
     groupe: 'sacs',
     detail: 'Anneaux dorés, pour les tenues du soir.',
+    prix: 35,
   },
   {
     categorie: 'sacs-de-plage',
@@ -88,6 +102,7 @@ export const familles: Famille[] = [
     cta: 'Personnaliser mon sac de plage',
     groupe: 'sacs-de-plage',
     detail: 'Grand format, à porter à l’épaule.',
+    prix: 45,
   },
   {
     categorie: 'porte-verres',
@@ -105,6 +120,7 @@ export const familles: Famille[] = [
     cta: 'Personnaliser ma pochette à livre',
     groupe: 'pochettes',
     detail: 'Un étui souple pour emporter sa lecture.',
+    prix: 40,
   },
   {
     categorie: 'pochettes/portable',

@@ -4,7 +4,7 @@
 // le hub /creations ne fait que donner à voir et orienter.
 import PageVoeu from '../../layouts/PageVoeu.astro';
 import { catalogue } from '../../data/catalogue';
-import { familles, groupes } from '../../data/familles';
+import { familles, groupes, libellePrix } from '../../data/familles';
 
 export function getStaticPaths() {
   return familles.map((f) => ({ params: { famille: f.slug }, props: { f } }));
@@ -29,6 +29,7 @@ const voisines = familles.filter((v) => v.groupe === f.groupe && v.slug !== f.sl
         <a href="/creations" class="fa-fil">Les créations</a> · {groupe?.nom}
       </p>
       <h1 class="display fa-head__title">{f.nom}</h1>
+      <p class="fa-prix">{libellePrix(f)}</p>
       <p>{f.detail} Chaque pièce est crochetée après ta commande, dans les couleurs que tu choisis.</p>
       <div class="fa-head__actions">
         <a class="btn-pill btn-pill--jaune" href={`/commander?modele=${f.slug}`}>{f.cta} →</a>
@@ -91,6 +92,10 @@ const voisines = familles.filter((v) => v.groupe === f.groupe && v.slug !== f.sl
   .fa-head__wrap { max-width: 1050px; margin-inline: auto; }
   .fa-head__title { color: var(--v-creme); font-size: clamp(2rem, 4.6vw, 3.2rem); margin-bottom: 0.9rem; }
   .fa-head p { color: rgba(245, 239, 224, 0.82); max-width: 56ch; }
+  .fa-prix {
+    font-family: 'Archivo', sans-serif; font-weight: 800; color: var(--v-jaune);
+    font-size: 1.05rem; margin-bottom: 0.7rem;
+  }
   .fa-fil { color: inherit; }
   .fa-head__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.7rem; margin-top: 1.5rem; }
   .fa-voisines { display: flex; flex-wrap: wrap; gap: 0.5rem; }
