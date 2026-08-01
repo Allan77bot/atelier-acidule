@@ -9,7 +9,10 @@ const IG = 'https://www.instagram.com/atelier_acidule';
 // Les vraies photos d'éditions spéciales du Drive. On ne leur invente ni nom
 // ni statut de disponibilité : ces pièces changent au fil des saisons et seule
 // la cliente sait ce qui reste — la réservation passe par le DM.
-const pieces = catalogue.find((c) => c.slug === 'editions-speciales')?.photos ?? [];
+// 12 pièces suffisent à montrer la variété sans transformer la page en
+// inventaire : ce sont des pièces uniques, la réservation se fait en DM.
+const toutes = catalogue.find((c) => c.slug === 'editions-speciales')?.photos ?? [];
+const pieces = toutes.slice(0, 12);
 ---
 
 <PageVoeu titre="Éditions spéciales" description="Des pièces uniques au crochet, en quantité limitée. Quand elles sont parties, elles sont parties.">

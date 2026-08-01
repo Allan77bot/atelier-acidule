@@ -26,11 +26,13 @@ export interface Famille {
   /** ce qui distingue cette famille — sert de sous-titre sur sa page */
   detail: string;
   /**
-   * Index de la photo à mettre en vignette, quand la première du dossier n'est
+   * Nom de la photo à mettre en vignette, quand la première du dossier n'est
    * pas représentative. Les porte-verres commencent par trois visuels promo
    * (affiches, pas produits) : on prend la première photo portée à la place.
+   * Désigné par NOM et non par index : un index se décale dès qu'une photo
+   * est retirée du dossier (c'est arrivé au nettoyage des doublons).
    */
-  vignette?: number;
+  vignette?: string;
   /**
    * Prix de départ en euros, uniquement quand il est ÉTABLI (repris des tarifs
    * historiques du site). Absent = « Prix sur mesure » : on préfère l'annoncer
@@ -111,7 +113,7 @@ export const familles: Famille[] = [
     cta: 'Personnaliser mon porte-verres',
     groupe: 'porte-verres',
     detail: 'Se porte en sautoir et tient le verre à pied.',
-    vignette: 7,
+    vignette: 'porte-verres-08',
   },
   {
     categorie: 'pochettes/livre',

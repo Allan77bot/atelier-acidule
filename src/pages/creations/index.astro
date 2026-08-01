@@ -15,7 +15,8 @@ const photosDe = (categorie: string) =>
 const univers = groupes.map((g) => {
   const familles = famillesDuGroupe(g.slug).map((f) => {
     const photos = photosDe(f.categorie);
-    return { ...f, photos, apercu: photos[f.vignette ?? 0] ?? photos[0] };
+    const choisie = f.vignette && photos.find((p) => p.src.includes(f.vignette!));
+    return { ...f, photos, apercu: choisie ?? photos[0] };
   });
   return { ...g, familles, total: familles.reduce((n, f) => n + f.photos.length, 0) };
 });

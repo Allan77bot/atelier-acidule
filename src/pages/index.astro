@@ -52,7 +52,7 @@ const produits = groupes.map((g) => {
     ? libellePrix(connus.reduce((a, b) => (a.prix! <= b.prix! ? a : b)))
     : 'Prix sur mesure';
   const ph = catalogue.find((c) => c.slug === premiere.categorie)?.photos ?? [];
-  const photo = ph[premiere.vignette ?? 0] ?? ph[0];
+  const photo = (premiere.vignette && ph.find((p) => p.src.includes(premiere.vignette!))) ?? ph[0];
   return {
     nom: g.nom,
     prix,
